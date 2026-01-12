@@ -12,9 +12,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\System\CSVManager.cpp" />
+    <ClCompile Include="Source\System\Map.cpp" />
     <ClCompile Include="Source\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\System\CSVManager.h" />
+    <ClInclude Include="Source\System\Map.h" />
+    <ClInclude Include="Source\System\SingletonTemplate.h" />
     <ClInclude Include="Source\utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

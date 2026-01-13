@@ -11,16 +11,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Scene\BaseScene.cpp" />
+    <ClCompile Include="Source\System\Scenemanager.cpp" />
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\System\CSVManager.cpp" />
     <ClCompile Include="Source\System\Map.cpp" />
     <ClCompile Include="Source\utils.cpp" />
+    <ClCompile Include="Source\Scene\TestScene.cpp" />
+    <ClCompile Include="Source\Scene\TestScene2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Scene\BaseScene.h" />
+    <ClInclude Include="Source\System\Scenemanager.h" />
     <ClInclude Include="Source\System\CSVManager.h" />
     <ClInclude Include="Source\System\Map.h" />
     <ClInclude Include="Source\System\SingletonTemplate.h" />
     <ClInclude Include="Source\utils.h" />
+    <ClInclude Include="Source\Scene\TestScene.h" />
+    <ClInclude Include="Source\Scene\TestScene2.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

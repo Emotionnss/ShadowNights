@@ -1,7 +1,7 @@
 #include "AEEngine.h"
 #include "System/SceneManager.h"
 #include "Scene/TestScene.h"
-
+#include <iostream>
 int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR lpCmd, int nShow) {
     // 1. Initialize
     if (AESysInit(hInst, nShow, 800, 600, 1, 60, false, NULL) == 0) {
@@ -15,9 +15,12 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR lpCmd, int nShow) 
     while (AESysDoesWindowExist()) {
 
         AESysFrameStart();
-        AEInputUpdate();
         SceneManager::Update();
 
+
+        bool balls = AEInputCheckTriggered(VK_SPACE);
+        if (balls)
+            std::cout << std::boolalpha << balls << std::endl;
         // Rendering
         AEGfxStart();
         AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);

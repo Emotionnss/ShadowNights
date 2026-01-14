@@ -37,9 +37,10 @@ void TestScene::Update() {
     if (AEInputCheckCurr(VK_UP))    playerY += speed * dt;
     if (AEInputCheckCurr(VK_DOWN))  playerY -= speed * dt;
     if (AEInputCheckCurr(VK_LEFT))  playerX -= speed * dt;
-    if (AEInputCheckCurr(VK_RIGHT)) playerX += speed * dt;
+    if (AEInputCheckCurr(VK_RIGHT)) playerX += speed * dt; 
 
-    if (AEInputCheckCurr(VK_SPACE)) {
+
+    if (AEInputCheckTriggered(VK_SPACE)) {
         std::cout << "DEBUG: Space IS Held Down!" << std::endl;
         SceneManager::ChangeScene(new TestScene2());
         return;

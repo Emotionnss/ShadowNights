@@ -7,29 +7,9 @@
 //* Player Testing
 
 void TestScene::Load() {
-    
     AEGfxReset();
-    AEGfxMeshStart();
 
-    // Now it's a square lol
-    AEGfxTriAdd(
-        -0.5f, -0.5f, 0xFFFF0000, 0.0f, 0.0f,
-        0.5f, -0.5f, 0xFF00FF00, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0xFF0000FF, 0.0f, 0.0f);
-
-    AEGfxTriAdd(
-        0.5f, -0.5f, 0xFF00FF00, 0.0f, 0.0f,
-        0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0xFF0000FF, 0.0f, 0.0f);
-
-    pMesh = AEGfxMeshEnd();
-
-    if (pMesh == nullptr) {
-        std::cout << "ERROR: Mesh Creation Failed!" << std::endl;
-    }
-    else {
-        std::cout << "SUCCESS: Mesh Created." << std::endl;
-    }
+    meshManager = MeshManager::GetInstance();
 }
 
 void TestScene::Init() {
@@ -68,7 +48,7 @@ void TestScene::Draw() {
     AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-    player->Draw(pMesh);
+    player->Draw(meshManager->GetMesh(SQUARE));
 
     // Floor placeholder lol
     AEMtx33 scaleMtx, transMtx, finalMtx;
@@ -80,18 +60,11 @@ void TestScene::Draw() {
     AEGfxSetTransform(finalMtx.m);
     AEGfxSetTransparency(1.0f);
 
-    if (pMesh != nullptr) {
-        AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-    }
+    AEGfxMeshDraw(meshManager->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);
 }
 
 void TestScene::Free() {
     
 }
 
-void TestScene::Unload() {
-    if (pMesh != nullptr) {
-        AEGfxMeshFree(pMesh);
-        pMesh = nullptr;
-    }
-}
+void TestScene::Unload() {}

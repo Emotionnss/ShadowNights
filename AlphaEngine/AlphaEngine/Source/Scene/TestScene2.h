@@ -2,6 +2,7 @@
 
 #include "AEEngine.h"
 #include "../../Source/Scene/BaseScene.h"
+#include "../System/MeshManager.h"
 
 class TestScene2 : public BaseScene {
 public:
@@ -15,6 +16,7 @@ public:
 private:
     float playerX, playerY;
     float speed = 200.0f;
-    AEGfxVertexList* pMesh = nullptr;
+
+    MeshManager* meshManager = nullptr;
 };
 

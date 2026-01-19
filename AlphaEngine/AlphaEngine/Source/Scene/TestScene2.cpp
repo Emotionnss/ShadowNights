@@ -5,15 +5,8 @@
 
 void TestScene2::Load() {
     AEGfxReset();
-    AEGfxMeshStart();
 
-    AEGfxTriAdd(
-        -0.5f, -0.5f, 0xFFFFFF00, 0.0f, 0.0f,
-        0.5f, -0.5f, 0xFFFFFF00, 0.0f, 0.0f,
-        0.0f, 0.5f, 0xFFFFFF00, 0.0f, 0.0f
-    );
-
-    pMesh = AEGfxMeshEnd();
+    meshManager = MeshManager::GetInstance();
 }
 
 void TestScene2::Init() {
@@ -47,10 +40,8 @@ void TestScene2::Draw() {
     AEMtx33Concat(&finalMtx, &transMtx, &scaleMtx);
     AEGfxSetTransform(finalMtx.m);
 
-    if (pMesh) AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+    AEGfxMeshDraw(meshManager->GetMesh(TRIANGLE), AE_GFX_MDM_TRIANGLES);
 }
 
 void TestScene2::Free() {}
-void TestScene2::Unload() {
-    if (pMesh) AEGfxMeshFree(pMesh);
-}
+void TestScene2::Unload() {}

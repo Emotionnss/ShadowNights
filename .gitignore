@@ -16,4 +16,4 @@
 bin
 Debug
 Release
-AlphaEngine/AlphaEngine.vcxproj.filters
+AlphaEngine/AlphaEngine/AlphaEngine.vcxproj.filters

@@ -1,10 +1,11 @@
 #include "AEEngine.h"
 #include "System/SceneManager.h"
+#include "System/MeshManager.h"
 #include "Scene/TestScene.h"
 #include <iostream>
 int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR lpCmd, int nShow) {
     // 1. Initialize
-    if (AESysInit(hInst, nShow, 800, 600, 1, 60, false, NULL) == 0) {
+    if (AESysInit(hInst, nShow, 1600, 900, 1, 60, false, NULL) == 0) {
         return 0;
     }
 
@@ -31,6 +32,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR lpCmd, int nShow) 
 
     // 4. Cleanup
     SceneManager::Exit();
+    MeshManager::DestroyInstance();
     AESysExit();
 
     return 1;

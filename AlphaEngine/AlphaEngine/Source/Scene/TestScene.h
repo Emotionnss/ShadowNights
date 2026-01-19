@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AEEngine.h"
+#include "../Player/Player.h"
 #include "../../Source/Scene/BaseScene.h"
 
 class TestScene : public BaseScene {
@@ -13,7 +14,10 @@ public:
     void Unload() override;
 
 private:
-    float playerX, playerY;
-    float speed = 200.0f;
+    // Constructor
+    Player *player;
+
+    //float playerX, playerY;
+    //float speed = 200.0f;
     AEGfxVertexList* pMesh = nullptr;
 };

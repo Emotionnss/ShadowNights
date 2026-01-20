@@ -30,6 +30,12 @@ void Transform2D::SetPosition(float x, float y)
 	needUpdate = true;
 }
 
+void Transform2D::SetPosition(AEVec2 pos)
+{
+	position = pos;
+	needUpdate = true;
+}
+
 void Transform2D::SetScale(float x, float y)
 {
 	scale = { x, y };

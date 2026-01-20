@@ -18,5 +18,6 @@ private:
     float speed = 200.0f;
 
     MeshManager* meshManager = nullptr;
+
 };
 

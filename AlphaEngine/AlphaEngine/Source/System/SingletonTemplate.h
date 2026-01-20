@@ -48,10 +48,10 @@ public:
 	 @param void
 	 @return void
 	 */
-	static void DestroyInstance(bool destroy = false)
+	static void DestroyInstance()
 	{
 		//Checks if there is a current instance of the singleton
-		if (destroy && instance)
+		if (instance)
 		{
 			//Delete the instance and reset it to nullptr
 			delete instance;

@@ -17,8 +17,17 @@ const char* Map::TILE_ASSETS_FILE_PATH = "Assets/Tiles/";
 *//*______________________________________________________________*/
 Map::Map()
 {
-	resetMap(false);
-	loadMapTileImages();
+	LoadMapTileImages();
+
+	LoadMap("TestMap");
+
+	meshManager = MeshManager::GetInstance();
+}
+
+Map::~Map()
+{
+	FreeImages();
+	ClearMap(true);
 }
 
 /*!
@@ -26,14 +35,53 @@ Map::Map()
 @param	TILE_TYPE tileType - type of the tile based off the enum TILE_TYPE
 @return string - filePath of the file to get
 *//*______________________________________________________________*/
-std::string Map::getImageFilePath(TILE_TYPE tileType)
+std::string Map::GetImageFilePath(TILE_TYPE tileType)
 {
 	std::string filePath = TILE_ASSETS_FILE_PATH;
 
 	switch (tileType)
 	{
-	case NONE:
-		filePath += "None.png";
+	case BACKGROUND:
+		filePath += "Background.png";
+		break;
+	case FLOOR:
+		filePath += "Floor.png";
+		break;
+	case CEILING:
+		filePath += "Ceiling.png";
+		break;
+	case LEFT_WALL:
+		filePath += "Left_Wall.png";
+		break;
+	case RIGHT_WALL:
+		filePath += "Right_Wall.png";
+		break;
+	case NW_CORNER:
+		filePath += "NW_Corner.png";
+		break;
+	case NE_CORNER:
+		filePath += "NE_Corner.png";
+		break;
+	case SW_CORNER:
+		filePath += "SW_Corner.png";
+		break;
+	case SE_CORNER:
+		filePath += "SE_Corner.png";
+		break;
+	case LEFT_PLATFORM:
+		filePath += "Left_Platform.png";
+		break;
+	case PLATFORM:
+		filePath += "Platform.png";
+		break;
+	case RIGHT_PLATFORM:
+		filePath += "Right_Platform.png";
+		break;
+	case LEFT_STAIR:
+		filePath += "Left_Stair.png";
+		break;
+	case RIGHT_STAIR:
+		filePath += "Right_Stair.png";
 		break;
 	default:
 		break;
@@ -47,14 +95,29 @@ std::string Map::getImageFilePath(TILE_TYPE tileType)
 @param	void
 @return void
 *//*______________________________________________________________*/
-void Map::loadMapTileImages(void)
+void Map::LoadMapTileImages(void)
 {
-	tileTypesVector = {};
+	tileTypesVector = { 
+		BACKGROUND,
+		FLOOR,
+		CEILING,
+		LEFT_WALL,
+		RIGHT_WALL,
+		NW_CORNER,
+		NE_CORNER,
+		SW_CORNER,
+		SE_CORNER,
+		LEFT_PLATFORM,
+		PLATFORM,
+		RIGHT_PLATFORM,
+		LEFT_STAIR,
+		RIGHT_STAIR 
+	};
 
 	for (int i = 0; i < tileTypesVector.size(); i++)
 	{
-		//CP_Image tempImage = CP_Image_Load(getImageFilePath(tileTypesVector[i]).c_str());
-		//imageMap.insert({ tileTypesVector[i], tempImage });
+		AEGfxTexture* pTex = AEGfxTextureLoad(GetImageFilePath(tileTypesVector[i]).c_str());
+		imageMap.insert({ tileTypesVector[i], pTex });
 	}
 }
 
@@ -64,9 +127,9 @@ void Map::loadMapTileImages(void)
 @param	yPos - y position
 @return Tile
 *//*______________________________________________________________*/
-Tile Map::getTile(float xPos, float yPos)
+Tile Map::GetTile(float xPos, float yPos) const
 {
-	AEVec2 tilePos = getTilePos(xPos, yPos);
+	AEVec2 tilePos = GetTilePos(xPos, yPos);
 
 	Tile tile = map[(int)tilePos.x][(int)tilePos.y];
 
@@ -79,7 +142,7 @@ Tile Map::getTile(float xPos, float yPos)
 @param	yPos - y tile position
 @return Tile
 *//*______________________________________________________________*/
-Tile Map::getTileFromTilePos(float xPos, float yPos)
+Tile Map::GetTileFromTilePos(float xPos, float yPos) const
 {
 	Tile tile = map[(int)xPos][(int)yPos];
 
@@ -92,14 +155,14 @@ Tile Map::getTileFromTilePos(float xPos, float yPos)
 @param	yPos - y position
 @return CP_Vector - tile grid pos
 *//*______________________________________________________________*/
-AEVec2 Map::getTilePos(float xPos, float yPos)
+AEVec2 Map::GetTilePos(float xPos, float yPos) const
 {
 	int rowPos = 0, columnPos = 0;
 
 	rowPos = (int)floor(xPos / TILE_WIDTH);
 	columnPos = (int)floor(yPos / TILE_HEIGHT);
 
-	if (rowPos >= NUM_ROW)
+	/*if (rowPos >= NUM_ROW)
 	{
 		rowPos = NUM_ROW - 1;
 	}
@@ -115,9 +178,9 @@ AEVec2 Map::getTilePos(float xPos, float yPos)
 	else if (columnPos < 0)
 	{
 		columnPos = 0;
-	}
+	}*/
 
-	AEVec2 vec = { rowPos, columnPos };
+	AEVec2 vec = { static_cast<f32>(rowPos), static_cast<f32>(columnPos) };
 
 	return vec;
 }
@@ -127,11 +190,11 @@ AEVec2 Map::getTilePos(float xPos, float yPos)
 @param	CP_Vector tilePos - tile grid pos
 @return CP_Vector - tile world pos
 *//*______________________________________________________________*/
-AEVec2 Map::getTileWorldPos(AEVec2 tilePos)
+AEVec2 Map::GetTileWorldPos(AEVec2 tilePos) const
 {
 	Tile tile = map[(int)tilePos.x][(int)tilePos.y];
 
-	return tile.pos;
+	return tile.transform.GetPosition();
 }
 
 /*!
@@ -140,7 +203,7 @@ AEVec2 Map::getTileWorldPos(AEVec2 tilePos)
 @param	columnPos - tile grid column pos
 @return void
 *//*______________________________________________________________*/
-void Map::setTile(TILE_TYPE tile, float rowPos, float columnPos)
+void Map::SetTile(TILE_TYPE tile, float rowPos, float columnPos)
 {
 	map[(int)rowPos][(int)columnPos].tileType = tile;
 }
@@ -150,7 +213,7 @@ void Map::setTile(TILE_TYPE tile, float rowPos, float columnPos)
 @param	void
 @return Tile** - map
 *//*______________________________________________________________*/
-Tile** Map::getMap(void)
+Tile** Map::GetMap(void) const
 {
 	return this->map;
 }
@@ -160,7 +223,7 @@ Tile** Map::getMap(void)
 @param	void
 @return int - number of columns
 *//*______________________________________________________________*/
-int Map::getNumCol(void) const
+int Map::GetNumCol(void) const
 {
 	return NUM_COLUMN;
 }
@@ -170,7 +233,7 @@ int Map::getNumCol(void) const
 @param	void
 @return int - number of rows
 *//*______________________________________________________________*/
-int Map::getNumRow(void) const
+int Map::GetNumRow(void) const
 {
 	return NUM_ROW;
 }
@@ -181,14 +244,14 @@ int Map::getNumRow(void) const
 @param	string fileName - name of the file
 @return bool
 *//*______________________________________________________________*/
-bool Map::loadMap(std::string fileName)
+bool Map::LoadMap(std::string fileName)
 {
 	std::string file;
 
 	file = fileName;
 
 	//Get the map data from reading the file
-	std::vector<std::vector<int>> mapData = CSVManager::read(file, NUM_COLUMN, NUM_ROW);
+	std::vector<std::vector<int>> mapData = CSVManager::read(file);
 
 	//Stop if empty
 	if (mapData.empty())
@@ -197,7 +260,10 @@ bool Map::loadMap(std::string fileName)
 	}
 
 	//Reset the map
-	resetMap(true);
+	NUM_ROW = static_cast<int>(mapData.size());
+	NUM_COLUMN = static_cast<int>(mapData[0].size());
+
+	ResetMap(false);
 
 	//Nested for loop to store the tile data read from file
 	for (int i = 0; i < NUM_ROW; i++)
@@ -206,9 +272,13 @@ bool Map::loadMap(std::string fileName)
 		{
 			//Save the data into the map array from the mapData recieved from reading the csv file.
 			//mapData row and column must be reversed for it to show properly
-			map[i][j].tileType = static_cast<TILE_TYPE>(mapData[j][i]);
-			AEVec2 vec = { (TILE_WIDTH * 0.5f) + TILE_WIDTH * i, (TILE_HEIGHT * 0.5f) + TILE_HEIGHT * j };
-			map[i][j].pos = vec;
+
+			map[i][j].tileType = static_cast<TILE_TYPE>(mapData[i][j]);
+			AEVec2 vec = { (TILE_WIDTH * 0.5f) + TILE_WIDTH * j, (TILE_HEIGHT * 0.5f) + TILE_HEIGHT * (NUM_ROW - i) };
+			map[i][j].transform.SetPosition(vec);
+			map[i][j].transform.SetScale(TILE_WIDTH, TILE_HEIGHT);
+
+			//std::cout << "Pos: " << vec.x << ", " << vec.y << std::endl;
 
 			/*if (map[i][j].tileType == STARTPOINT)
 			{
@@ -225,7 +295,7 @@ bool Map::loadMap(std::string fileName)
 @param	string fileName - name of the file
 @return bool
 *//*______________________________________________________________*/
-bool Map::saveMap(std::string fileName)
+bool Map::SaveMap(std::string fileName)
 {
 	std::vector<std::vector<int>> mapData;
 
@@ -255,14 +325,31 @@ bool Map::saveMap(std::string fileName)
 @param	void
 @return void
 *//*______________________________________________________________*/
-void Map::renderMap(void)
+void Map::RenderMap(void)
 {
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+	AEGfxVertexList* texSquareMesh = meshManager->GetMesh(TEXTURE_SQUARE);
+
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1.0f);
+
 	//Render the map
 	for (int i = 0; i < NUM_ROW; i++)
 	{
 		for (int j = 0; j < NUM_COLUMN; j++)
 		{
-			//CP_Image_Draw(imageMap[map[i][j].tileType], map[i][j].pos.x, map[i][j].pos.y, TILE_WIDTH, TILE_HEIGHT, 255);
+			TILE_TYPE type = map[i][j].tileType;
+
+			if (type != NONE)
+			{
+				AEGfxTextureSet(imageMap[map[i][j].tileType], 0, 0);
+				AEGfxSetTransform(map[i][j].transform.GetMatrix().m);
+				AEGfxMeshDraw(texSquareMesh, AE_GFX_MDM_TRIANGLES);
+			}
 		}
 	}
 }
@@ -273,12 +360,12 @@ void Map::renderMap(void)
 @param	bool clear - whether to clear the map or not (used when first initialising the map)
 @return void
 *//*______________________________________________________________*/
-void Map::resetMap(bool clear)
+void Map::ResetMap(bool clear)
 {
-	clearMap(clear);
+	ClearMap(clear);
 
 	//Resets the map with new blank data
-	map = new Tile * [NUM_ROW];
+	map = new Tile* [NUM_ROW];
 
 	for (int i = 0; i < NUM_ROW; i++)
 	{
@@ -287,7 +374,6 @@ void Map::resetMap(bool clear)
 		for (int j = 0; j < NUM_COLUMN; j++)
 		{
 			map[i][j].tileType = NONE;
-			map[i][j].pos = { 0 };
 		}
 	}
 }
@@ -297,16 +383,16 @@ void Map::resetMap(bool clear)
 @param	bool clear - whether to clear the map or not (used when first initialising the map)
 @return void
 *//*______________________________________________________________*/
-void Map::clearMap(bool clear)
+void Map::ClearMap(bool clear)
 {
 	if (clear)
 	{
 		for (int i = 0; i < NUM_ROW; i++)
 		{
-			delete map[i];
+			delete[] map[i];
 		}
 
-		delete map;
+		delete[] map;
 	}
 }
 
@@ -315,18 +401,15 @@ void Map::clearMap(bool clear)
 @param	void
 @return void
 *//*______________________________________________________________*/
-void Map::freeImages(bool free)
+void Map::FreeImages()
 {
-	if (free)
+	for (int i = 0; i < imageMap.size(); i++)
 	{
-		/*for (int i = 0; i < tileTypesVector.size(); i++)
-		{
-			CP_Image_Free(imageMap[tileTypesVector[i]]);
-		}
-
-		imageMap.clear();*/
-		tileTypesVector.clear();
+		AEGfxTextureUnload(imageMap[tileTypesVector[i]]);
 	}
+
+	imageMap.clear();
+	tileTypesVector.clear();
 }
 
 /*!
@@ -334,9 +417,9 @@ void Map::freeImages(bool free)
 @param	void
 @return CP_Vector - map dimensions
 *//*______________________________________________________________*/
-AEVec2 Map::getDimensions(void)
+AEVec2 Map::GetDimensions(void) const
 {
-	AEVec2 vec = { static_cast<float>(NUM_ROW), static_cast<float>(NUM_COLUMN) };
+	AEVec2 vec = { static_cast<f32>(NUM_ROW), static_cast<f32>(NUM_COLUMN) };
 	return vec;
 }
 
@@ -345,7 +428,7 @@ AEVec2 Map::getDimensions(void)
 @param	void
 @return float - size of tile
 *//*______________________________________________________________*/
-float Map::getTileSize(void) const
+float Map::GetTileSize(void) const
 {
 	return TILE_WIDTH;
 }
@@ -355,7 +438,7 @@ float Map::getTileSize(void) const
 @param	void
 @return CP_Vector - vector of spawnpoint
 *//*______________________________________________________________*/
-AEVec2 Map::getSpawnpoint(void) const
+AEVec2 Map::GetSpawnpoint(void) const
 {
 	return spawnpoint;
 }
@@ -366,7 +449,7 @@ AEVec2 Map::getSpawnpoint(void) const
 @param	CP_Vector - vector of spawnpoint
 @return void
 *//*______________________________________________________________*/
-void Map::setSpawnpoint(AEVec2 spawnpoint)
+void Map::SetSpawnpoint(AEVec2 spawnpoint)
 {
 	this->spawnpoint = spawnpoint;
 }

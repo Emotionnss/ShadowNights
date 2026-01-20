@@ -44,4 +44,7 @@ void TestScene2::Draw() {
 }
 
 void TestScene2::Free() {}
-void TestScene2::Unload() {}
+void TestScene2::Unload() 
+{
+    meshManager = nullptr;
+}

@@ -20,7 +20,7 @@ public:
 
 	static bool write(std::string fileName, const int TILE_ROW_NUM, const int TILE_COLUMN_NUM, std::vector<std::vector<int>> data);
 
-	static std::vector<std::vector<int>> read(std::string fileName, const int TILE_ROW_NUM, const int TILE_COLUMN_NUM);
+	static std::vector<std::vector<int>> read(std::string fileName);
 
 	static std::vector<std::string> tokenise(std::string line, char separator);
 };

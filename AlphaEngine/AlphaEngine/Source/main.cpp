@@ -1,21 +1,35 @@
 #include "AEEngine.h"
 #include "System/SceneManager.h"
 #include "System/MeshManager.h"
+#include "System/Map.h"
 #include "Scene/TestScene.h"
 #include <iostream>
-int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR lpCmd, int nShow) {
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow) 
+{
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+    UNREFERENCED_PARAMETER(hPrevInstance);
+    UNREFERENCED_PARAMETER(lpCmdLine);
+
     // 1. Initialize
-    if (AESysInit(hInst, nShow, 1600, 900, 1, 60, false, NULL) == 0) {
+    if (AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL) == 0) {
         return 0;
     }
+
+    bool gGameRunning = true;
 
     // 2. Set Scene
     SceneManager::ChangeScene(new TestScene());
 
     // 3. Game Loop
-    while (AESysDoesWindowExist()) {
+    while (gGameRunning) {
 
         AESysFrameStart();
+
+        // check if forcing the application to quit
+        if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
+            gGameRunning = false;
+
         SceneManager::Update();
 
 
@@ -33,6 +47,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR lpCmd, int nShow) 
     // 4. Cleanup
     SceneManager::Exit();
     MeshManager::DestroyInstance();
+    Map::DestroyInstance();
     AESysExit();
 
     return 1;

@@ -16,6 +16,7 @@ public:
 
 	// Set Functions
 	void SetPosition(float x, float y);
+	void SetPosition(AEVec2 pos);
 	void SetScale(float x, float y);
 	void SetRotation(float r);
 

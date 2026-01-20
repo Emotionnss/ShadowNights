@@ -11,10 +11,26 @@
 #include <string>
 #include <map>
 #include <vector>
+#include "../System/MeshManager.h"
+#include "../Player/Transform2D.h"
 
 enum TILE_TYPE
 {
 	NONE = 0,
+	BACKGROUND,
+	FLOOR = 101,
+	CEILING = 102,
+	LEFT_WALL = 103,
+	RIGHT_WALL = 104,
+	NW_CORNER = 111,
+	NE_CORNER = 112,
+	SW_CORNER = 113,
+	SE_CORNER = 114,
+	LEFT_PLATFORM = 120,
+	PLATFORM = 121,
+	RIGHT_PLATFORM = 122,
+	LEFT_STAIR = 150,
+	RIGHT_STAIR = 151,
 	TOTAL
 };
 
@@ -29,7 +45,7 @@ enum TILE_RELATIVE_POSITION
 
 struct Tile
 {
-	AEVec2 pos;
+	Transform2D transform;
 	TILE_TYPE tileType;
 };
 
@@ -39,49 +55,51 @@ class Map : public SingletonTemplate<Map>
 
 private:
 	static const char* TILE_ASSETS_FILE_PATH;
-	const float TILE_WIDTH = 50.f;
-	const float TILE_HEIGHT = 50.f;
-	const int NUM_COLUMN = 18;
-	const int NUM_ROW = 26;
+	const float TILE_WIDTH = 75.f;
+	const float TILE_HEIGHT = 75.f;
+	int NUM_COLUMN;
+	int NUM_ROW;
+
+	MeshManager* meshManager;
 
 	Tile** map;
 
 	std::vector<TILE_TYPE> tileTypesVector;
 	AEVec2 spawnpoint;
 
-	std::string getImageFilePath(TILE_TYPE tileType);
-	void loadMapTileImages(void);
+	std::map<TILE_TYPE, AEGfxTexture*> imageMap;
+
+	std::string GetImageFilePath(TILE_TYPE tileType);
+	void LoadMapTileImages(void);
 
 protected:
 	Map();
+	~Map();
 
 public:
+	Tile GetTile(float xPos, float yPos) const;
+	Tile GetTileFromTilePos(float xPos, float yPos) const;
+	AEVec2 GetTilePos(float xPos, float yPos) const;
+	AEVec2 GetTileWorldPos(AEVec2 tilePos) const;
+	void SetTile(TILE_TYPE tile, float rowPos, float columnPos);
 
-	Tile getTile(float xPos, float yPos);
-	Tile getTileFromTilePos(float xPos, float yPos);
-	AEVec2 getTilePos(float xPos, float yPos);
-	AEVec2 getTileWorldPos(AEVec2 tilePos);
-	void setTile(TILE_TYPE tile, float rowPos, float columnPos);
+	Tile** GetMap(void) const;
+	int GetNumCol(void) const;
+	int GetNumRow(void) const;
 
-	Tile** getMap(void);
-	int getNumCol(void) const;
-	int getNumRow(void) const;
+	bool LoadMap(std::string fileName);
+	bool SaveMap(std::string fileName);
 
-	bool loadMap(std::string fileName);
-	bool saveMap(std::string fileName);
+	void RenderMap(void);
 
-	void renderMap(void);
+	void ResetMap(bool clear);
+	void ClearMap(bool clear);
 
-	void resetMap(bool clear);
-	void clearMap(bool clear);
+	void FreeImages();
 
-	void freeImages(bool free);
+	AEVec2 GetDimensions(void) const;
+	float GetTileSize(void) const;
 
-	AEVec2 getDimensions(void);
-	float getTileSize(void) const;
-
-	AEVec2 getSpawnpoint(void) const;
-	void setSpawnpoint(AEVec2 spawnpoint);
-
-	std::map<TILE_TYPE, AEGfxTexture*> imageMap;
+	AEVec2 GetSpawnpoint(void) const;
+	void SetSpawnpoint(AEVec2 spawnpoint);
 };

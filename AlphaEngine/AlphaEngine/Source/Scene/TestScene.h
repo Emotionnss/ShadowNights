@@ -4,6 +4,7 @@
 #include "../Player/Player.h"
 #include "../../Source/Scene/BaseScene.h"
 #include "../System/MeshManager.h"
+#include "../System/Map.h"
 
 class TestScene : public BaseScene {
 public:
@@ -21,4 +22,5 @@ private:
     //float playerX, playerY;
     //float speed = 200.0f;
     MeshManager* meshManager = nullptr;
+    Map* map = nullptr;
 };

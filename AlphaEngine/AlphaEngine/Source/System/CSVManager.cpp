@@ -98,7 +98,7 @@ bool CSVManager::write(std::string fileName, const int TILE_ROW_NUM, const int T
  @param TILE_COLUMN_NUM A const int containing the number of tiles in the y-axis
  @return vector<vector<int>> data
  */
-std::vector<std::vector<int>> CSVManager::read(std::string fileName, const int TILE_ROW_NUM, const int TILE_COLUMN_NUM)
+std::vector<std::vector<int>> CSVManager::read(std::string fileName)
 {
 	//Double vector to store the tile data
 	std::vector<std::vector<int>> rowValues;
@@ -123,7 +123,6 @@ std::vector<std::vector<int>> CSVManager::read(std::string fileName, const int T
 
 	std::string line;
 	int value = 0;
-	bool readResult = true;
 
 	//Gets the values of an entire row, repeats until end of csv file
 	while (getline(file, line))
@@ -145,38 +144,40 @@ std::vector<std::vector<int>> CSVManager::read(std::string fileName, const int T
 		}
 
 		//Push the whole column into the data vector if column size matches
-		if (columnValues.size() == TILE_COLUMN_NUM)
-		{
+		//if (columnValues.size() == TILE_COLUMN_NUM)
+		//{
 			rowValues.push_back(columnValues);
-		}
-		else
-		{
-			//End loop immediately since this is a gone case alr
-			columnValues.clear();
-			readResult = false;
-			break;
-		}
+		//}
+		//else
+		//{
+		//	//End loop immediately since this is a gone case alr
+		//	columnValues.clear();
+		//	readResult = false;
+		//	break;
+		//}
 	}
 
 	//Close the file
 	file.close();
 
 	//Check if the rows are correct
-	if (rowValues.size() != TILE_ROW_NUM)
+	/*if (rowValues.size() != TILE_ROW_NUM)
 	{
 		readResult = false;
-	}
+	}*/
 
 	//Clear the vector if there are any issues
-	if (!readResult)
-	{
-		for (int i = 0; i < (int)rowValues.size(); i++)
+	//if (!readResult)
+	//{
+		/*for (int i = 0; i < (int)rowValues.size(); i++)
 		{
 			rowValues[i].clear();
-		}
+		}*/
 
-		rowValues.clear();
-	}
+		//rowValues.clear();
+	//}
+
+		std::cout << "Read map" << std::endl;
 
 	return rowValues;
 }
@@ -187,14 +188,16 @@ std::vector<std::string> CSVManager::tokenise(std::string line, char separator)
 	std::vector<std::string> tokens;
 
 	//Start and end of line
-	signed int start, end;
+	size_t start, end;
 
 	//Temp placeholder for individual token to be pushed into vector
 	std::string token;
 
+	//Find beginning of line
 	start = line.find_first_not_of(separator, 0);
 
 	do {
+		//Find first separator from start onwards
 		end = line.find_first_of(separator, start);
 
 		//Quit loop if the start and the end is the same
@@ -202,12 +205,12 @@ std::vector<std::string> CSVManager::tokenise(std::string line, char separator)
 		{
 			break;
 		}
-		//Get substr based off end - start
+		//Get substr based of the starting pos and length of word
 		else if (end >= 0)
 		{
 			token = line.substr(start, end - start);
 		}
-		//Get substr based off the entire line
+		//Get substr based off the starting pos and length of last word
 		else
 		{
 			token = line.substr(start, line.length() - start);

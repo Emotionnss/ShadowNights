@@ -10,6 +10,7 @@ void TestScene::Load() {
     AEGfxReset();
 
     meshManager = MeshManager::GetInstance();
+    map = Map::GetInstance();
 }
 
 void TestScene::Init() {
@@ -46,7 +47,10 @@ void TestScene::Draw() {
     //AEGfxSetCamPosition(0.0f, 0.0f);
 
     AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+    map->RenderMap();
+
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+
 
     player->Draw(meshManager->GetMesh(SQUARE));
 
@@ -64,7 +68,11 @@ void TestScene::Draw() {
 }
 
 void TestScene::Free() {
-    
+    delete player;
+    player = nullptr;
 }
 
-void TestScene::Unload() {}
+void TestScene::Unload() 
+{
+    meshManager = nullptr;
+}

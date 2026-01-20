@@ -43,14 +43,14 @@ void MeshManager::CreateSquareMesh(bool texture)
 
     // Now it's a square lol
     AEGfxTriAdd(
-        -0.5f, -0.5f, 0xFFFF0000, uvCoords[0], uvCoords[1],
-        0.5f, -0.5f, 0xFF00FF00, uvCoords[1], uvCoords[1],
-        -0.5f, 0.5f, 0xFF0000FF, uvCoords[0], uvCoords[0]);
+        -0.5f, -0.5f, 0xFFFFFFFF, uvCoords[0], uvCoords[1],
+        0.5f, -0.5f, 0xFFFFFFFF, uvCoords[1], uvCoords[1],
+        -0.5f, 0.5f, 0xFFFFFFFF, uvCoords[0], uvCoords[0]);
 
     AEGfxTriAdd(
-        0.5f, -0.5f, 0xFF00FF00, uvCoords[1], uvCoords[1],
+        0.5f, -0.5f, 0xFFFFFFFF, uvCoords[1], uvCoords[1],
         0.5f, 0.5f, 0xFFFFFFFF, uvCoords[1], uvCoords[0],
-        -0.5f, 0.5f, 0xFF0000FF, uvCoords[0], uvCoords[0]);
+        -0.5f, 0.5f, 0xFFFFFFFF, uvCoords[0], uvCoords[0]);
 
     mesh = AEGfxMeshEnd();
 

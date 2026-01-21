@@ -470,8 +470,8 @@ void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos)
 
 	AEVec2 currentPos{};
 
-	Tile* tile = &GetTileFromTilePos(startPos.x, startPos.y);
-	tile->ResetPathfindingInfo();
+	//Tile* tile = &GetTileFromTilePos(startPos.x, startPos.y);
+	//tile->ResetPathfindingInfo();
 
 	openList.push(GetTileFromTilePos(startPos.x, startPos.y));
 

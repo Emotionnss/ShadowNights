@@ -11,6 +11,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <queue>
 #include "../System/MeshManager.h"
 #include "../Player/Transform2D.h"
 
@@ -34,6 +35,23 @@ enum TILE_TYPE
 	TOTAL
 };
 
+enum TILE_RELATIVE_POSITION
+{
+	//7 0 1
+	//6   2
+	//5 4 3
+
+	NORTH = 0,
+	NORTH_EAST,
+	EAST,
+	SOUTH_EAST,
+	SOUTH,
+	SOUTH_WEST,
+	WEST,
+	NORTH_WEST,
+	TILE_RELATIVE_TOTAL
+};
+
 struct Tile
 {
 	Transform2D transform;
@@ -44,6 +62,14 @@ struct Tile
 	unsigned int f;
 	unsigned int h;
 	unsigned int g;
+
+	void ResetPathfindingInfo()
+	{
+		parent = { -1.f, -1.f };
+		f = 0;
+		h = 0;
+		g = 0;
+	}
 };
 
 class Map : public SingletonTemplate<Map>
@@ -62,6 +88,8 @@ private:
 	//2D array to store map info
 	Tile** map;
 
+	std::priority_queue<Tile> openList;
+	std::vector<AEVec2> closedList;
 
 	AEVec2 spawnpoint;
 
@@ -78,18 +106,19 @@ protected:
 	~Map();
 
 public:
+	//Functions to get tile info
 	Tile GetTile(float xPos, float yPos) const;
 	Tile GetTileFromTilePos(float xPos, float yPos) const;
 	AEVec2 GetTilePos(float xPos, float yPos) const;
 	AEVec2 GetTileWorldPos(AEVec2 tilePos) const;
 	void SetTile(TILE_TYPE tile, float rowPos, float columnPos);
 
+	//Functions to get map info
 	Tile** GetMap(void) const;
 	int GetNumCol(void) const;
 	int GetNumRow(void) const;
-	//Functions to get map info
-	//Functions to load and save map
 
+	//Functions to load and save map
 	bool LoadMap(std::string fileName);
 	bool SaveMap(std::string fileName);
 
@@ -105,5 +134,8 @@ public:
 
 	AEVec2 GetSpawnpoint(void) const;
 	void SetSpawnpoint(AEVec2 spawnpoint);
-	void generatePath(AEVec2 startPos, AEVec2 targetPos);
+
+	//Pathfinding functions
+	void CleanAStarLists();
+	void GeneratePath(AEVec2 startPos, AEVec2 targetPos);
 };

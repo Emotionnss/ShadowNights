@@ -454,7 +454,7 @@ void Map::SetSpawnpoint(AEVec2 spawnpoint)
 }
 
 
-void Map::cleanAStarLists()
+void Map::CleanAStarLists()
 {
 	while (!openList.empty())
 	{
@@ -464,18 +464,25 @@ void Map::cleanAStarLists()
 	closedList.clear();
 }
 
-void Map::generatePath(AEVec2 startPos, AEVec2 targetPos)
+void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos)
 {
-	cleanAStarLists();
+	CleanAStarLists();
 
 	AEVec2 currentPos{};
 
+	Tile* tile = &GetTileFromTilePos(startPos.x, startPos.y);
+	tile->ResetPathfindingInfo();
+
+	openList.push(GetTileFromTilePos(startPos.x, startPos.y));
+
 	while (!openList.empty())
 	{
-		currentPos = openList.top().pos;
+		currentPos = openList.top().transform.GetPosition();
 
+		//Quit if reached target
 		if (currentPos.x == targetPos.x && currentPos.y == targetPos.y)
 		{
+			//Clean open list
 			while (!openList.empty())
 			{
 				openList.pop();
@@ -484,7 +491,11 @@ void Map::generatePath(AEVec2 startPos, AEVec2 targetPos)
 			break;
 		}
 
+		//Remove the current node from open list
 		openList.pop();
+
+		//Get 8 surrounding nodes
+
 	}
 
 	// A* Search Algorithm

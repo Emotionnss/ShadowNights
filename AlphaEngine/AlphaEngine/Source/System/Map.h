@@ -34,19 +34,16 @@ enum TILE_TYPE
 	TOTAL
 };
 
-enum TILE_RELATIVE_POSITION
-{
-	TOP_MIDDLE,
-	MIDDLE_LEFT,
-	MIDDLE_RIGHT,
-	BOTTOM_MIDDLE,
-	TILE_RELATIVE_TOTAL
-};
-
 struct Tile
 {
 	Transform2D transform;
 	TILE_TYPE tileType;
+
+	//Stuff for A* pathfinding
+	AEVec2 parent;
+	unsigned int f;
+	unsigned int h;
+	unsigned int g;
 };
 
 class Map : public SingletonTemplate<Map>
@@ -62,15 +59,19 @@ private:
 
 	MeshManager* meshManager;
 
+	//2D array to store map info
 	Tile** map;
 
-	std::vector<TILE_TYPE> tileTypesVector;
+
 	AEVec2 spawnpoint;
 
 	std::map<TILE_TYPE, AEGfxTexture*> imageMap;
 
 	std::string GetImageFilePath(TILE_TYPE tileType);
 	void LoadMapTileImages(void);
+	//Functions to store tile and texture info
+	std::vector<TILE_TYPE> tileTypesVector;
+	std::map<TILE_TYPE, AEGfxTexture*> imageMap;
 
 protected:
 	Map();
@@ -86,6 +87,8 @@ public:
 	Tile** GetMap(void) const;
 	int GetNumCol(void) const;
 	int GetNumRow(void) const;
+	//Functions to get map info
+	//Functions to load and save map
 
 	bool LoadMap(std::string fileName);
 	bool SaveMap(std::string fileName);
@@ -102,4 +105,5 @@ public:
 
 	AEVec2 GetSpawnpoint(void) const;
 	void SetSpawnpoint(AEVec2 spawnpoint);
+	void generatePath(AEVec2 startPos, AEVec2 targetPos);
 };

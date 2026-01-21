@@ -7,9 +7,9 @@ public:
 	Transform2D();
 
 	// Get Functions
-	AEVec2 GetPosition();
-	AEVec2 GetScale();
-	float GetRotation();
+	AEVec2 GetPosition() const;
+	AEVec2 GetScale() const;
+	float GetRotation() const;
 
 	// Get Matrix
 	AEMtx33& GetMatrix();

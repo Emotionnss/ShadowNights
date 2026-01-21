@@ -443,7 +443,6 @@ AEVec2 Map::GetSpawnpoint(void) const
 	return spawnpoint;
 }
 
-
 /*!
 @brief	Set spawnpoint of the enemies
 @param	CP_Vector - vector of spawnpoint
@@ -452,5 +451,81 @@ AEVec2 Map::GetSpawnpoint(void) const
 void Map::SetSpawnpoint(AEVec2 spawnpoint)
 {
 	this->spawnpoint = spawnpoint;
+}
+
+
+void Map::cleanAStarLists()
+{
+	while (!openList.empty())
+	{
+		openList.pop();
+	}
+
+	closedList.clear();
+}
+
+void Map::generatePath(AEVec2 startPos, AEVec2 targetPos)
+{
+	cleanAStarLists();
+
+	AEVec2 currentPos{};
+
+	while (!openList.empty())
+	{
+		currentPos = openList.top().pos;
+
+		if (currentPos.x == targetPos.x && currentPos.y == targetPos.y)
+		{
+			while (!openList.empty())
+			{
+				openList.pop();
+			}
+
+			break;
+		}
+
+		openList.pop();
+	}
+
+	// A* Search Algorithm
+	/*1.  Initialize the open list
+	* 
+	2.  Initialize the closed list
+	put the starting node on the open
+	list(you can leave its f at zero)
+
+	3.  while the open list is not empty
+		a) find the node with the least f on
+		the open list, call it "q"
+		b) pop q off the open list
+
+		c) generate q's 8 successors and set their 
+		parents to q
+
+		d) for each successor
+		i) if successor is the goal, stop search
+
+		ii) else, compute both g and h for successor
+		successor.g = q.g + distance between
+		successor and q
+		successor.h = distance from goal to
+		successor (Euclidean)
+		h = sqrt ( (current_cell.x – goal.x)2 +
+			(current_cell.y – goal.y)2 )
+
+		successor.f = successor.g + successor.h
+
+		iii) if a node with the same position as
+		successor is in the OPEN list which has a
+		lower f than successor, skip this successor
+
+		iV) if a node with the same position as
+		successor  is in the CLOSED list which has
+		a lower f than successor, skip this successor
+		otherwise, add  the node to the open list
+		end(for loop)
+
+		e) push q on the closed list
+		end(while loop)*/
 }
 

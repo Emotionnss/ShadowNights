@@ -9,17 +9,17 @@ Transform2D::Transform2D()
 	AEMtx33Identity(&transform);
 }
 
-AEVec2 Transform2D::GetPosition()
+AEVec2 Transform2D::GetPosition() const
 {
 	return position;
 }
 
-AEVec2 Transform2D::GetScale()
+AEVec2 Transform2D::GetScale() const
 {
 	return AEVec2();
 }
 
-float Transform2D::GetRotation()
+float Transform2D::GetRotation() const
 {
 	return rotation;
 }

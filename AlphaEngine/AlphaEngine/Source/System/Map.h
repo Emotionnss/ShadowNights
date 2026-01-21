@@ -93,10 +93,9 @@ private:
 
 	AEVec2 spawnpoint;
 
-	std::map<TILE_TYPE, AEGfxTexture*> imageMap;
-
 	std::string GetImageFilePath(TILE_TYPE tileType);
 	void LoadMapTileImages(void);
+
 	//Functions to store tile and texture info
 	std::vector<TILE_TYPE> tileTypesVector;
 	std::map<TILE_TYPE, AEGfxTexture*> imageMap;

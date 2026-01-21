@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Player\GameObject.cpp" />
     <ClCompile Include="Source\Player\Player.cpp" />
     <ClCompile Include="Source\Player\Transform2D.cpp" />
     <ClCompile Include="Source\Scene\BaseScene.cpp" />

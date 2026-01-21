@@ -88,7 +88,7 @@ private:
 	//2D array to store map info
 	Tile** map;
 
-	std::priority_queue<Tile> openList;
+	//std::priority_queue<Tile> openList;
 	std::vector<AEVec2> closedList;
 
 	AEVec2 spawnpoint;

@@ -142,6 +142,6 @@ public:
 	void GeneratePath(AEVec2 startPos, AEVec2 targetPos);
 	unsigned int CalculateHeuristic(AEVec2 newTilePos, AEVec2 currentPos);
 
-	std::vector<Tile> GetSurroundingTiles(AEVec2 tilePos);
-	bool CheckSurroundingTile(AEVec2 tilePos);
+	std::vector<Node*> GetSurroundingNodes(AEVec2 tilePos);
+	bool CheckSurroundingNode(AEVec2 tilePos);
 };

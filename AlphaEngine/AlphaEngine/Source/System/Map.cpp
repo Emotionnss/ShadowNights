@@ -477,59 +477,63 @@ void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos)
 {
 	CleanAStarLists();
 
+	Node* currentNode{};
 	AEVec2 currentPos{};
 
 	openList.push(new Node(startPos));
 
-	//while (!openList.empty())
-	//{
-	//	currentPos = openList.front()->position;
+	while (!openList.empty())
+	{
+		currentNode = openList.front();
+		currentPos = currentNode->position;
 
-	//	//Quit if reached target
-	//	if (currentPos.x == targetPos.x && currentPos.y == targetPos.y)
-	//	{
-	//		//Clean open list
-	//		while (!openList.empty())
-	//		{
-	//			openList.pop();
-	//		}
+		//Quit if reached target
+		if (currentPos.x == targetPos.x && currentPos.y == targetPos.y)
+		{
+			//Clean open list
+			while (!openList.empty())
+			{
+				openList.pop();
+			}
 
-	//		break;
-	//	}
+			break;
+		}
 
-	//	//Remove the current node from open list
-	//	openList.pop();
+		//Remove the current node from open list
+		openList.pop();
 
-	//	//Get 8 surrounding nodes
-	//	std::vector<Tile> tiles = GetSurroundingTiles(currentPos);
+		//Get 8 surrounding nodes
+		std::vector<Node*> nodes = GetSurroundingNodes(currentPos);
 
-	//	for (Tile& tile : tiles)
-	//	{
-	//		tile.parent = currentPos;
+		for (Node* node : nodes)
+		{
+			node->parent = currentPos;
 
-	//		AEVec2 currentTileWorldPos = tile.transform.GetPosition();
+			AEVec2 currentTileWorldPos = node->position;
 
-	//		if (currentTileWorldPos.x == targetPos.x && currentTileWorldPos.y == targetPos.y)
-	//		{
-	//			//Clean open list
-	//			while (!openList.empty())
-	//			{
-	//				openList.pop();
-	//			}
+			if (currentTileWorldPos.x == targetPos.x && currentTileWorldPos.y == targetPos.y)
+			{
+				//Clean open list
+				while (!openList.empty())
+				{
+					openList.pop();
+				}
 
-	//			break;
-	//		}
-	//		
-	//		tile.g = currentTile.g + 1.0;
-	//		tile.h = CalculateHeuristic(tile.transform.GetPosition(), currentPos);
-	//		tile.f = tile.g + tile.h;
+				break;
+			}
+			
+			node->g = currentNode->g + 1.0;
+			node->h = CalculateHeuristic(node->position, currentPos);
+			node->f = node->g + node->h;
+
+			
 
 
-	//		closedList.push_back(currentTile);
+			closedList.push_back(currentNode);
 
-	//	}
+		}
 
-	//}
+	}
 
 	// A* Search Algorithm
 	/*1.  Initialize the open list
@@ -585,11 +589,11 @@ unsigned int Map::CalculateHeuristic(AEVec2 newTilePos, AEVec2 targetPos)
 @param	tilePos - tile grid pos
 @return std::map<TILE_RELATIVE_POSITION, Tile> - map that stores 0 - 4 tiles
 *//*______________________________________________________________*/
-std::vector<Tile> Map::GetSurroundingTiles(AEVec2 tilePos)
+std::vector<Node*> Map::GetSurroundingNodes(AEVec2 tilePos)
 {
-	std::vector<Tile> tileVector;
+	std::vector<Node*> nodeVector;
 
-	/*AEVec2 positions[8] = { 
+	AEVec2 positions[8] = { 
 		(tilePos.x, tilePos.y + 1), 
 		(tilePos.x + 1, tilePos.y + 1), 
 		(tilePos.x + 1, tilePos.y), 
@@ -602,13 +606,14 @@ std::vector<Tile> Map::GetSurroundingTiles(AEVec2 tilePos)
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (CheckSurroundingTile(positions[i]))
+		if (CheckSurroundingNode(positions[i]))
 		{
-			tileVector.push_back(map[(int)positions[i].x][(int)positions[i].y]);
+			AEVec2 tileWorldPos = GetTileWorldPos(tilePos);
+			nodeVector.push_back(new Node(tileWorldPos));
 		}
-	}*/
+	}
 
-	return tileVector;
+	return nodeVector;
 }
 
 /*!
@@ -617,12 +622,12 @@ std::vector<Tile> Map::GetSurroundingTiles(AEVec2 tilePos)
 @param	tilePos - tile grid pos
 @return bool - true is valid, false is not
 *//*______________________________________________________________*/
-bool Map::CheckSurroundingTile(AEVec2 tilePos)
+bool Map::CheckSurroundingNode(AEVec2 tilePos)
 {
-	/*if (tilePos.x < 0 || tilePos.x >= NUM_COLUMN || tilePos.y < 0 || tilePos.y >= NUM_ROW || (map[static_cast<int>(tilePos.x)][static_cast<int>(tilePos.y)].tileType >= FLOOR) && (map[static_cast<int>(tilePos.x)][static_cast<int>(tilePos.y)].tileType <= LEFT_PLATFORM))
+	if (tilePos.x < 0 || tilePos.x >= NUM_COLUMN || tilePos.y < 0 || tilePos.y >= NUM_ROW || (map[static_cast<int>(tilePos.x)][static_cast<int>(tilePos.y)].tileType >= FLOOR) && (map[static_cast<int>(tilePos.x)][static_cast<int>(tilePos.y)].tileType <= LEFT_PLATFORM))
 	{
 		return false;
-	}*/
+	}
 
 	return true;
 }

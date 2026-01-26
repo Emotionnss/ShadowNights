@@ -52,24 +52,27 @@ enum TILE_RELATIVE_POSITION
 	TILE_RELATIVE_TOTAL
 };
 
+struct Node
+{
+	Node() 
+		: position{ 0.0f }, parent{ -1.0f }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
+	Node(AEVec2 pos)
+		: position{ pos }, parent{ -1.0f }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
+	Node(AEVec2 pos, AEVec2 p, double f, double g, double h)
+		: position{ pos }, parent{ p }, f{ f }, g{ g }, h{ h } {}
+
+	AEVec2 parent;
+
+	AEVec2 position;
+	double f;
+	double g;
+	double h;
+};
+
 struct Tile
 {
 	Transform2D transform;
 	TILE_TYPE tileType;
-
-	//Stuff for A* pathfinding
-	AEVec2 parent;
-	unsigned int f;
-	unsigned int h;
-	unsigned int g;
-
-	void ResetPathfindingInfo()
-	{
-		parent = { -1.f, -1.f };
-		f = 0;
-		h = 0;
-		g = 0;
-	}
 };
 
 class Map : public SingletonTemplate<Map>
@@ -88,8 +91,8 @@ private:
 	//2D array to store map info
 	Tile** map;
 
-	//std::priority_queue<Tile> openList;
-	std::vector<AEVec2> closedList;
+	std::queue<Node*> openList;
+	std::vector<Node*> closedList;
 
 	AEVec2 spawnpoint;
 
@@ -107,7 +110,7 @@ protected:
 public:
 	//Functions to get tile info
 	Tile GetTile(float xPos, float yPos) const;
-	Tile GetTileFromTilePos(float xPos, float yPos) const;
+	Tile& GetTileFromTilePos(float xPos, float yPos) const;
 	AEVec2 GetTilePos(float xPos, float yPos) const;
 	AEVec2 GetTileWorldPos(AEVec2 tilePos) const;
 	void SetTile(TILE_TYPE tile, float rowPos, float columnPos);
@@ -137,4 +140,8 @@ public:
 	//Pathfinding functions
 	void CleanAStarLists();
 	void GeneratePath(AEVec2 startPos, AEVec2 targetPos);
+	unsigned int CalculateHeuristic(AEVec2 newTilePos, AEVec2 currentPos);
+
+	std::vector<Tile> GetSurroundingTiles(AEVec2 tilePos);
+	bool CheckSurroundingTile(AEVec2 tilePos);
 };

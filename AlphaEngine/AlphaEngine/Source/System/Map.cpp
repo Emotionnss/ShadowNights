@@ -142,9 +142,9 @@ Tile Map::GetTile(float xPos, float yPos) const
 @param	yPos - y tile position
 @return Tile
 *//*______________________________________________________________*/
-Tile Map::GetTileFromTilePos(float xPos, float yPos) const
+Tile& Map::GetTileFromTilePos(float xPos, float yPos) const
 {
-	Tile tile = map[(int)xPos][(int)yPos];
+	Tile& tile = map[(int)xPos][(int)yPos];
 
 	return tile;
 }
@@ -160,7 +160,7 @@ AEVec2 Map::GetTilePos(float xPos, float yPos) const
 	int rowPos = 0, columnPos = 0;
 
 	rowPos = (int)floor(xPos / TILE_WIDTH);
-	columnPos = (int)floor(yPos / TILE_HEIGHT);
+	columnPos = NUM_ROW - (int)floor(yPos / TILE_HEIGHT);
 
 	/*if (rowPos >= NUM_ROW)
 	{
@@ -278,7 +278,11 @@ bool Map::LoadMap(std::string fileName)
 			map[i][j].transform.SetPosition(vec);
 			map[i][j].transform.SetScale(TILE_WIDTH, TILE_HEIGHT);
 
-			//std::cout << "Pos: " << vec.x << ", " << vec.y << std::endl;
+			std::cout << "Pos: " << vec.x << ", " << vec.y << std::endl;
+
+			AEVec2 tilePos = GetTilePos(vec.x, vec.y);
+
+			std::cout << "Tile Pos: " << tilePos.x << ", " << tilePos.y << std::endl;
 
 			/*if (map[i][j].tileType == STARTPOINT)
 			{
@@ -456,28 +460,30 @@ void Map::SetSpawnpoint(AEVec2 spawnpoint)
 
 void Map::CleanAStarLists()
 {
-	/*while (!openList.empty())
+	while (!openList.empty())
 	{
+		delete openList.back();
 		openList.pop();
 	}
 
-	closedList.clear();*/
+	for (Node* node : closedList)
+	{
+		delete node;
+	}
+	closedList.clear();
 }
 
 void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos)
 {
-	//CleanAStarLists();
+	CleanAStarLists();
 
-	//AEVec2 currentPos{};
+	AEVec2 currentPos{};
 
-	////Tile* tile = &GetTileFromTilePos(startPos.x, startPos.y);
-	////tile->ResetPathfindingInfo();
-
-	//openList.push(GetTileFromTilePos(startPos.x, startPos.y));
+	openList.push(new Node(startPos));
 
 	//while (!openList.empty())
 	//{
-	//	currentPos = openList.top().transform.GetPosition();
+	//	currentPos = openList.front()->position;
 
 	//	//Quit if reached target
 	//	if (currentPos.x == targetPos.x && currentPos.y == targetPos.y)
@@ -495,8 +501,35 @@ void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos)
 	//	openList.pop();
 
 	//	//Get 8 surrounding nodes
+	//	std::vector<Tile> tiles = GetSurroundingTiles(currentPos);
 
-//	}
+	//	for (Tile& tile : tiles)
+	//	{
+	//		tile.parent = currentPos;
+
+	//		AEVec2 currentTileWorldPos = tile.transform.GetPosition();
+
+	//		if (currentTileWorldPos.x == targetPos.x && currentTileWorldPos.y == targetPos.y)
+	//		{
+	//			//Clean open list
+	//			while (!openList.empty())
+	//			{
+	//				openList.pop();
+	//			}
+
+	//			break;
+	//		}
+	//		
+	//		tile.g = currentTile.g + 1.0;
+	//		tile.h = CalculateHeuristic(tile.transform.GetPosition(), currentPos);
+	//		tile.f = tile.g + tile.h;
+
+
+	//		closedList.push_back(currentTile);
+
+	//	}
+
+	//}
 
 	// A* Search Algorithm
 	/*1.  Initialize the open list
@@ -538,5 +571,59 @@ void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos)
 
 		e) push q on the closed list
 		end(while loop)*/
+}
+
+unsigned int Map::CalculateHeuristic(AEVec2 newTilePos, AEVec2 targetPos)
+{
+	return static_cast<unsigned int>(sqrt(pow((newTilePos.x - targetPos.x), 2) +
+		pow((newTilePos.y - targetPos.y), 2)));;
+}
+
+/*!
+@brief	Get up to 4 surrounding tiles based on tile grid pos given
+		if they are "active" (not empty)
+@param	tilePos - tile grid pos
+@return std::map<TILE_RELATIVE_POSITION, Tile> - map that stores 0 - 4 tiles
+*//*______________________________________________________________*/
+std::vector<Tile> Map::GetSurroundingTiles(AEVec2 tilePos)
+{
+	std::vector<Tile> tileVector;
+
+	/*AEVec2 positions[8] = { 
+		(tilePos.x, tilePos.y + 1), 
+		(tilePos.x + 1, tilePos.y + 1), 
+		(tilePos.x + 1, tilePos.y), 
+		(tilePos.x + 1, tilePos.y - 1), 
+		(tilePos.x, tilePos.y - 1), 
+		(tilePos.x - 1, tilePos.y - 1), 
+		(tilePos.x - 1, tilePos.y),
+		(tilePos.x - 1, tilePos.y + 1)
+	};
+
+	for (int i = 0; i < 8; i++)
+	{
+		if (CheckSurroundingTile(positions[i]))
+		{
+			tileVector.push_back(map[(int)positions[i].x][(int)positions[i].y]);
+		}
+	}*/
+
+	return tileVector;
+}
+
+/*!
+@brief	Check whether the surrounding tile is valid by checking if it within bounds and the tile is not
+		a ground tile
+@param	tilePos - tile grid pos
+@return bool - true is valid, false is not
+*//*______________________________________________________________*/
+bool Map::CheckSurroundingTile(AEVec2 tilePos)
+{
+	/*if (tilePos.x < 0 || tilePos.x >= NUM_COLUMN || tilePos.y < 0 || tilePos.y >= NUM_ROW || (map[static_cast<int>(tilePos.x)][static_cast<int>(tilePos.y)].tileType >= FLOOR) && (map[static_cast<int>(tilePos.x)][static_cast<int>(tilePos.y)].tileType <= LEFT_PLATFORM))
+	{
+		return false;
+	}*/
+
+	return true;
 }
 

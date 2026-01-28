@@ -1,9 +1,11 @@
 #pragma once
+#include "../System/SingletonTemplate.h"
 #include "AEEngine.h"
 #include "Transform2D.h"
 
-class Player
+class Player : public SingletonTemplate<Player>
 {
+	friend class SingletonTemplate<Player>;
 public:
 	Player();
 

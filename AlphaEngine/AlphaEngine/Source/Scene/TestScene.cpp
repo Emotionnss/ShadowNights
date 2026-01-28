@@ -11,17 +11,15 @@ void TestScene::Load() {
 
     meshManager = MeshManager::GetInstance();
     map = Map::GetInstance();
+    player = Player::GetInstance();
 }
 
 void TestScene::Init() {
-    //playerX = 0.0f;
-    //playerY = 0.0f;
-
-    player = new Player;
+    player->transform.SetPosition(300, 900);
 }
 
 void TestScene::Update() {
-    float dt = (float)AEFrameRateControllerGetFrameTime();
+    f32 dt = (f32)AEFrameRateControllerGetFrameTime();
 
     player->HandleInput();
 
@@ -68,8 +66,7 @@ void TestScene::Draw() {
 }
 
 void TestScene::Free() {
-    delete player;
-    player = nullptr;
+    player->DestroyInstance();
 }
 
 void TestScene::Unload() 

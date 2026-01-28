@@ -47,3 +47,13 @@ bool AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float 
 
 	return false;
 }
+
+AEVec2 ScreenToWorldPos(AEVec2 MouseScreenWorldPos)
+{
+	AEVec2 temp;
+	temp.x = ((f32)MouseScreenWorldPos.x / AEGfxGetWindowWidth() - 0.5f) * 2.0f;
+	temp.y = ((f32)MouseScreenWorldPos.y / AEGfxGetWindowHeight() - 0.5f) * 2.0f;
+	temp.y = -temp.y;
+
+	return temp;
+}

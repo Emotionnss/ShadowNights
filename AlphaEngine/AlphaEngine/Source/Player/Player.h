@@ -2,12 +2,14 @@
 #include "../System/SingletonTemplate.h"
 #include "AEEngine.h"
 #include "Transform2D.h"
+#include "../Projectiles/BaseProjectile.h"
 
 class Player : public SingletonTemplate<Player>
 {
 	friend class SingletonTemplate<Player>;
 public:
 	Player();
+	~Player();
 
 	// Handle Inputs
 	void HandleInput();
@@ -21,7 +23,9 @@ public:
 	// Player's Transform Properties
 	Transform2D transform;
 
+
 private:
+	BaseProjectile* proj;
 	// Future Proofing
 	enum Direction
 	{

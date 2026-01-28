@@ -55,13 +55,13 @@ enum TILE_RELATIVE_POSITION
 struct Node
 {
 	Node() 
-		: position{ 0.0f }, parent{ -1.0f }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
+		: position{ 0.0f }, parent{ nullptr }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
 	Node(AEVec2 pos)
-		: position{ pos }, parent{ -1.0f }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
+		: position{ pos }, parent{ nullptr }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
 	Node(AEVec2 pos, AEVec2 p, double f, double g, double h)
-		: position{ pos }, parent{ p }, f{ f }, g{ g }, h{ h } {}
+		: position{ pos }, parent{ nullptr }, f{ f }, g{ g }, h{ h } {}
 
-	AEVec2 parent;
+	Node* parent;
 
 	AEVec2 position;
 	double f;
@@ -91,7 +91,8 @@ private:
 	//2D array to store map info
 	Tile** map;
 
-	std::queue<Node*> openList;
+	std::priority_queue<Node*> openList;
+	std::vector<Node*> openVector;
 	std::vector<Node*> closedList;
 
 	AEVec2 spawnpoint;
@@ -139,9 +140,10 @@ public:
 
 	//Pathfinding functions
 	void CleanAStarLists();
-	void GeneratePath(AEVec2 startPos, AEVec2 targetPos);
+	void GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits);
+	std::vector<AEVec2> BuildPath(Node* node);
 	unsigned int CalculateHeuristic(AEVec2 newTilePos, AEVec2 currentPos);
 
-	std::vector<Node*> GetSurroundingNodes(AEVec2 tilePos);
-	bool CheckSurroundingNode(AEVec2 tilePos);
+	std::vector<Node*> GetSurroundingNodes(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits);
+	bool CheckNode(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits);
 };

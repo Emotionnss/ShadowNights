@@ -27,6 +27,7 @@ Map::Map()
 Map::~Map()
 {
 	FreeImages();
+	CleanAStarLists();
 	ClearMap(true);
 }
 
@@ -460,9 +461,10 @@ void Map::SetSpawnpoint(AEVec2 spawnpoint)
 
 void Map::CleanAStarLists()
 {
-	while (!openList.empty())
+	while (openList.size() > 0)
 	{
-		delete openList.back();
+		Node* node = openList.top();
+		delete node;
 		openList.pop();
 	}
 
@@ -473,7 +475,7 @@ void Map::CleanAStarLists()
 	closedList.clear();
 }
 
-void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos)
+void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits)
 {
 	CleanAStarLists();
 
@@ -484,97 +486,88 @@ void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos)
 
 	while (!openList.empty())
 	{
-		currentNode = openList.front();
+		//Get node with lowest f value on openList
+		currentNode = openList.top();
 		currentPos = currentNode->position;
 
-		//Quit if reached target
-		if (currentPos.x == targetPos.x && currentPos.y == targetPos.y)
-		{
-			//Clean open list
-			while (!openList.empty())
-			{
-				openList.pop();
-			}
-
-			break;
-		}
-
-		//Remove the current node from open list
+		//Remove the current node from openList
 		openList.pop();
 
-		//Get 8 surrounding nodes
-		std::vector<Node*> nodes = GetSurroundingNodes(currentPos);
+		//Get surrounding nodes that are valid
+		std::vector<Node*> nodes = GetSurroundingNodes(currentPos, minLimits, maxLimits);
 
 		for (Node* node : nodes)
 		{
-			node->parent = currentPos;
+			bool proceed{true};
 
-			AEVec2 currentTileWorldPos = node->position;
-
-			if (currentTileWorldPos.x == targetPos.x && currentTileWorldPos.y == targetPos.y)
+			//Check if current node has already been evaluated
+			for (Node* closedNode : closedList)
 			{
-				//Clean open list
-				while (!openList.empty())
+				if (node->position.x == closedNode->position.x && node->position.y == closedNode->position.y)
 				{
-					openList.pop();
+					proceed = false;
+					continue;
 				}
-
-				break;
 			}
-			
-			node->g = currentNode->g + 1.0;
+
+			//If already evaluated, skip to next node
+			if (!proceed)
+			{
+				delete node;
+				continue;
+			}
+
+			//Set tentative g value
+			int tempGValue = currentNode->g + 1.0;
+
+			//Loop through open list to see if node is already inside
+			std::vector<Node*>::iterator it = std::find(openVector.begin(), openVector.end(), node);
+
+			//If not in open list, add it, else if tentative g value is not better, skip to next node
+			if (it != openVector.end())
+			{
+				openList.push(node);
+				openVector.push_back(node);
+			}
+			else if (tempGValue >= node->g)
+			{
+				delete node;
+				continue;
+			}
+
+			//Set node values
+			node->parent = currentNode;
+			node->g = tempGValue;
 			node->h = CalculateHeuristic(node->position, currentPos);
 			node->f = node->g + node->h;
 
-			
-
-
+			//Push back current node to closed list
 			closedList.push_back(currentNode);
-
 		}
 
+		//Delete current node
+		delete currentNode;
+		currentNode = nullptr;
+	}
+}
+
+std::vector<AEVec2> Map::BuildPath(Node* node)
+{
+	std::vector<AEVec2> path;
+
+	Node* currentNode = node;
+
+	//Generate path by backtracking from target node to start node
+	while (currentNode != nullptr)
+	{
+		path.push_back(currentNode->position);
+		currentNode = currentNode->parent;
 	}
 
-	// A* Search Algorithm
-	/*1.  Initialize the open list
-	* 
-	2.  Initialize the closed list
-	put the starting node on the open
-	list(you can leave its f at zero)
+	//Reverse the path to get from start to target
+	std::reverse(path.begin(), path.end());
 
-	3.  while the open list is not empty
-		a) find the node with the least f on
-		the open list, call it "q"
-		b) pop q off the open list
-
-		c) generate q's 8 successors and set their 
-		parents to q
-
-		d) for each successor
-		i) if successor is the goal, stop search
-
-		ii) else, compute both g and h for successor
-		successor.g = q.g + distance between
-		successor and q
-		successor.h = distance from goal to
-		successor (Euclidean)
-		h = sqrt ( (current_cell.x – goal.x)2 +
-			(current_cell.y – goal.y)2 )
-
-		successor.f = successor.g + successor.h
-
-		iii) if a node with the same position as
-		successor is in the OPEN list which has a
-		lower f than successor, skip this successor
-
-		iV) if a node with the same position as
-		successor  is in the CLOSED list which has
-		a lower f than successor, skip this successor
-		otherwise, add  the node to the open list
-		end(for loop)
-
-		e) push q on the closed list
-		end(while loop)*/
+	return path;
 }
 
 unsigned int Map::CalculateHeuristic(AEVec2 newTilePos, AEVec2 targetPos)
@@ -589,7 +582,7 @@ unsigned int Map::CalculateHeuristic(AEVec2 newTilePos, AEVec2 targetPos)
 @param	tilePos - tile grid pos
 @return std::map<TILE_RELATIVE_POSITION, Tile> - map that stores 0 - 4 tiles
 *//*______________________________________________________________*/
-std::vector<Node*> Map::GetSurroundingNodes(AEVec2 tilePos)
+std::vector<Node*> Map::GetSurroundingNodes(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits)
 {
 	std::vector<Node*> nodeVector;
 
@@ -606,7 +599,7 @@ std::vector<Node*> Map::GetSurroundingNodes(AEVec2 tilePos)
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (CheckSurroundingNode(positions[i]))
+		if (CheckNode(positions[i], minLimits, maxLimits))
 		{
 			AEVec2 tileWorldPos = GetTileWorldPos(tilePos);
 			nodeVector.push_back(new Node(tileWorldPos));
@@ -622,9 +615,9 @@ std::vector<Node*> Map::GetSurroundingNodes(AEVec2 tilePos)
 @param	tilePos - tile grid pos
 @return bool - true is valid, false is not
 *//*______________________________________________________________*/
-bool Map::CheckSurroundingNode(AEVec2 tilePos)
+bool Map::CheckNode(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits)
 {
-	if (tilePos.x < 0 || tilePos.x >= NUM_COLUMN || tilePos.y < 0 || tilePos.y >= NUM_ROW || (map[static_cast<int>(tilePos.x)][static_cast<int>(tilePos.y)].tileType >= FLOOR) && (map[static_cast<int>(tilePos.x)][static_cast<int>(tilePos.y)].tileType <= LEFT_PLATFORM))
+	if (tilePos.x < minLimits.x || tilePos.x >= maxLimits.x || tilePos.y < minLimits.y || tilePos.y >= maxLimits.y || (map[static_cast<int>(tilePos.x)][static_cast<int>(tilePos.y)].tileType >= FLOOR) && (map[static_cast<int>(tilePos.x)][static_cast<int>(tilePos.y)].tileType <= LEFT_PLATFORM))
 	{
 		return false;
 	}

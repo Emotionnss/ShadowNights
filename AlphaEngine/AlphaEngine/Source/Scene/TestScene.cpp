@@ -11,17 +11,19 @@ void TestScene::Load() {
 
     meshManager = MeshManager::GetInstance();
     map = Map::GetInstance();
+    player = Player::GetInstance();
 }
 
 void TestScene::Init() {
-    //playerX = 0.0f;
-    //playerY = 0.0f;
-
-    player = new Player;
+    player->transform.SetPosition(300, 900);
+    abilityHandler = new AbilityHandler();
+    //std::cout << "Ability Handler address" << &abilityHandler << '\n';
+    //std::cout << "map address" << &map << '\n';
+    //std::cout << "testscene meshmanager" << &meshManager << '\n';
 }
 
 void TestScene::Update() {
-    float dt = (float)AEFrameRateControllerGetFrameTime();
+    f32 dt = (f32)AEFrameRateControllerGetFrameTime();
 
     player->HandleInput();
 
@@ -34,7 +36,7 @@ void TestScene::Update() {
 
     //Player Update
     player->Update(dt);
-
+    abilityHandler->AbilityUpdate(dt);
     if (AEInputCheckTriggered(VK_SPACE)) {
         std::cout << "DEBUG: Space IS Held Down!" << std::endl;
         SceneManager::ChangeScene(new TestScene2());
@@ -53,6 +55,7 @@ void TestScene::Draw() {
 
 
     player->Draw(meshManager->GetMesh(SQUARE));
+    abilityHandler->Draw();
 
     // Floor placeholder lol
     AEMtx33 scaleMtx, transMtx, finalMtx;
@@ -68,11 +71,14 @@ void TestScene::Draw() {
 }
 
 void TestScene::Free() {
-    delete player;
-    player = nullptr;
+    player->DestroyInstance();
+    delete abilityHandler;
 }
 
 void TestScene::Unload() 
 {
+    player = nullptr;
+    abilityHandler = nullptr;
     meshManager = nullptr;
+
 }

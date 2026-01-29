@@ -9,6 +9,7 @@ enum MESH_TYPE
 	SQUARE = 0,
 	TEXTURE_SQUARE,
 	TRIANGLE,
+	CIRCLE,
 	LINE,
 	TOTAL_MESH
 };
@@ -30,6 +31,7 @@ public:
 	void CreateTriangle();
 	void CreateLine();
 
+	void CreateCircle();
 	//Get Meshes
 	AEGfxVertexList* GetMesh(MESH_TYPE type) const;
 };

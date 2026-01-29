@@ -5,6 +5,7 @@
 #include "../../Source/Scene/BaseScene.h"
 #include "../System/MeshManager.h"
 #include "../System/Map.h"
+#include "../Abilities/AbilityHandler.h"
 
 class TestScene : public BaseScene {
 public:
@@ -18,6 +19,7 @@ public:
 private:
     // Constructor
     Player *player;
+    AbilityHandler* abilityHandler = nullptr;;
 
     //float playerX, playerY;
     //float speed = 200.0f;

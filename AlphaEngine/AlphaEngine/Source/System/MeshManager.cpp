@@ -9,12 +9,19 @@ MeshManager::MeshManager()
 
 MeshManager::~MeshManager()
 {
-    for (std::map<MESH_TYPE, AEGfxVertexList*>::iterator it = meshList.begin(); it != meshList.end(); it++)
+    for (std::pair<MESH_TYPE, AEGfxVertexList*> mesh : meshList)
     {
         //Free meshes
-        AEGfxMeshFree(it->second);
-        it->second = nullptr;
+        AEGfxMeshFree(mesh.second);
+        mesh.second = nullptr;
     }
+
+    //for (std::map<MESH_TYPE, AEGfxVertexList*>::iterator it = meshList.begin(); it != meshList.end(); it++)
+    //{
+    //    //Free meshes
+    //    AEGfxMeshFree(it->second);
+    //    it->second = nullptr;
+    //}
 }
 
 void MeshManager::CreateMeshes()
@@ -22,6 +29,7 @@ void MeshManager::CreateMeshes()
     CreateSquareMesh();
     CreateSquareMesh(true);
     CreateTriangle();
+    CreateCircle();
 }
 
 void MeshManager::CreateSquareMesh(bool texture)
@@ -87,6 +95,33 @@ void MeshManager::CreateTriangle()
 
         //Insert mesh into list if sucessful
         meshList.insert({ TRIANGLE, mesh });
+    }
+}
+
+void MeshManager::CreateCircle()
+{
+    AEGfxVertexList* mesh;
+
+    AEGfxMeshStart();
+
+    for (int j = 0; j < 36; j++)
+    {
+        AEGfxTriAdd(
+            AECos((PI / 180) * j * 10.f), AESin((PI / 180) * j * 10.f), 0xFFFFFFFF, 0.0f, 0.0f,
+            AECos((PI / 180) * (j + 1) * 10.f), AESin((PI / 180) * (j + 1) * 10.f), 0xFFFFFFFF, 0.0f, 0.0f,
+            0.f, 0.f, 0xFFFFFFFF, 0.0f, 0.0f);
+    }
+
+    mesh = AEGfxMeshEnd();
+
+    if (mesh == nullptr) {
+        std::cout << "ERROR: Circle Mesh Creation Failed!" << std::endl;
+    }
+    else {
+        std::cout << "SUCCESS: Circle Mesh Created." << std::endl;
+
+        //Insert mesh into list if sucessful
+        meshList.insert({ CIRCLE, mesh });
     }
 }
 

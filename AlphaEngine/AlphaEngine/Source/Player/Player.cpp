@@ -1,5 +1,8 @@
 #include "Player.h"
+#include "../Projectiles/BaseProjectile.h"
+#include "../utils.h"
 #include <iostream>
+
 
 Player::Player()
 	: input{ 0.f, 0.f }
@@ -13,6 +16,17 @@ Player::Player()
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
 	AEVec2Set(&cameraOffset, 400.f, -50.f);
+
+	proj = nullptr;
+}
+
+Player::~Player()
+{
+	for (BaseProjectile* proj : projectileList)
+	{
+		delete proj;
+	}
+	projectileList.clear();
 }
 
 void Player::HandleInput()
@@ -33,6 +47,7 @@ void Player::HandleInput()
 	{
 		velocity.y *= 0.5f;
 	}
+
 }
 
 void Player::Update(float deltaTime)
@@ -77,10 +92,37 @@ void Player::Update(float deltaTime)
 	// Constant is for tracking speed
 	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpVector, deltaTime * 5.0f);
 	AEGfxSetCamPosition(cameraPosition.x, cameraPosition.y);
+
+	s32 xDir, yDir;
+	f32 finalX, finalY;
+	if (AEInputCheckTriggered(AEVK_LBUTTON))
+	{
+		AEInputGetCursorPosition(&xDir, &yDir);
+		AEVec2 mousePos = {xDir, yDir};
+		AEVec2 playerDir = ScreenToWorldPos(mousePos);
+		std::cout << playerDir.x << " " << playerDir.y << std::endl;
+		//AEVec2 playerDir = {finalX - transform.GetPosition().x, finalY - transform.GetPosition().y};
+		//AEVec2Normalize(&playerDir, &playerDir);
+
+		projectileList.push_back(new BaseProjectile(position, playerDir));
+	}
+	for (BaseProjectile* proj : projectileList)
+	{
+		proj->Update(deltaTime);
+		if (proj->GetLifespan() <= 0.f)
+		{
+			proj->Exit();
+		}
+	}
 }
 
 void Player::Draw(AEGfxVertexList* mesh)
 {
+	for (BaseProjectile* proj : projectileList)
+	{
+		proj->Draw(mesh);
+	}
+
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	AEGfxSetColorToAdd(-1.f, -1.f, 0.7f, 0.0f);
 	AEGfxSetTransform(transform.GetMatrix().m);

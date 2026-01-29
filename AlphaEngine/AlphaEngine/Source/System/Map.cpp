@@ -145,7 +145,7 @@ Tile Map::GetTile(float xPos, float yPos) const
 *//*______________________________________________________________*/
 Tile& Map::GetTileFromTilePos(float xPos, float yPos) const
 {
-	Tile& tile = map[(int)xPos][(int)yPos];
+	Tile& tile = map[static_cast<int>(xPos)][static_cast<int>(yPos)];
 
 	return tile;
 }
@@ -160,8 +160,8 @@ AEVec2 Map::GetTilePos(float xPos, float yPos) const
 {
 	int rowPos = 0, columnPos = 0;
 
-	rowPos = (int)floor(xPos / TILE_WIDTH);
-	columnPos = NUM_ROW - (int)floor(yPos / TILE_HEIGHT);
+	rowPos = static_cast<int>(floor(xPos / TILE_WIDTH));
+	columnPos = NUM_ROW - static_cast<int>(floor(yPos / TILE_HEIGHT));
 
 	/*if (rowPos >= NUM_ROW)
 	{
@@ -193,7 +193,7 @@ AEVec2 Map::GetTilePos(float xPos, float yPos) const
 *//*______________________________________________________________*/
 AEVec2 Map::GetTileWorldPos(AEVec2 tilePos) const
 {
-	Tile tile = map[(int)tilePos.x][(int)tilePos.y];
+	Tile tile = map[static_cast<int>(tilePos.x)][static_cast<int>(tilePos.y)];
 
 	return tile.transform.GetPosition();
 }
@@ -206,7 +206,7 @@ AEVec2 Map::GetTileWorldPos(AEVec2 tilePos) const
 *//*______________________________________________________________*/
 void Map::SetTile(TILE_TYPE tile, float rowPos, float columnPos)
 {
-	map[(int)rowPos][(int)columnPos].tileType = tile;
+	map[static_cast<int>(rowPos)][static_cast<int>(columnPos)].tileType = tile;
 }
 
 /*!
@@ -570,9 +570,9 @@ std::vector<AEVec2> Map::BuildPath(Node* node)
 	return path;
 }
 
-unsigned int Map::CalculateHeuristic(AEVec2 newTilePos, AEVec2 targetPos)
+double Map::CalculateHeuristic(AEVec2 newTilePos, AEVec2 targetPos)
 {
-	return static_cast<unsigned int>(sqrt(pow((newTilePos.x - targetPos.x), 2) +
+	return static_cast<double>(sqrt(pow((newTilePos.x - targetPos.x), 2) +
 		pow((newTilePos.y - targetPos.y), 2)));;
 }
 
@@ -623,5 +623,31 @@ bool Map::CheckNode(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits)
 	}
 
 	return true;
+}
+
+void Map::RenderPathDebug(std::vector<AEVec2> const& path)
+{
+	AEGfxVertexList* lineMesh = meshManager->GetMesh(LINE);
+
+	for (AEVec2 currentPos : path)
+	{
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+
+		AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.5f);
+		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.5f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
+		//Set line rotation
+		//Get angle in radians from currentPos to the nextPos
+		
+		//Set line length
+		//Get magnitude from one edge of the square to the other based on the rotation
+		
+		//Create transform
+		Transform2D transform{ currentPos, {1.0f, 1.0f}, 250 };
+
+		AEGfxSetTransform(transform.GetMatrix().m);
+		AEGfxMeshDraw(lineMesh, AE_GFX_MDM_TRIANGLES);
+	}
 }
 

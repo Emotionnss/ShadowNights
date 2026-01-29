@@ -142,8 +142,9 @@ public:
 	void CleanAStarLists();
 	void GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits);
 	std::vector<AEVec2> BuildPath(Node* node);
-	unsigned int CalculateHeuristic(AEVec2 newTilePos, AEVec2 currentPos);
-
+	double CalculateHeuristic(AEVec2 newTilePos, AEVec2 currentPos);
 	std::vector<Node*> GetSurroundingNodes(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits);
 	bool CheckNode(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits);
+
+	void RenderPathDebug(std::vector<AEVec2> const& path);
 };

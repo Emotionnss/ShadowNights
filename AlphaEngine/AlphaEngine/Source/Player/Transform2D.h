@@ -5,6 +5,7 @@ class Transform2D
 {
 public:
 	Transform2D();
+	Transform2D(AEVec2 pos, AEVec2 scale, float rot);
 
 	// Get Functions
 	AEVec2 GetPosition() const;

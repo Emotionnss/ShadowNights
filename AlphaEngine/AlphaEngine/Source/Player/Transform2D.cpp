@@ -9,6 +9,15 @@ Transform2D::Transform2D()
 	AEMtx33Identity(&transform);
 }
 
+Transform2D::Transform2D(AEVec2 pos, AEVec2 scale, float rot)
+	: position{ pos }
+	, scale{ scale }
+	, rotation{ rot }
+	, needUpdate{ true }
+{
+	AEMtx33Identity(&transform);
+}
+
 AEVec2 Transform2D::GetPosition() const
 {
 	return position;

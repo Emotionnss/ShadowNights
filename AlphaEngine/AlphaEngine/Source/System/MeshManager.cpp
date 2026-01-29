@@ -90,6 +90,33 @@ void MeshManager::CreateTriangle()
     }
 }
 
+void MeshManager::CreateLine()
+{
+    AEGfxVertexList* mesh;
+
+    AEGfxMeshStart();
+
+    AEGfxVertexAdd(
+        -0.5f, 0.0f, 0xFFFF0000, 0.0f, 0.0f
+    );
+
+    AEGfxVertexAdd(
+        0.5f, 0.0f, 0xFFFF0000, 0.0f, 0.0f
+    );
+
+    mesh = AEGfxMeshEnd();
+
+    if (mesh == nullptr) {
+        std::cout << "ERROR: Line Mesh Creation Failed!" << std::endl;
+    }
+    else {
+        std::cout << "SUCCESS: Line Mesh Created." << std::endl;
+
+        //Insert mesh into list if sucessful
+        meshList.insert({ LINE, mesh });
+    }
+}
+
 AEGfxVertexList* MeshManager::GetMesh(MESH_TYPE type) const
 {
 	return meshList.at(type);

@@ -9,7 +9,8 @@ enum MESH_TYPE
 	SQUARE = 0,
 	TEXTURE_SQUARE,
 	TRIANGLE,
-	TOTAL_MESH
+	CIRCLE
+	//TOTAL_MESH
 };
 
 class MeshManager : public SingletonTemplate<MeshManager>
@@ -28,6 +29,7 @@ public:
 	void CreateSquareMesh(bool texture = false);
 	void CreateTriangle();
 
+	void CreateCircle();
 	//Get Meshes
 	AEGfxVertexList* GetMesh(MESH_TYPE type) const;
 };

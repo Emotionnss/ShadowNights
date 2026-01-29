@@ -34,8 +34,8 @@ void BaseProjectile::Update(float deltaTime)
 	}
 
 	AEVec2 position = transform.GetPosition();
-	position.x += 100.f * direction.x * deltaTime;
-	position.y += 100.f * direction.y * deltaTime;
+	position.x += speed * direction.x * deltaTime;
+	position.y += speed * direction.y * deltaTime;
 
 	transform.SetPosition(position.x, position.y);
 }

@@ -2,9 +2,7 @@
 #include "../Projectiles/BaseProjectile.h"
 #include "../utils.h"
 #include <iostream>
-#include <vector>
 
-std::vector<BaseProjectile*> projectileList;
 
 Player::Player()
 	: input{ 0.f, 0.f }

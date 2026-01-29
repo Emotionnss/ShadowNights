@@ -15,7 +15,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     if (AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL) == 0) {
         return 0;
     }
-
+   // _CrtSetBreakAlloc(8067);
     bool gGameRunning = true;
 
     // 2. Set Scene

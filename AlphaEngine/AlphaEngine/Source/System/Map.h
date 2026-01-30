@@ -58,8 +58,9 @@ struct Node
 		: position{ 0.0f }, parent{ nullptr }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
 	Node(AEVec2 pos)
 		: position{ pos }, parent{ nullptr }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
-	Node(AEVec2 pos, AEVec2 p, double f, double g, double h)
-		: position{ pos }, parent{ nullptr }, f{ f }, g{ g }, h{ h } {}
+	Node(AEVec2 pos, Node* p, double f, double g, double h)
+		: position{ pos }, parent{ p }, f{ f }, g{ g }, h{ h } {
+	}
 
 	Node* parent;
 
@@ -140,8 +141,8 @@ public:
 
 	//Pathfinding functions
 	void CleanAStarLists();
-	void GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits);
-	std::vector<AEVec2> BuildPath(Node* node);
+	bool GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits);
+	std::vector<AEVec2>& BuildPath(std::vector<AEVec2>& path, Node* node);
 	double CalculateHeuristic(AEVec2 newTilePos, AEVec2 currentPos);
 	std::vector<Node*> GetSurroundingNodes(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits);
 	bool CheckNode(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits);

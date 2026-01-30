@@ -475,7 +475,7 @@ void Map::CleanAStarLists()
 	closedList.clear();
 }
 
-void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits)
+bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits)
 {
 	CleanAStarLists();
 
@@ -490,8 +490,17 @@ void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 		currentNode = openList.top();
 		currentPos = currentNode->position;
 
+		//End finding of path if current node is reached
+		if (currentNode->position.x == targetPos.x && currentNode->position.y == targetPos.y)
+		{
+			return true;
+		}
+
 		//Remove the current node from openList
 		openList.pop();
+
+		//Push back current node to closed list
+		closedList.push_back(currentNode);
 
 		//Get surrounding nodes that are valid
 		std::vector<Node*> nodes = GetSurroundingNodes(currentPos, minLimits, maxLimits);
@@ -518,7 +527,7 @@ void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 			}
 
 			//Set tentative g value
-			int tempGValue = currentNode->g + 1.0;
+			double tempGValue = currentNode->g + 1.0;
 
 			//Loop through open list to see if node is already inside
 			std::vector<Node*>::iterator it = std::find(openVector.begin(), openVector.end(), node);
@@ -540,21 +549,18 @@ void Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 			node->g = tempGValue;
 			node->h = CalculateHeuristic(node->position, currentPos);
 			node->f = node->g + node->h;
-
-			//Push back current node to closed list
-			closedList.push_back(currentNode);
 		}
 
 		//Delete current node
 		delete currentNode;
 		currentNode = nullptr;
 	}
+
+	return false;
 }
 
-std::vector<AEVec2> Map::BuildPath(Node* node)
+std::vector<AEVec2>& Map::BuildPath(std::vector<AEVec2>& path, Node* node)
 {
-	std::vector<AEVec2> path;
-
 	Node* currentNode = node;
 
 	//Generate path by backtracking from target node to start node

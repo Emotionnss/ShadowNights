@@ -20,7 +20,7 @@ Player::Player()
 
 	std::vector<std::string> spriteInfo = CSVManager::ReadSpriteInfo("Ame");
 
-	sprite = new Sprite{ std::stoul(spriteInfo[1]), std::stoul(spriteInfo[2]), std::stoul(spriteInfo[3]), spriteInfo[4] };
+	sprite.Init(std::stoul(spriteInfo[1]), std::stoul(spriteInfo[2]), std::stoul(spriteInfo[3]), spriteInfo[4]);
 
 	proj = nullptr;
 }
@@ -120,7 +120,7 @@ void Player::Update(float deltaTime)
 		}
 	}
 
-	sprite->Update();
+	sprite.Update();
 }
 
 void Player::Draw(AEGfxVertexList* mesh)
@@ -135,5 +135,5 @@ void Player::Draw(AEGfxVertexList* mesh)
 	AEGfxSetTransform(transform.GetMatrix().m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);*/
 
-	sprite->Render(transform);
+	sprite.Render(transform);
 }

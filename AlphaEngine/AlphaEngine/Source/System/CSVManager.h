@@ -1,7 +1,7 @@
 /*!
 @file       CSVManager.h
 @author     Yap Yu Xuan Daevon (yuxuandaevon.yap)
-@brief      This file contains declaration of functions used to read and write to CSV
+@brief      This file contains declarations of functions used to read and write to CSV
 *//*_______________________________________________________________________*/
 
 #pragma once

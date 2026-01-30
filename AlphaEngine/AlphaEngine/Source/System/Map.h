@@ -1,7 +1,7 @@
 /*!
 @file       Map.h
 @author     Yap Yu Xuan Daevon (yuxuandaevon.yap)
-@brief      This file contains declaration of functions and variables
+@brief      This file contains declarations of functions and variables
 			used for the Map class
 *//*_______________________________________________________________________*/
 

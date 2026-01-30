@@ -1,3 +1,10 @@
+/*!
+@file       Sprite.cpp
+@author     Yap Yu Xuan Daevon (yuxuandaevon.yap)
+@brief      This file contains definitions of functions and variables
+			used for the Sprite class
+*//*_______________________________________________________________________*/
+
 #include "Sprite.h"
 #include "MeshBuilder.h"
 
@@ -12,7 +19,8 @@ Sprite::Sprite() :
 	animationTimer{ 0.0f },
 	currentAnimationFrame{ 0 },
 	currentUVCoords{ 0.0f },
-	spritesheetFilename{""}
+	spritesheetFilename{""},
+	animation_duration_per_frame{ 0.0f }
 {
 }
 
@@ -27,7 +35,8 @@ Sprite::Sprite(u32 spritesheetRows, u32 spritesheetColumns, u32 spritesheetMaxFr
 	animationTimer{ 0.0f },
 	currentAnimationFrame{ 0 },
 	currentUVCoords{ 0.0f },
-	spritesheetFilename{ "Assets/Spritesheets/" + name }
+	spritesheetFilename{ "Assets/Spritesheets/" + name },
+	animation_duration_per_frame{ 0.1f }
 {
 	mesh = MeshBuilder::CreateSpriteMesh(spriteUVWidth, spriteUVHeight);
 	tex = AEGfxTextureLoad(spritesheetFilename.c_str());
@@ -38,6 +47,20 @@ Sprite::~Sprite()
 {
 	AEGfxMeshFree(mesh);
 	AEGfxTextureUnload(tex);
+}
+
+void Sprite::Init(u32 rows, u32 columns, u32 maxFrames, std::string name)
+{
+	spritesheetRows = rows;
+	spritesheetColumns = columns;
+	spritesheetMaxFrames = maxFrames;
+	spriteUVWidth = 1.f / spritesheetColumns;
+	spriteUVHeight = 1.f / spritesheetRows;
+
+	spritesheetFilename = "Assets/Spritesheets/" + name;
+	mesh = MeshBuilder::CreateSpriteMesh(spriteUVWidth, spriteUVHeight);
+	tex = AEGfxTextureLoad(spritesheetFilename.c_str());
+	animation_duration_per_frame = 0.1f;
 }
 
 void Sprite::Update()

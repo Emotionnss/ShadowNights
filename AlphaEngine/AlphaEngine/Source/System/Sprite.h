@@ -1,3 +1,10 @@
+/*!
+@file       Sprite.h
+@author     Yap Yu Xuan Daevon (yuxuandaevon.yap)
+@brief      This file contains declarations of functions and variables
+			used for the Sprite class
+*//*_______________________________________________________________________*/
+
 #pragma once
 
 #include "AEEngine.h"
@@ -34,6 +41,27 @@ public:
 	Sprite(u32 spritesheetRows, u32 spritesheetColumns, u32 spritesheetMaxFrames, std::string spritesheetFilename);
 	~Sprite();
 
+	/*!
+	@brief	Initialize sprite
+	@param	u32 rows - number of rows in spritesheet
+	@param	u32 columns - number of columns in spritesheet
+	@param	u32 maxFrames - max number of frames in spritesheet
+	@param	std::string name - name of spritesheet file
+	@return void
+	*/
+	void Init(u32 rows, u32 columns, u32 maxFrames, std::string name);
+
+	/*!
+	@brief	Update sprite
+	@param	void
+	@return void
+	*/
 	void Update();
+
+	/*!
+	@brief	Render sprite
+	@param	Transform2D& transform - transform matrix of the object
+	@return void
+	*/
 	void Render(Transform2D& transform);
 };

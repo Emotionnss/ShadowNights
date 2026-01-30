@@ -25,7 +25,7 @@ public:
 	Transform2D transform;
 
 	// Player's Sprite
-	Sprite* sprite;
+	Sprite sprite;
 
 	std::vector<BaseProjectile*> projectileList;
 

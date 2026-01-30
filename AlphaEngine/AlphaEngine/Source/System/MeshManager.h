@@ -1,7 +1,7 @@
 /*!
 @file       MeshManager.h
 @author     Yap Yu Xuan Daevon (yuxuandaevon.yap)
-@brief      This file contains declaration of functions and variables
+@brief      This file contains declarations of functions and variables
 			used for the MeshManager class, which holds all primitive meshes
 			that are reused many times across the whole project
 *//*_______________________________________________________________________*/

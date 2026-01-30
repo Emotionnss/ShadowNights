@@ -2,6 +2,7 @@
 #include "../Projectiles/BaseProjectile.h"
 #include "../utils.h"
 #include <iostream>
+#include "../System/CSVManager.h"
 
 
 Player::Player()
@@ -16,6 +17,10 @@ Player::Player()
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
 	AEVec2Set(&cameraOffset, 400.f, -50.f);
+
+	std::vector<std::string> spriteInfo = CSVManager::ReadSpriteInfo("Ame");
+
+	sprite = new Sprite{ std::stoul(spriteInfo[1]), std::stoul(spriteInfo[2]), std::stoul(spriteInfo[3]), spriteInfo[4] };
 
 	proj = nullptr;
 }
@@ -114,6 +119,8 @@ void Player::Update(float deltaTime)
 			proj->Exit();
 		}
 	}
+
+	sprite->Update();
 }
 
 void Player::Draw(AEGfxVertexList* mesh)
@@ -123,8 +130,10 @@ void Player::Draw(AEGfxVertexList* mesh)
 		proj->Draw(mesh);
 	}
 
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	/*AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	AEGfxSetColorToAdd(-1.f, -1.f, 0.7f, 0.0f);
 	AEGfxSetTransform(transform.GetMatrix().m);
-	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);*/
+
+	sprite->Render(transform);
 }

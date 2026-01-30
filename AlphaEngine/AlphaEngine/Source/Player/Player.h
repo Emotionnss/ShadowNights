@@ -1,5 +1,6 @@
 #pragma once
 #include "../System/SingletonTemplate.h"
+#include "../System/Sprite.h"
 #include "AEEngine.h"
 #include "Transform2D.h"
 #include "../Projectiles/BaseProjectile.h"
@@ -22,6 +23,9 @@ public:
 
 	// Player's Transform Properties
 	Transform2D transform;
+
+	// Player's Sprite
+	Sprite* sprite;
 
 	std::vector<BaseProjectile*> projectileList;
 

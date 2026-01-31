@@ -1,12 +1,13 @@
 #pragma once
 #include "AEEngine.h"
 #include "Transform2D.h"
-#include "../System/Sprite.h"
+#include "../Sprite/Sprite.h"
 
 class GameObject {
 public:
     GameObject();
-    virtual ~GameObject() {}
+
+    virtual ~GameObject();
 
     virtual void Init() {}
 
@@ -25,4 +26,6 @@ protected:
     AEVec2 velocity;
     AEVec2 acceleration;
     float friction;
+
+    Sprite* sprite;
 };

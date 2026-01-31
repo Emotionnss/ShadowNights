@@ -18,7 +18,8 @@ Player::Player()
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
 	AEVec2Set(&cameraOffset, 400.f, -50.f);
 
-	sprite.Init(CSVManager::ReadSpriteInfo("ame"));
+	sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "ame"));
+	sprite->PlayAnimation("bounce", -1, 1.0f);
 
 	proj = nullptr;
 }
@@ -31,6 +32,9 @@ Player::~Player()
 			delete proj;
 	}
 	projectileList.clear();
+
+	delete sprite;
+	sprite = nullptr;
 }
 
 void Player::HandleInput()
@@ -120,7 +124,7 @@ void Player::Update(float deltaTime)
 		}
 	}
 
-	sprite.Update();
+	sprite->Update();
 }
 
 void Player::Draw(AEGfxVertexList* mesh)
@@ -135,5 +139,5 @@ void Player::Draw(AEGfxVertexList* mesh)
 	AEGfxSetTransform(transform.GetMatrix().m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);*/
 
-	sprite.Render(transform);
+	sprite->Render(transform);
 }

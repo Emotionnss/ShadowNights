@@ -9,11 +9,16 @@
 #include <string>
 #include <vector>
 
+enum CSV_DATA_TYPE
+{
+	SPRITESHEET_DATA,
+	TOTAL_DATA
+};
+
 class CSVManager
 {
 private:
 	static const char* MAP_FILE_PATH;
-	static const char* SPRITE_DATA_FILE_PATH;
 
 public:
 	CSVManager();
@@ -30,11 +35,18 @@ public:
 	static std::vector<std::vector<int>> ReadMap(std::string fileName);
 
 	/**
-	 @brief Read spritesheet information from a CSV file
-	 @param std::string spritesheetName - name of the spritesheet to get info from
+	 @brief Read information from a CSV file
+	 @param std::string headerName - header name to check against
 	 @return std::vector<std::string> - spritesheet data
 	 */
-	static std::vector<std::string> ReadSpriteInfo(std::string spritesheetName);
+	static std::vector<std::string> ReadInfo(CSV_DATA_TYPE dataType, std::string headerName);
+	
+	/**
+	 @brief Read animation information from a CSV file
+	 @param std::string animationName - animation name to check against
+	 @return sstd::vector<std::vector<std::string>> - animation data
+	 */
+	static std::vector<std::vector<std::string>> ReadAnimationInfo(std::string animationName);
 
 	/**
 	 @brief Separate a given string by using the given separator and stores all the information into a string vector

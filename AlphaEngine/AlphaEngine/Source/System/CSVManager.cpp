@@ -11,7 +11,6 @@
 #include <iostream>
 
 const char* CSVManager::MAP_FILE_PATH = "Assets/Maps/";
-const char* CSVManager::SPRITE_DATA_FILE_PATH = "Assets/Data/SpriteData.csv";
 
 CSVManager::CSVManager()
 {
@@ -148,13 +147,22 @@ std::vector<std::vector<int>> CSVManager::ReadMap(std::string fileName)
 	return rowValues;
 }
 
-std::vector<std::string> CSVManager::ReadSpriteInfo(std::string spritesheetName)
+std::vector<std::string> CSVManager::ReadInfo(CSV_DATA_TYPE dataType, std::string headerName)
 {
-	//Get sprite info in string
-	std::vector<std::string> spriteInfo;
+	//Get info in string
+	std::vector<std::string> info;
+
+	std::string filePath;
+
+	switch (dataType)
+	{
+	case SPRITESHEET_DATA:
+		filePath = "Assets/Data/SpriteData.csv";
+		break;
+	}
 
 	//Creates an output filestream and opens the file
-	std::ifstream file{ SPRITE_DATA_FILE_PATH, std::ios::in };
+	std::ifstream file{ filePath, std::ios::in };
 
 	// Make sure the file is open
 	try
@@ -167,7 +175,7 @@ std::vector<std::string> CSVManager::ReadSpriteInfo(std::string spritesheetName)
 	catch (std::runtime_error e)
 	{
 		//std::cout << "Runtime error: " << e.what();
-		return spriteInfo;
+		return info;
 	}
 
 	std::string line;
@@ -179,14 +187,55 @@ std::vector<std::string> CSVManager::ReadSpriteInfo(std::string spritesheetName)
 		std::string name = line.substr(0, line.find_first_of(","));
 
 		//If name matches, save info in vector and return
-		if (name == spritesheetName)
+		if (name == headerName)
 		{
-			spriteInfo = Tokenise(line, ',');
-			return spriteInfo;
+			info = Tokenise(line, ',');
+			return info;
 		}
 	}
 
-	return spriteInfo;
+	return info;
+}
+
+std::vector<std::vector<std::string>> CSVManager::ReadAnimationInfo(std::string animationName)
+{
+	//Get info in string
+	std::vector<std::vector<std::string>> animInfo;
+
+	//Creates an output filestream and opens the file
+	std::ifstream file{ "Assets/Data/AnimationData.csv", std::ios::in };
+
+	// Make sure the file is open
+	try
+	{
+		if (!file.is_open())
+		{
+			throw std::runtime_error("Could not open file");
+		}
+	}
+	catch (std::runtime_error e)
+	{
+		//std::cout << "Runtime error: " << e.what();
+		return animInfo;
+	}
+
+	std::string line;
+
+	//Gets line by line until end of file
+	while (getline(file, line))
+	{
+		//Get the spritesheet name
+		std::string name = line.substr(0, line.find_first_of(","));
+
+		//If name matches, save info in vector and return
+		if (name == animationName)
+		{
+			std::vector<std::string> info{ Tokenise(line, ',') };
+			animInfo.push_back(info);
+		}
+	}
+
+	return animInfo;
 }
 
 std::vector<std::string> CSVManager::Tokenise(std::string line, char separator)

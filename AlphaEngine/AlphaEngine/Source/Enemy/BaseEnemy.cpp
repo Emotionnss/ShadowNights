@@ -13,16 +13,16 @@ void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     transform.SetPosition(x, y);
     transform.SetScale(w, h);
 
-    sprite.Init(CSVManager::ReadSpriteInfo(spriteName));
+    sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));
+    sprite->PlayAnimation("idle", -1, 1.0f);
 }
 
 void BaseEnemy::Update(float deltaTime)
 {
     GameObject::Update(deltaTime);
-    sprite.Update();
 }
 
 void BaseEnemy::Draw()
 {
-    sprite.Render(transform);
+    GameObject::Draw();
 }

@@ -1,6 +1,6 @@
 #include "Button.h"
 #include <iostream>
-#include "../../Source/System/MeshManager.h"
+#include "MeshManager.h"
 
 AEGfxTexture* Button::sprite = nullptr;
 AEGfxVertexList* Button::pMesh = nullptr;

@@ -1,6 +1,6 @@
 #pragma once
 #include "../Player/GameObject.h"
-#include "../System/Sprite.h"
+#include "../Sprite/Sprite.h"
 #include <string>
 
 class BaseEnemy : public GameObject
@@ -13,7 +13,4 @@ public:
 
     void Update(float deltaTime) override;
     void Draw() override;
-
-private:
-    Sprite sprite;
 };

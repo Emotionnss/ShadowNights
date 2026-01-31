@@ -69,7 +69,7 @@
     <ClCompile Include="Source\System\Animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Button.cpp">
+    <ClCompile Include="Source\System\Button.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scene\MainMenu.cpp">
@@ -134,7 +134,7 @@
     <ClInclude Include="Source\System\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Button.h">
+    <ClInclude Include="Source\System\Button.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scene\MainMenu.h">

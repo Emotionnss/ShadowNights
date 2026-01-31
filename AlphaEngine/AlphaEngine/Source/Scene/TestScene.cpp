@@ -4,10 +4,8 @@
 #include "../System/Scenemanager.h"
 #include "TestScene2.h"
 
-
 void TestScene::Load() {
     AEGfxReset();
-
     meshManager = MeshManager::GetInstance();
     map = Map::GetInstance();
     player = Player::GetInstance();
@@ -20,7 +18,7 @@ void TestScene::Init() {
     abilityHandler = new AbilityHandler();
 
     if (myEnemy) {
-        myEnemy->Init(500.0f, 0.0f, 200.0f, 200.0f, "shadow1 - Idle", 1, 10, 10);
+        myEnemy->Init(500.0f, -300.0f, 288.0f, 128.0f, "shadow1 - Idle");
         myEnemy->SetVelocity(0.0f, 0.0f);
     }
 }

@@ -11,7 +11,7 @@ private:
 public:
 	Transform2D transform;
 	AEGfxTexture* projTex;
-	AEGfxVertexList* Texmesh;
+	AEGfxVertexList* Texmesh = nullptr;
 
 	float speed = 1.f, size = 1.f;
 

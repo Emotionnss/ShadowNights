@@ -40,6 +40,12 @@ BaseProjectile::BaseProjectile(AEVec2 pos, AEVec2 dir)
 
 BaseProjectile::~BaseProjectile()
 {
+	Exit();
+	if (Texmesh)
+	{
+		AEGfxMeshFree(Texmesh);
+		Texmesh = nullptr;
+	}
 }
 
 void BaseProjectile::Init()

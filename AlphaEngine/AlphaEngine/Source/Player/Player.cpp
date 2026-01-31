@@ -29,7 +29,8 @@ Player::~Player()
 {
 	for (BaseProjectile* proj : projectileList)
 	{
-		delete proj;
+		if (proj)
+			delete proj;
 	}
 	projectileList.clear();
 }
@@ -98,16 +99,13 @@ void Player::Update(float deltaTime)
 	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpVector, deltaTime * 5.0f);
 	AEGfxSetCamPosition(cameraPosition.x, cameraPosition.y);
 
-	s32 xDir, yDir;
-	f32 finalX, finalY;
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
+		s32 xDir, yDir;
 		AEInputGetCursorPosition(&xDir, &yDir);
 		AEVec2 mousePos = {xDir, yDir};
 		AEVec2 playerDir = ScreenToWorldPos(mousePos);
 		std::cout << playerDir.x << " " << playerDir.y << std::endl;
-		//AEVec2 playerDir = {finalX - transform.GetPosition().x, finalY - transform.GetPosition().y};
-		//AEVec2Normalize(&playerDir, &playerDir);
 
 		projectileList.push_back(new BaseProjectile(position, playerDir));
 	}
@@ -118,9 +116,9 @@ void Player::Update(float deltaTime)
 		proj->Update(deltaTime);
 		if (proj->GetLifespan() <= 0.f)
 		{
-			proj->Exit();
 			delete proj; // free memory
 			projectileList.erase(projectileList.begin() + i);
+			i--;
 		}
 	}
 

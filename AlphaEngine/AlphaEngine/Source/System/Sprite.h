@@ -49,7 +49,7 @@ public:
 	@param	std::string name - name of spritesheet file
 	@return void
 	*/
-	void Init(u32 rows, u32 columns, u32 maxFrames, std::string name);
+	void Init(std::vector<std::string> spriteInfo);
 
 	/*!
 	@brief	Update sprite

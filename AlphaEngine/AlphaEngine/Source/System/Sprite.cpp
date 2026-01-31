@@ -49,15 +49,15 @@ Sprite::~Sprite()
 	AEGfxTextureUnload(tex);
 }
 
-void Sprite::Init(u32 rows, u32 columns, u32 maxFrames, std::string name)
+void Sprite::Init(std::vector<std::string> spriteInfo)
 {
-	spritesheetRows = rows;
-	spritesheetColumns = columns;
-	spritesheetMaxFrames = maxFrames;
+	spritesheetRows = std::stoul(spriteInfo[1]);
+	spritesheetColumns = std::stoul(spriteInfo[2]);
+	spritesheetMaxFrames = std::stoul(spriteInfo[3]);
 	spriteUVWidth = 1.f / spritesheetColumns;
 	spriteUVHeight = 1.f / spritesheetRows;
 
-	spritesheetFilename = "Assets/Spritesheets/" + name;
+	spritesheetFilename = "Assets/Spritesheets/" + spriteInfo[0] + ".png";
 	mesh = MeshBuilder::CreateSpriteMesh(spriteUVWidth, spriteUVHeight);
 	tex = AEGfxTextureLoad(spritesheetFilename.c_str());
 	animation_duration_per_frame = 0.1f;

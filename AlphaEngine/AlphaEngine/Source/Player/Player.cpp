@@ -18,9 +18,7 @@ Player::Player()
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
 	AEVec2Set(&cameraOffset, 400.f, -50.f);
 
-	std::vector<std::string> spriteInfo = CSVManager::ReadSpriteInfo("Ame");
-
-	sprite.Init(std::stoul(spriteInfo[1]), std::stoul(spriteInfo[2]), std::stoul(spriteInfo[3]), spriteInfo[4]);
+	sprite.Init(CSVManager::ReadSpriteInfo("ame"));
 
 	proj = nullptr;
 }

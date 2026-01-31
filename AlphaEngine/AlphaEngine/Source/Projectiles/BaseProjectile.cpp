@@ -1,4 +1,5 @@
 #include "BaseProjectile.h"
+#include <iostream>
 
 BaseProjectile::BaseProjectile()
 {
@@ -15,11 +16,30 @@ BaseProjectile::BaseProjectile(AEVec2 pos, AEVec2 dir)
 
 	transform.SetScale(size, size);
 	transform.SetPosition(pos.x, pos.y);
+
+	projTex = AEGfxTextureLoad("Assets/Weapons/knife.png");
+	if (projTex)
+	{
+		std::cout << "loaded successfully" << std::endl;
+	}
+
+	AEGfxMeshStart();
+	AEGfxTriAdd(
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+	AEGfxTriAdd(
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+	// Saving the mesh (list of triangles) in pMesh
+	Texmesh = AEGfxMeshEnd();
 }
 
 BaseProjectile::~BaseProjectile()
 {
-
 }
 
 void BaseProjectile::Init()
@@ -37,19 +57,29 @@ void BaseProjectile::Update(float deltaTime)
 	position.x += speed * direction.x * deltaTime;
 	position.y += speed * direction.y * deltaTime;
 
+	float angle = transform.GetRotation();
+	transform.SetRotation(atan2f(direction.y, direction.x) + (PI*1.25f));
 	transform.SetPosition(position.x, position.y);
 }
 
 void BaseProjectile::Draw(AEGfxVertexList* mesh)
 {
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	AEGfxSetColorToAdd(-1.f, -1.f, 0.7f, 0.0f);
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1.0f);
+	
+	AEGfxTextureSet(projTex, 0, 0);
+	
 	AEGfxSetTransform(transform.GetMatrix().m);
-	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxMeshDraw(Texmesh, AE_GFX_MDM_TRIANGLES);
 }
 
 void BaseProjectile::Exit()
 {
+	AEGfxTextureUnload(projTex);
 }
 
 float BaseProjectile::GetLifespan()

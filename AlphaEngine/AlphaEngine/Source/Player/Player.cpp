@@ -111,12 +111,16 @@ void Player::Update(float deltaTime)
 
 		projectileList.push_back(new BaseProjectile(position, playerDir));
 	}
-	for (BaseProjectile* proj : projectileList)
+	for (int i = 0; i < projectileList.size(); i++)
 	{
+		BaseProjectile* proj = projectileList[i];
+
 		proj->Update(deltaTime);
 		if (proj->GetLifespan() <= 0.f)
 		{
 			proj->Exit();
+			delete proj; // free memory
+			projectileList.erase(projectileList.begin() + i);
 		}
 	}
 

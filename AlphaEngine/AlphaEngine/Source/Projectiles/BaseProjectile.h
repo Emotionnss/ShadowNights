@@ -10,8 +10,10 @@ private:
 
 public:
 	Transform2D transform;
+	AEGfxTexture* projTex;
+	AEGfxVertexList* Texmesh;
 
-	float speed, size;
+	float speed = 1.f, size = 1.f;
 
 	BaseProjectile();
 	BaseProjectile(AEVec2 pos, AEVec2 dir);

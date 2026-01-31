@@ -18,7 +18,9 @@ void TestScene::Init() {
     abilityHandler = new AbilityHandler();
 
     if (myEnemy) {
-        myEnemy->Init(500.0f, -300.0f, 288.0f, 128.0f, "shadow1 - Idle");
+
+        myEnemy->Init(500.0f, -300.0f, 85.0f, 60.0f, "shadow1 - Idle_test");
+
         myEnemy->SetVelocity(0.0f, 0.0f);
     }
 }

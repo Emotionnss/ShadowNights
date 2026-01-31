@@ -18,8 +18,6 @@ public:
 
     void SetVelocity(float x, float y) { velocity.x = x; velocity.y = y; }
 
-    Sprite sprite;
-
 protected:
     Transform2D transform;
 

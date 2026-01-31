@@ -4,7 +4,6 @@
 #include "../System/Scenemanager.h"
 #include "TestScene2.h"
 
-//* Player Testing
 
 void TestScene::Load() {
     AEGfxReset();
@@ -12,14 +11,18 @@ void TestScene::Load() {
     meshManager = MeshManager::GetInstance();
     map = Map::GetInstance();
     player = Player::GetInstance();
+
+    myEnemy = new BaseEnemy();
 }
 
 void TestScene::Init() {
     player->transform.SetPosition(300, 900);
     abilityHandler = new AbilityHandler();
-    //std::cout << "Ability Handler address" << &abilityHandler << '\n';
-    //std::cout << "map address" << &map << '\n';
-    //std::cout << "testscene meshmanager" << &meshManager << '\n';
+
+    if (myEnemy) {
+        myEnemy->Init(500.0f, 0.0f, 200.0f, 200.0f, "shadow1 - Idle", 1, 10, 10);
+        myEnemy->SetVelocity(0.0f, 0.0f);
+    }
 }
 
 void TestScene::Update() {
@@ -27,16 +30,13 @@ void TestScene::Update() {
 
     player->HandleInput();
 
-    /*
-    if (AEInputCheckCurr(VK_UP))    playerY += speed * dt;
-    if (AEInputCheckCurr(VK_DOWN))  playerY -= speed * dt;
-    if (AEInputCheckCurr(VK_LEFT))  playerX -= speed * dt;
-    if (AEInputCheckCurr(VK_RIGHT)) playerX += speed * dt;
-    */
-
-    //Player Update
     player->Update(dt);
     abilityHandler->AbilityUpdate(dt);
+
+    if (myEnemy) {
+        myEnemy->Update(dt);
+    }
+
     if (AEInputCheckTriggered(VK_SPACE)) {
         std::cout << "DEBUG: Space IS Held Down!" << std::endl;
         SceneManager::ChangeScene(new TestScene2());
@@ -45,19 +45,20 @@ void TestScene::Update() {
 }
 
 void TestScene::Draw() {
-
-    //AEGfxSetCamPosition(0.0f, 0.0f);
-
-    AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+    AEGfxSetBackgroundColor(2.0f, 2.0f, 2.0f);
     map->RenderMap();
 
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-
+    // Draw Player & Abilities
     player->Draw(meshManager->GetMesh(SQUARE));
     abilityHandler->Draw();
 
-    // Floor placeholder lol
+    if (myEnemy) {
+        myEnemy->Draw();
+    }
+
+    // Floor placeholder
     AEMtx33 scaleMtx, transMtx, finalMtx;
     AEMtx33Scale(&scaleMtx, 800.0f, 100.0f);
     AEMtx33Trans(&transMtx, 0.f, -475.f);
@@ -73,12 +74,18 @@ void TestScene::Draw() {
 void TestScene::Free() {
     player->DestroyInstance();
     delete abilityHandler;
+
+    if (myEnemy) {
+        delete myEnemy;
+        myEnemy = nullptr;
+    }
 }
 
-void TestScene::Unload() 
+void TestScene::Unload()
 {
     player = nullptr;
     abilityHandler = nullptr;
     meshManager = nullptr;
 
+    myEnemy = nullptr;
 }

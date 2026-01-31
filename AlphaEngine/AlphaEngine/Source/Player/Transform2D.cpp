@@ -25,7 +25,7 @@ AEVec2 Transform2D::GetPosition() const
 
 AEVec2 Transform2D::GetScale() const
 {
-	return AEVec2();
+	return scale;
 }
 
 float Transform2D::GetRotation() const

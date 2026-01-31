@@ -1,32 +1,30 @@
 #pragma once
 #include "AEEngine.h"
 #include "Transform2D.h"
+#include "../System/Sprite.h"
 
-class GameObject
-{
+class GameObject {
 public:
-	GameObject();
-	virtual ~GameObject() = default; // No idea if we'll use this
+    GameObject();
+    virtual ~GameObject() {}
 
-	virtual void Init();
-	virtual void Update(float deltaTime);
-	virtual void Draw(AEGfxVertexList *pMesh);
-	virtual void Exit();
+    virtual void Init() {}
 
+    virtual void Update(float deltaTime);
 
-	// Contains position and matrix
-	Transform2D transform;
+    virtual void Draw();
 
-	bool isStatic;
-	AEVec2 velocity, acceleration;
-	float mass, friction;
+    Transform2D& GetTransform() { return transform; }
 
-	enum class CollisionShape
-	{
-		NONE,
-		AABB,
-		CIRCLE
-	};
+    void SetVelocity(float x, float y) { velocity.x = x; velocity.y = y; }
 
-	CollisionShape collision;
+    Sprite sprite;
+
+protected:
+    Transform2D transform;
+
+    bool isStatic;
+    AEVec2 velocity;
+    AEVec2 acceleration;
+    float friction;
 };

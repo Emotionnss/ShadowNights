@@ -18,7 +18,7 @@ public:
 
 private:
     // Constructor
-    Player *player;
+    Player *player = nullptr;
     AbilityHandler* abilityHandler = nullptr;;
 
     //float playerX, playerY;

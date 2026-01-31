@@ -3,7 +3,11 @@
 #include "System/MeshManager.h"
 #include "System/Map.h"
 #include "Scene/TestScene.h"
+#include "Scene/MainMenu.h"
 #include <iostream>
+
+bool gGameRunning = true;
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow) 
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -16,10 +20,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         return 0;
     }
    // _CrtSetBreakAlloc(8067);
-    bool gGameRunning = true;
+    
 
     // 2. Set Scene
-    SceneManager::ChangeScene(new TestScene());
+    SceneManager::ChangeScene(new MainMenu());
 
     // 3. Game Loop
     while (gGameRunning) {
@@ -32,11 +36,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
         SceneManager::Update();
 
-
-        bool balls = AEInputCheckTriggered(VK_SPACE);
-        if (balls)
-            std::cout << std::boolalpha << balls << std::endl;
-        // Rendering
         AEGfxStart();
         AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
         SceneManager::Draw();
@@ -48,6 +47,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     SceneManager::Exit();
     MeshManager::DestroyInstance();
     Map::DestroyInstance();
+    Button::FreeResources();
     AESysExit();
 
     return 1;

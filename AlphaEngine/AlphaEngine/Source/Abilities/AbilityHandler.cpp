@@ -21,7 +21,7 @@ void AbilityHandler::AbilityUpdate(float deltaTime)
 	timeStop.Update(deltaTime);
 	if (AEInputCheckTriggered(AEVK_F))
 	{
-		timeStop.ToggleTime(player->transform.GetPosition());
+		timeStop.ToggleTime(player->GameObject.GetTransform().GetPosition());
 	}
 	if (timeStop.TimeStopped())
 	{

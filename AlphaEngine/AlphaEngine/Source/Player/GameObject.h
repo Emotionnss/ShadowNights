@@ -19,13 +19,16 @@ public:
 
     void SetVelocity(float x, float y) { velocity.x = x; velocity.y = y; }
 
+    const AEVec2 GetVelocity() { return velocity; }
+
+    Sprite* sprite;
+
 protected:
     Transform2D transform;
 
-    bool isStatic;
     AEVec2 velocity;
     AEVec2 acceleration;
     float friction;
+    bool isStatic;
 
-    Sprite* sprite;
 };

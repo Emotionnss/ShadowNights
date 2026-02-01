@@ -7,34 +7,34 @@
 
 Player::Player()
 	: input{ 0.f, 0.f }
-	, velocity{ 0.f, 0.f }
 	, speed{ 500.f }
-	, size{ 50.f }
-	, gravity{ -1000.f }
+	, size{ 100.f }
+	, gravity{ -1400.f }
 	, isGrounded{ false }
 {
-	transform.SetScale(size, size);
+	GameObject.GetTransform().SetScale(size, size);
+	//transform.SetScale(size, size);
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
 	AEVec2Set(&cameraOffset, 400.f, -50.f);
 
-	sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "ame"));
-	sprite->PlayAnimation("bounce", -1, 1.0f);
+	GameObject.sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "ame"));
+	GameObject.sprite->PlayAnimation("bounce", -1, 1.f);
 
 	proj = nullptr;
 }
 
 Player::~Player()
 {
-	for (BaseProjectile* proj : projectileList)
+	for (BaseProjectile* pProj : projectileList)
 	{
-		if (proj)
-			delete proj;
+		if (pProj)
+			delete pProj;
 	}
 	projectileList.clear();
 
-	delete sprite;
-	sprite = nullptr;
+	delete GameObject.sprite;
+	GameObject.sprite = nullptr;
 }
 
 void Player::HandleInput()
@@ -42,18 +42,30 @@ void Player::HandleInput()
 	// Zero Out Input Vector
 	AEVec2Zero(&input);
 
-	if (AEInputCheckCurr(AEVK_D)) input.x += 1.f;
-	if (AEInputCheckCurr(AEVK_A)) input.x -= 1.f;
+	if (AEInputCheckCurr(AEVK_D))
+	{
+		playerDirection = RIGHT;
+		input.x += 1.f;
+	}
+
+	if (AEInputCheckCurr(AEVK_A))
+	{
+		playerDirection = LEFT;
+		input.x -= 1.f;
+	}
+
 
 	// Jump (Triggered)
 	if (AEInputCheckTriggered(AEVK_W) && isGrounded)
 	{
-		velocity.y = 900.f;
+		GameObject.SetVelocity(GameObject.GetVelocity().x, 900.f);
+		//velocity.y = 900.f;
 		isGrounded = false;
 	}
-	else if (!AEInputCheckCurr(AEVK_W) && velocity.y > 0)
+	else if (!AEInputCheckCurr(AEVK_W) && GameObject.GetVelocity().y > 0)
 	{
-		velocity.y *= 0.5f;
+		GameObject.SetVelocity(GameObject.GetVelocity().x, GameObject.GetVelocity().y * 0.5f);
+		//velocity.y *= 0.5f;
 	}
 
 }
@@ -67,35 +79,37 @@ void Player::Update(float deltaTime)
 	//* Gather Input Movement
 	if (input.x != 0.f)
 	{
-		velocity.x += input.x * playerAcceleration * deltaTime;
+		GameObject.SetVelocity(GameObject.GetVelocity().x + input.x * playerAcceleration * deltaTime, GameObject.GetVelocity().y);
 	}
 	else
 	{
-		velocity.x *= friction;
+		GameObject.SetVelocity(GameObject.GetVelocity().x * friction * deltaTime, GameObject.GetVelocity().y);
 	}
 
-	velocity.x = AEClamp(velocity.x, -maxSpeed, maxSpeed);
-	velocity.y += gravity * deltaTime;
+	//GameObject.GetVelocity().x = AEClamp(velocity.x, -maxSpeed, maxSpeed);
+	GameObject.SetVelocity(AEClamp(GameObject.GetVelocity().x, -maxSpeed, maxSpeed), GameObject.GetVelocity().y + gravity * deltaTime);
+	//velocity.y += gravity * deltaTime;
 
 	//* Compute Physics Movement
-	AEVec2 position = transform.GetPosition();
-	position.x += velocity.x * deltaTime;
-	position.y += velocity.y * deltaTime;
+	AEVec2 position = GameObject.GetTransform().GetPosition();
+	position.x += GameObject.GetVelocity().x * deltaTime;
+	position.y += GameObject.GetVelocity().y * deltaTime;
 
 	// Placeholder grounded until I can figure collision
 	if (position.y <= -400.f)
 	{
 		position.y = -400.f;
-		velocity.y = 0.f;
+		GameObject.SetVelocity(GameObject.GetVelocity().x, 0.f);
+		//GameObject.GetVelocity().y = 0.f;
 		isGrounded = true;
 	}
 
 	//* Apply Physics Movement
-	transform.SetPosition(position.x, position.y);
+	GameObject.GetTransform().SetPosition(position.x, position.y);
 
 	//* Apply Camera Movement
-	AEVec2 cameraLerpVector{ transform.GetPosition().x + cameraOffset.x * input.x,
-							transform.GetPosition().y + cameraOffset.y };
+	AEVec2 cameraLerpVector{ GameObject.GetTransform().GetPosition().x + cameraOffset.x * input.x,
+							GameObject.GetTransform().GetPosition().y + cameraOffset.y };
 
 	// Constant is for tracking speed
 	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpVector, deltaTime * 5.0f);
@@ -105,7 +119,7 @@ void Player::Update(float deltaTime)
 	{
 		s32 xDir, yDir;
 		AEInputGetCursorPosition(&xDir, &yDir);
-		AEVec2 mousePos = {xDir, yDir};
+		AEVec2 mousePos = {static_cast<f32>(xDir), static_cast<f32>(yDir)};
 		AEVec2 playerDir = ScreenToWorldPos(mousePos);
 		std::cout << playerDir.x << " " << playerDir.y << std::endl;
 
@@ -113,25 +127,26 @@ void Player::Update(float deltaTime)
 	}
 	for (int i = 0; i < projectileList.size(); i++)
 	{
-		BaseProjectile* proj = projectileList[i];
+		BaseProjectile* pProj = projectileList[i];
 
-		proj->Update(deltaTime);
-		if (proj->GetLifespan() <= 0.f)
+		pProj->Update(deltaTime);
+		if (pProj->GetLifespan() <= 0.f)
 		{
-			delete proj; // free memory
+			delete pProj; // free memory
 			projectileList.erase(projectileList.begin() + i);
 			i--;
 		}
 	}
 
-	sprite->Update();
+	GameObject.sprite->Update();
+	//sprite->Update();
 }
 
 void Player::Draw(AEGfxVertexList* mesh)
 {
-	for (BaseProjectile* proj : projectileList)
+	for (BaseProjectile* pProj : projectileList)
 	{
-		proj->Draw(mesh);
+		pProj->Draw(mesh);
 	}
 
 	/*AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -139,5 +154,6 @@ void Player::Draw(AEGfxVertexList* mesh)
 	AEGfxSetTransform(transform.GetMatrix().m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);*/
 
-	sprite->Render(transform);
+	GameObject.sprite->Render(GameObject.GetTransform());
+	//sprite->Render(transform);
 }

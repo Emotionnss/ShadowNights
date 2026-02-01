@@ -14,7 +14,7 @@ void TestScene::Load() {
 }
 
 void TestScene::Init() {
-    player->transform.SetPosition(300, 900);
+    player->GameObject.GetTransform().SetPosition(300, 900);
     abilityHandler = new AbilityHandler();
 
     if (myEnemy) {

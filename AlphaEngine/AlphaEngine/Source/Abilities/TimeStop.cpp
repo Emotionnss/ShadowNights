@@ -26,7 +26,7 @@ void TimeStop::Update(float dt)
     }
     resource = AEClamp(resource, 0, maxResource);
     resourceBarTfm.SetScale(20, (resource / maxResource * 100.f));
-    resourceBarTfm.SetPosition(player->transform.GetPosition().x + 450, player->transform.GetPosition().y - 200.f);
+    resourceBarTfm.SetPosition(player->GameObject.GetTransform().GetPosition().x + 450, player->GameObject.GetTransform().GetPosition().y - 200.f);
     if (resource <= 0)
     {
         active = false;

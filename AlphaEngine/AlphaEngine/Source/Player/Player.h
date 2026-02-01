@@ -4,6 +4,7 @@
 #include "AEEngine.h"
 #include "Transform2D.h"
 #include "../Projectiles/BaseProjectile.h"
+#include "GameObject.h"
 #include <vector>
 class Player : public SingletonTemplate<Player>
 {	
@@ -22,10 +23,12 @@ public:
 	void Draw(AEGfxVertexList* mesh);
 
 	// Player's Transform Properties
-	Transform2D transform;
+	
+	//Transform2D transform;
+	GameObject GameObject;
 
 	// Player's Sprite
-	Sprite* sprite;
+	//Sprite* sprite;
 
 	std::vector<BaseProjectile*> projectileList;
 
@@ -39,11 +42,13 @@ private:
 		IDLE = 0
 	};
 
+	Direction playerDirection = IDLE;
+
 	// Player input handler
 	AEVec2 input;
 
 	// Player jump
-	AEVec2 velocity;
+	//AEVec2 velocity;
 	bool isGrounded;
 
 	float speed, size, gravity;

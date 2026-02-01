@@ -1,92 +1,30 @@
+/*!
+@file       MeshManager.cpp
+@author     Yap Yu Xuan Daevon (yuxuandaevon.yap)
+@brief      This file contains definitions of functions and variables
+            used for the MeshManager class, which holds all primitive meshes
+            that are reused many times across the whole project
+*//*_______________________________________________________________________*/
+
 #include "MeshManager.h"
-#include <iostream>
-#include <array>
+#include "MeshBuilder.h"
 
 MeshManager::MeshManager()
 {
-    CreateMeshes();
+    meshList.insert({ SQUARE, MeshBuilder::CreateSquareMesh() });
+    meshList.insert({ TEXTURE_SQUARE, MeshBuilder::CreateSquareMesh(true) });
+    meshList.insert({ TRIANGLE, MeshBuilder::CreateTriangle() });
+    meshList.insert({ CIRCLE, MeshBuilder::CreateCircle() });
+    meshList.insert({ LINE, MeshBuilder::CreateLine() });
 }
 
 MeshManager::~MeshManager()
 {
-    for (std::map<MESH_TYPE, AEGfxVertexList*>::iterator it = meshList.begin(); it != meshList.end(); it++)
+    for (std::pair<MESH_TYPE, AEGfxVertexList*> mesh : meshList)
     {
         //Free meshes
-        AEGfxMeshFree(it->second);
-        it->second = nullptr;
-    }
-}
-
-void MeshManager::CreateMeshes()
-{
-    CreateSquareMesh();
-    CreateSquareMesh(true);
-    CreateTriangle();
-}
-
-void MeshManager::CreateSquareMesh(bool texture)
-{
-    AEGfxVertexList* mesh;
-
-    std::array<f32, 2> uvCoords{};
-
-    MESH_TYPE type = SQUARE;
-
-    if (texture)
-    {
-        //This is square with UV coords
-        uvCoords[1] = { 1.0f };
-        type = TEXTURE_SQUARE;
-    }
-
-    AEGfxMeshStart();
-
-    // Now it's a square lol
-    AEGfxTriAdd(
-        -0.5f, -0.5f, 0xFFFFFFFF, uvCoords[0], uvCoords[1],
-        0.5f, -0.5f, 0xFFFFFFFF, uvCoords[1], uvCoords[1],
-        -0.5f, 0.5f, 0xFFFFFFFF, uvCoords[0], uvCoords[0]);
-
-    AEGfxTriAdd(
-        0.5f, -0.5f, 0xFFFFFFFF, uvCoords[1], uvCoords[1],
-        0.5f, 0.5f, 0xFFFFFFFF, uvCoords[1], uvCoords[0],
-        -0.5f, 0.5f, 0xFFFFFFFF, uvCoords[0], uvCoords[0]);
-
-    mesh = AEGfxMeshEnd();
-
-    if (mesh == nullptr) {
-        std::cout << "ERROR: Square Mesh Creation Failed!" << std::endl;
-    }
-    else {
-        std::cout << "SUCCESS: Square Mesh Created." << std::endl;
-
-        //Insert mesh into list if sucessful
-        meshList.insert({ type, mesh });
-    }
-}
-
-void MeshManager::CreateTriangle()
-{
-    AEGfxVertexList* mesh;
-
-    AEGfxMeshStart();
-
-    AEGfxTriAdd(
-        -0.5f, -0.5f, 0xFFFFFF00, 0.0f, 0.0f,
-        0.5f, -0.5f, 0xFFFFFF00, 0.0f, 0.0f,
-        0.0f, 0.5f, 0xFFFFFF00, 0.0f, 0.0f
-    );
-
-    mesh = AEGfxMeshEnd();
-
-    if (mesh == nullptr) {
-        std::cout << "ERROR: Triangle Mesh Creation Failed!" << std::endl;
-    }
-    else {
-        std::cout << "SUCCESS: Triangle Mesh Created." << std::endl;
-
-        //Insert mesh into list if sucessful
-        meshList.insert({ TRIANGLE, mesh });
+        AEGfxMeshFree(mesh.second);
+        mesh.second = nullptr;
     }
 }
 

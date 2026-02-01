@@ -1,13 +1,13 @@
 /*!
 @file       Map.h
 @author     Yap Yu Xuan Daevon (yuxuandaevon.yap)
-@brief      This file contains declaration of functions and variables
+@brief      This file contains declarations of functions and variables
 			used for the Map class
 *//*_______________________________________________________________________*/
 
 #pragma once
 #include "SingletonTemplate.h"
-#include "../../AlphaEngine/include/AEEngine.h"
+#include "AEEngine.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -55,13 +55,14 @@ enum TILE_RELATIVE_POSITION
 struct Node
 {
 	Node() 
-		: position{ 0.0f }, parent{ -1.0f }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
+		: position{ 0.0f }, parent{ nullptr }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
 	Node(AEVec2 pos)
-		: position{ pos }, parent{ -1.0f }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
-	Node(AEVec2 pos, AEVec2 p, double f, double g, double h)
-		: position{ pos }, parent{ p }, f{ f }, g{ g }, h{ h } {}
+		: position{ pos }, parent{ nullptr }, f{ 0.0 }, g{ 0.0 }, h{ 0.0 } {}
+	Node(AEVec2 pos, Node* p, double f, double g, double h)
+		: position{ pos }, parent{ p }, f{ f }, g{ g }, h{ h } {
+	}
 
-	AEVec2 parent;
+	Node* parent;
 
 	AEVec2 position;
 	double f;
@@ -81,67 +82,245 @@ class Map : public SingletonTemplate<Map>
 
 private:
 	static const char* TILE_ASSETS_FILE_PATH;
-	const float TILE_WIDTH = 75.f;
-	const float TILE_HEIGHT = 75.f;
-	int NUM_COLUMN;
-	int NUM_ROW;
+	const f32 TILE_WIDTH = 75.f;
+	const f32 TILE_HEIGHT = 75.f;
+	s32 NUM_COLUMN;
+	s32 NUM_ROW;
 
 	MeshManager* meshManager;
 
 	//2D array to store map info
 	Tile** map;
 
-	std::queue<Node*> openList;
+	//Priority queue to sort openList based on the lowest f value
+	std::priority_queue<Node*> openList;
+	
+	//Vector to allow checking of node in openList (since its very hard to iterate through queue)
+	std::vector<Node*> openVector;
+
+	//Stores nodes that have already been checked
 	std::vector<Node*> closedList;
 
 	AEVec2 spawnpoint;
 
-	std::string GetImageFilePath(TILE_TYPE tileType);
-	void LoadMapTileImages(void);
-
-	//Functions to store tile and texture info
+	//ADT's to store tile and texture info
 	std::vector<TILE_TYPE> tileTypesVector;
 	std::map<TILE_TYPE, AEGfxTexture*> imageMap;
 
+	/*!
+	@brief	Gets the image file path based on the tileType of the tile
+	@param	TILE_TYPE tileType - type of the tile based off the enum TILE_TYPE
+	@return string - filePath of the file to get
+	*/
+	std::string GetImageFilePath(TILE_TYPE tileType);
+
+	/**
+	@brief	Load all the map tile images and inserts them s32o the imageMap
+	@param	void
+	@return void
+	*/
+	void LoadMapTileImages();
+
 protected:
+	/*!
+	@brief Constructor. Makes it set the map array to empty and loads all map tile images
+	*/
 	Map();
+
+	/*!
+	@brief Destructor. Used to clean up the map
+	*/
 	~Map();
 
 public:
-	//Functions to get tile info
-	Tile GetTile(float xPos, float yPos) const;
-	Tile& GetTileFromTilePos(float xPos, float yPos) const;
-	AEVec2 GetTilePos(float xPos, float yPos) const;
+	/*!
+	@brief	Gets a tile based on the x & y postion given
+	@param	f32 xPos - x position
+	@param	f32 yPos - y position
+	@return Tile& - reference to tile
+	*/
+	Tile& GetTile(f32 xPos, f32 yPos) const;
+
+	/*!
+	@brief	Gets a tile based on the x & y tile pos given
+	@param	f32 xPos - x tile position
+	@param	f32 yPos - y tile position
+	@return Tile& - reference to tile
+	*/
+	Tile& GetTileFromTilePos(f32 xPos, f32 yPos) const;
+
+	/*!
+	@brief	Gets tile grid pos based on x & y position given
+	@param	f32 xPos - x position
+	@param	f32 yPos - y position
+	@return AEVec2 - tile grid pos
+	*/
+	AEVec2 GetTilePos(f32 xPos, f32 yPos) const;
+
+	/*!
+	@brief	Gets tile world pos based on tile grid pos
+	@param	AEVec2 tilePos - tile grid pos
+	@return AEVec2 - tile world pos
+	*/
 	AEVec2 GetTileWorldPos(AEVec2 tilePos) const;
-	void SetTile(TILE_TYPE tile, float rowPos, float columnPos);
 
-	//Functions to get map info
-	Tile** GetMap(void) const;
-	int GetNumCol(void) const;
-	int GetNumRow(void) const;
+	/*!
+	@brief	Set tile type based on given grid position
+	@param	f32 rowPos - tile grid row pos
+	@param	f32 columnPos - tile grid column pos
+	@return void
+	*/
+	void SetTile(TILE_TYPE tile, f32 rowPos, f32 columnPos);
 
-	//Functions to load and save map
+	/*!
+	@brief	Get the map
+	@param	void
+	@return Tile** - map
+	*/
+	Tile** GetMap() const;
+
+	/*!
+	@brief	Get number of columns
+	@param	void
+	@return s32 - number of columns
+	*/
+	s32 GetNumCol() const;
+
+	/*!
+	@brief	Get number of rows
+	@param	void
+	@return s32 - number of rows
+	*/
+	s32 GetNumRow() const;
+
+	/*!
+	@brief	Loads the map using CSVManager based off the fileName,
+			stores this into in the map array
+	@param	std::string fileName - name of the file
+	@return bool
+	*/
 	bool LoadMap(std::string fileName);
+
+	/*!
+	@brief	Saves the map by using CSVManager to write to csv
+	@param	std::string fileName - name of the file
+	@return bool
+	*/
 	bool SaveMap(std::string fileName);
 
-	void RenderMap(void);
+	/*!
+	@brief	Render the map by using the data from the map array
+	@param	void
+	@return void
+	*/
+	void RenderMap();
 
+	/*!
+	@brief	Resets the map by clearing it then initialising it with
+			empty values
+	@param	bool clear - whether to clear the map or not (used when first initialising the map)
+	@return void
+	*/
 	void ResetMap(bool clear);
+
+	/*!
+	@brief	Clears the map to prevent memory leak
+	@param	bool clear - whether to clear the map or not (used when first initialising the map)
+	@return void
+	*/
 	void ClearMap(bool clear);
 
+	/*!
+	@brief	Frees all the images and clears the vectors (used when program is shutting down)
+	@param	void
+	@return void
+	*/
 	void FreeImages();
 
-	AEVec2 GetDimensions(void) const;
-	float GetTileSize(void) const;
+	/*!
+	@brief	Get dimensions of map in AEVec2 form
+	@param	void
+	@return AEVec2 - map dimensions
+	*/
+	AEVec2 GetDimensions() const;
 
-	AEVec2 GetSpawnpoint(void) const;
+	/*!
+	@brief	Get size of tile
+	@param	void
+	@return f32 - size of tile
+	*/
+	f32 GetTileSize() const;
+
+	/*!
+	@brief	Get spawnpoint of the enemies
+	@param	void
+	@return AEVec2 - vector of spawnpoint
+	*/
+	AEVec2 GetSpawnpoint() const;
+
+	/*!
+	@brief	Set spawnpos32 of the enemies
+	@param	AEVec2 - vector of spawnpos32
+	@return void
+	*/
 	void SetSpawnpoint(AEVec2 spawnpoint);
 
-	//Pathfinding functions
+	/*!
+	@brief	Clean all lists used for A* pathfinding
+	@param	void
+	@return void
+	*/
 	void CleanAStarLists();
-	void GeneratePath(AEVec2 startPos, AEVec2 targetPos);
-	unsigned int CalculateHeuristic(AEVec2 newTilePos, AEVec2 currentPos);
 
-	std::vector<Tile> GetSurroundingTiles(AEVec2 tilePos);
-	bool CheckSurroundingTile(AEVec2 tilePos);
+	/*!
+	@brief	Generate path using A* pathfinding
+	@param	AEVec2 startPos - start position to generate path from
+	@param	AEVec2 targetPos - target position to generate path to
+	@param	AEVec2 minLimits - minimum x and y value to constrain path to
+	@param	AEVec2 maxLimits - maximum x and y value to constrain path to
+	@return bool - true if sucessful, false otherwise
+	*/
+	bool GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits);
+
+	/*!
+	@brief	Builds a path by iterating through all nodes connected to each other
+	@param	std::vector<AEVec2>& path - reference to vector storing coordinates of the path
+	@param	Node* node - target node to reach
+	@return std::vector<AEVec2>& - reference to vector storing coordinates of the path
+	*/
+	std::vector<AEVec2>& BuildPath(std::vector<AEVec2>& path, Node* node);
+
+	/*!
+	@brief	Calculate heuristic (h) value for A* pathfinding
+	@param	AEVec2 newTilePos - tile world position to calculate from
+	@param	AEVec2 targetPos - tile world position to calculate to
+	@return double - new h value
+	*/
+	double CalculateHeuristic(AEVec2 newTilePos, AEVec2 currentPos);
+
+	/*!
+	@brief	Get up to 8 surrounding nodes based on node pos given
+			if they are "active" (not empty)
+	@param	AEVec2 nodePos - node pos
+	@param	AEVec2 minLimits - minimum x and y value to constrain path to
+	@param	AEVec2 maxLimits - maximum x and y value to constrain path to
+	@return std::vector<Node*> - vector that stores 0 - 8 nodes
+	*/
+	std::vector<Node*> GetSurroundingNodes(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits);
+
+	/*!
+	@brief	Check whether the surrounding tile is valid by checking if it within bounds and the tile is not a solid tile
+	@param	AEVec2 tilePos - tile grid pos
+	@param	AEVec2 minLimits - minimum x and y value to constrain tile position to
+	@param	AEVec2 maxLimits - maximum x and y value to constrain tile position to
+	@return bool - true is valid, false is not
+	*/
+	bool CheckTile(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits);
+
+	/*!
+	@brief	Render a line that shows the path that was calculated
+	@param	std::vector<AEVec2> const& path - read only reference to the path
+	@return void
+	*/
+	void RenderPathDebug(std::vector<AEVec2> const& path);
 };

@@ -1,13 +1,19 @@
 /*!
 @file       CSVManager.h
 @author     Yap Yu Xuan Daevon (yuxuandaevon.yap)
-@brief      This file contains declaration of functions used to read and write to CSV
+@brief      This file contains declarations of functions used to read and write to CSV
 *//*_______________________________________________________________________*/
 
 #pragma once
 
 #include <string>
 #include <vector>
+
+enum CSV_DATA_TYPE
+{
+	SPRITESHEET_DATA,
+	TOTAL_DATA
+};
 
 class CSVManager
 {
@@ -18,10 +24,36 @@ public:
 	CSVManager();
 	~CSVManager();
 
+	//Not used currently
 	static bool write(std::string fileName, const int TILE_ROW_NUM, const int TILE_COLUMN_NUM, std::vector<std::vector<int>> data);
 
-	static std::vector<std::vector<int>> read(std::string fileName);
+	/**
+	 @brief Read map information from a CSV file
+	 @param std::string fileName - name of the file to read
+	 @return std::vector<std::vector<int>> - map data
+	 */
+	static std::vector<std::vector<int>> ReadMap(std::string fileName);
 
-	static std::vector<std::string> tokenise(std::string line, char separator);
+	/**
+	 @brief Read information from a CSV file
+	 @param std::string headerName - header name to check against
+	 @return std::vector<std::string> - spritesheet data
+	 */
+	static std::vector<std::string> ReadInfo(CSV_DATA_TYPE dataType, std::string headerName);
+	
+	/**
+	 @brief Read animation information from a CSV file
+	 @param std::string animationName - animation name to check against
+	 @return sstd::vector<std::vector<std::string>> - animation data
+	 */
+	static std::vector<std::vector<std::string>> ReadAnimationInfo(std::string animationName);
+
+	/**
+	 @brief Separate a given string by using the given separator and stores all the information into a string vector
+	 @param std::string line - line to tokenise
+	 @param char separator - char that denotes what to separate with
+	 @return std::vector<std::string> - tokenised information
+	 */
+	static std::vector<std::string> Tokenise(std::string line, char separator);
 };
 

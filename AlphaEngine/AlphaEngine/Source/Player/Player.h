@@ -1,9 +1,10 @@
 #pragma once
 #include "../System/SingletonTemplate.h"
+#include "../Sprite/Sprite.h"
 #include "AEEngine.h"
 #include "Transform2D.h"
 #include "../Projectiles/BaseProjectile.h"
-
+#include <vector>
 class Player : public SingletonTemplate<Player>
 {	
 	friend class SingletonTemplate<Player>;
@@ -23,6 +24,10 @@ public:
 	// Player's Transform Properties
 	Transform2D transform;
 
+	// Player's Sprite
+	Sprite* sprite;
+
+	std::vector<BaseProjectile*> projectileList;
 
 private:
 	BaseProjectile* proj;

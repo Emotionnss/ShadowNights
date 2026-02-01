@@ -5,6 +5,8 @@
 #include "../../Source/Scene/BaseScene.h"
 #include "../System/MeshManager.h"
 #include "../System/Map.h"
+#include "../Abilities/AbilityHandler.h"
+#include "../Enemy/BaseEnemy.h" 
 
 class TestScene : public BaseScene {
 public:
@@ -16,11 +18,10 @@ public:
     void Unload() override;
 
 private:
-    // Constructor
-    Player *player;
-
-    //float playerX, playerY;
-    //float speed = 200.0f;
+    Player* player = nullptr;
+    AbilityHandler* abilityHandler = nullptr;
     MeshManager* meshManager = nullptr;
     Map* map = nullptr;
+
+    BaseEnemy* myEnemy = nullptr;
 };

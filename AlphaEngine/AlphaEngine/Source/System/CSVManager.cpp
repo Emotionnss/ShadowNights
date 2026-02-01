@@ -91,21 +91,14 @@ bool CSVManager::write(std::string fileName, const int TILE_ROW_NUM, const int T
 	return writeSucessful;
 }
 
-/**
- @brief Read from a CSV file
- @param fileName A string containing the name of the output file
- @param TILE_ROW_NUM A const int containing the number of tiles in the x-axis
- @param TILE_COLUMN_NUM A const int containing the number of tiles in the y-axis
- @return vector<vector<int>> data
- */
-std::vector<std::vector<int>> CSVManager::read(std::string fileName)
+std::vector<std::vector<int>> CSVManager::ReadMap(std::string fileName)
 {
 	//Double vector to store the tile data
 	std::vector<std::vector<int>> rowValues;
 
 	//Creates an output filestream and opens the file
 	std::string filePath = MAP_FILE_PATH + fileName + ".csv";
-	std::ifstream file(filePath);
+	std::ifstream file{filePath, std::ios::in};
 
 	// Make sure the file is open
 	try 
@@ -143,46 +136,109 @@ std::vector<std::vector<int>> CSVManager::read(std::string fileName)
 				ss.ignore();
 		}
 
-		//Push the whole column into the data vector if column size matches
-		//if (columnValues.size() == TILE_COLUMN_NUM)
-		//{
-			rowValues.push_back(columnValues);
-		//}
-		//else
-		//{
-		//	//End loop immediately since this is a gone case alr
-		//	columnValues.clear();
-		//	readResult = false;
-		//	break;
-		//}
+		rowValues.push_back(columnValues);
 	}
 
 	//Close the file
 	file.close();
 
-	//Check if the rows are correct
-	/*if (rowValues.size() != TILE_ROW_NUM)
-	{
-		readResult = false;
-	}*/
-
-	//Clear the vector if there are any issues
-	//if (!readResult)
-	//{
-		/*for (int i = 0; i < (int)rowValues.size(); i++)
-		{
-			rowValues[i].clear();
-		}*/
-
-		//rowValues.clear();
-	//}
-
-		std::cout << "Read map" << std::endl;
+	std::cout << "Read map" << std::endl;
 
 	return rowValues;
 }
 
-std::vector<std::string> CSVManager::tokenise(std::string line, char separator)
+std::vector<std::string> CSVManager::ReadInfo(CSV_DATA_TYPE dataType, std::string headerName)
+{
+	//Get info in string
+	std::vector<std::string> info;
+
+	std::string filePath;
+
+	switch (dataType)
+	{
+	case SPRITESHEET_DATA:
+		filePath = "Assets/Data/SpriteData.csv";
+		break;
+	}
+
+	//Creates an output filestream and opens the file
+	std::ifstream file{ filePath, std::ios::in };
+
+	// Make sure the file is open
+	try
+	{
+		if (!file.is_open())
+		{
+			throw std::runtime_error("Could not open file");
+		}
+	}
+	catch (std::runtime_error e)
+	{
+		//std::cout << "Runtime error: " << e.what();
+		return info;
+	}
+
+	std::string line;
+
+	//Gets line by line until end of file
+	while (getline(file, line))
+	{
+		//Get the spritesheet name
+		std::string name = line.substr(0, line.find_first_of(","));
+
+		//If name matches, save info in vector and return
+		if (name == headerName)
+		{
+			info = Tokenise(line, ',');
+			return info;
+		}
+	}
+
+	return info;
+}
+
+std::vector<std::vector<std::string>> CSVManager::ReadAnimationInfo(std::string animationName)
+{
+	//Get info in string
+	std::vector<std::vector<std::string>> animInfo;
+
+	//Creates an output filestream and opens the file
+	std::ifstream file{ "Assets/Data/AnimationData.csv", std::ios::in };
+
+	// Make sure the file is open
+	try
+	{
+		if (!file.is_open())
+		{
+			throw std::runtime_error("Could not open file");
+		}
+	}
+	catch (std::runtime_error e)
+	{
+		//std::cout << "Runtime error: " << e.what();
+		return animInfo;
+	}
+
+	std::string line;
+
+	//Gets line by line until end of file
+	while (getline(file, line))
+	{
+		//Get the spritesheet name
+		std::string name = line.substr(0, line.find_first_of(","));
+
+		//If name matches, save info in vector and return
+		if (name == animationName)
+		{
+			std::vector<std::string> info{ Tokenise(line, ',') };
+			animInfo.push_back(info);
+		}
+	}
+
+	return animInfo;
+}
+
+std::vector<std::string> CSVManager::Tokenise(std::string line, char separator)
 {
 	//List of separated tokens
 	std::vector<std::string> tokens;
@@ -219,7 +275,8 @@ std::vector<std::string> CSVManager::tokenise(std::string line, char separator)
 		tokens.push_back(token);
 		
 		start = end + 1;
-	} while (end > 0);
+
+	} while (end != std::string::npos);
 
 	return tokens;
 }

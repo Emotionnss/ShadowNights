@@ -1,47 +1,43 @@
 #include "GameObject.h"
 
 GameObject::GameObject()
-	: isStatic{ true }
-	, velocity{ 0.f, 0.f }
-	, acceleration{ 0.f, 0.f }
-	, friction{0.f}
-	, mass{10.f}
-	, collision{CollisionShape::NONE}
+    : isStatic(true), friction(0.0f), sprite(nullptr)
 {
-
+    velocity = { 0.0f, 0.0f };
+    acceleration = { 0.0f, 0.0f };
 }
 
-void GameObject::Init()
+GameObject::~GameObject()
 {
-
+    if (sprite != nullptr)
+    {
+        delete sprite;
+    }
 }
 
-void GameObject::Update(f32 deltaTime)
+void GameObject::Update(float deltaTime)
 {
-	if (deltaTime) //Sample reference
-	{
+    if (isStatic) return;
 
-	}
+    velocity.x += acceleration.x * deltaTime;
+    velocity.y += acceleration.y * deltaTime;
 
-	if (isStatic)
-	{
-		// If Object does not engage physics
-	}
-	else
-	{
+    AEVec2 pos = transform.GetPosition();
+    pos.x += velocity.x * deltaTime;
+    pos.y += velocity.y * deltaTime;
 
-	}
+    transform.SetPosition(pos);
+
+    if (sprite != nullptr)
+    {
+        sprite->Update();
+    }
 }
 
-void GameObject::Draw(AEGfxVertexList *pMesh)
+void GameObject::Draw() 
 {
-	if (pMesh == nullptr)
-	{
-		return;
-	}
-}
-
-void GameObject::Exit()
-{
-
+    if (sprite != nullptr)
+    {
+        sprite->Render(transform);
+    }
 }

@@ -318,6 +318,13 @@ public:
 	bool CheckTile(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits);
 
 	/*!
+	@brief	Checks if tile should be solid or not
+	@param	TILE_TYPE type - type of tile returned
+	@return bool - true is valid, false is not
+	*/
+	bool CheckTile(TILE_TYPE type);
+
+	/*!
 	@brief	Render a line that shows the path that was calculated
 	@param	std::vector<AEVec2> const& path - read only reference to the path
 	@return void

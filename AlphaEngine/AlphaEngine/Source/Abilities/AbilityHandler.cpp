@@ -36,7 +36,6 @@ void AbilityHandler::AbilityUpdate(float deltaTime)
 	} 
 	else if(!timeStop.TimeStopped())
 	{
-		std::cout << "movin\n";
 		for (BaseProjectile* proj : player->projectileList)
 		{
 			proj->speed = originalProjSpeed;

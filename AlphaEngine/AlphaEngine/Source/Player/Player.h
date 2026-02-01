@@ -6,6 +6,9 @@
 #include "../Projectiles/BaseProjectile.h"
 #include "GameObject.h"
 #include <vector>
+#include "../utils.h"
+#include "../System/Map.h"
+
 class Player : public SingletonTemplate<Player>
 {	
 	friend class SingletonTemplate<Player>;
@@ -57,4 +60,5 @@ private:
 	// Honestly, I don't even know where else to put it
 	AEVec2 cameraPosition, cameraOffset;
 
+	Map *map;
 };

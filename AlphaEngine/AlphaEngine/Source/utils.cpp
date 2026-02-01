@@ -48,6 +48,12 @@ bool AreCirclesIntersecting(float c1_x, float c1_y, float r1, float c2_x, float 
 	return false;
 }
 
+bool AABBOverlap(AEVec2 aPosition, AEVec2 aHalf, AEVec2 bPosition, AEVec2 bHalf)
+{
+	return fabs(aPosition.x - bPosition.x) <= (aHalf.x + bHalf.x) &&
+		fabs(aPosition.y - bPosition.y) <= (aHalf.y + bHalf.y);
+}
+
 AEVec2 ScreenToWorldPos(AEVec2 MouseScreenWorldPos)
 {
 	AEVec2 temp;

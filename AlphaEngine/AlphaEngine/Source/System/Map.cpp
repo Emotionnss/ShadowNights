@@ -1,7 +1,7 @@
 /*!
 @file       Map.cpp
 @author     Yap Yu Xuan Daevon (yuxuandaevon.yap)
-@brief      This file contains definitions of functions	
+@brief      This file contains definitions of functions
 			used for the Map class
 *//*_______________________________________________________________________*/
 
@@ -85,7 +85,7 @@ std::string Map::GetImageFilePath(TILE_TYPE tileType)
 
 void Map::LoadMapTileImages()
 {
-	tileTypesVector = { 
+	tileTypesVector = {
 		BACKGROUND,
 		FLOOR,
 		CEILING,
@@ -99,7 +99,7 @@ void Map::LoadMapTileImages()
 		PLATFORM,
 		RIGHT_PLATFORM,
 		LEFT_STAIR,
-		RIGHT_STAIR 
+		RIGHT_STAIR
 	};
 
 	for (s32 i = 0; i < tileTypesVector.size(); i++)
@@ -212,11 +212,11 @@ bool Map::LoadMap(std::string fileName)
 			map[i][j].transform.SetPosition(vec);
 			map[i][j].transform.SetScale(TILE_WIDTH, TILE_HEIGHT);
 
-			std::cout << "Pos: " << vec.x << ", " << vec.y << std::endl;
+			//std::cout << "Pos: " << vec.x << ", " << vec.y << std::endl;
 
 			AEVec2 tilePos = GetTilePos(vec.x, vec.y);
 
-			std::cout << "Tile Pos: " << tilePos.x << ", " << tilePos.y << std::endl;
+			//std::cout << "Tile Pos: " << tilePos.x << ", " << tilePos.y << std::endl;
 
 			/*if (map[i][j].tileType == STARTPOs32)
 			{
@@ -288,7 +288,7 @@ void Map::ResetMap(bool clear)
 	ClearMap(clear);
 
 	//Resets the map with new blank data
-	map = new Tile* [NUM_ROW];
+	map = new Tile * [NUM_ROW];
 
 	for (s32 i = 0; i < NUM_ROW; i++)
 	{
@@ -405,7 +405,7 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 
 		for (Node* node : nodes)
 		{
-			bool proceed{true};
+			bool proceed{ true };
 
 			//Check if current node has already been evaluated
 			for (Node* closedNode : closedList)
@@ -485,13 +485,13 @@ std::vector<Node*> Map::GetSurroundingNodes(AEVec2 nodePos, AEVec2 minLimits, AE
 	AEVec2 tilePos = GetTilePos(nodePos.x, nodePos.y);
 
 	//Get surrounding tile indexes
-	AEVec2 positions[8] = { 
-		(tilePos.x, tilePos.y + 1), 
-		(tilePos.x + 1, tilePos.y + 1), 
-		(tilePos.x + 1, tilePos.y), 
-		(tilePos.x + 1, tilePos.y - 1), 
-		(tilePos.x, tilePos.y - 1), 
-		(tilePos.x - 1, tilePos.y - 1), 
+	AEVec2 positions[8] = {
+		(tilePos.x, tilePos.y + 1),
+		(tilePos.x + 1, tilePos.y + 1),
+		(tilePos.x + 1, tilePos.y),
+		(tilePos.x + 1, tilePos.y - 1),
+		(tilePos.x, tilePos.y - 1),
+		(tilePos.x - 1, tilePos.y - 1),
 		(tilePos.x - 1, tilePos.y),
 		(tilePos.x - 1, tilePos.y + 1)
 	};
@@ -520,6 +520,11 @@ bool Map::CheckTile(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits)
 	return true;
 }
 
+bool Map::CheckTile(TILE_TYPE type)
+{
+	return (type >= FLOOR && type <= LEFT_PLATFORM);
+}
+
 void Map::RenderPathDebug(std::vector<AEVec2> const& path)
 {
 	AEGfxVertexList* lineMesh = meshManager->GetMesh(LINE);
@@ -534,10 +539,10 @@ void Map::RenderPathDebug(std::vector<AEVec2> const& path)
 
 		//Set line rotation
 		//Get angle in radians from currentPos to the nextPos
-		
+
 		//Set line length
 		//Get magnitude from one edge of the square to the other based on the rotation
-		
+
 		//Create transform
 		Transform2D transform{ currentPos, {1.0f, 1.0f}, 250 };
 

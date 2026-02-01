@@ -15,7 +15,7 @@ void TimeStop::Init()
 
 void TimeStop::Update(float dt)
 {
-    std::cout << resource << "\n";
+    //std::cout << resource << "\n";
     if (active)
     {
         resource -= 30 * dt;

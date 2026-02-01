@@ -16,8 +16,13 @@ void GameObject::Init()
 
 }
 
-void GameObject::Update(float deltaTime)
+void GameObject::Update(f32 deltaTime)
 {
+	if (deltaTime) //Sample reference
+	{
+
+	}
+
 	if (isStatic)
 	{
 		// If Object does not engage physics

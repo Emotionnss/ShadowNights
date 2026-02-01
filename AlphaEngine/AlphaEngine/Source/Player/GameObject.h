@@ -9,7 +9,7 @@ public:
 	virtual ~GameObject() = default; // No idea if we'll use this
 
 	virtual void Init();
-	virtual void Update(float deltaTime);
+	virtual void Update(f32 deltaTime);
 	virtual void Draw(AEGfxVertexList *pMesh);
 	virtual void Exit();
 

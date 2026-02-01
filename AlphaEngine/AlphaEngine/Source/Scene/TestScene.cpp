@@ -66,7 +66,9 @@ void TestScene::Draw() {
 }
 
 void TestScene::Free() {
+
     player->DestroyInstance();
+    player = nullptr;
 }
 
 void TestScene::Unload() 

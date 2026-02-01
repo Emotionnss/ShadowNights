@@ -5,7 +5,7 @@
 #include "../Projectiles/BaseProjectile.h"
 
 class Player : public SingletonTemplate<Player>
-{
+{	
 	friend class SingletonTemplate<Player>;
 public:
 	Player();

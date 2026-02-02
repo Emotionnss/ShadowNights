@@ -21,7 +21,7 @@ void TestScene::Init() {
 
     if (myEnemy) {
 
-        myEnemy->Init(500.0f, 0.0f, 85.0f, 60.0f, "shadow1 - Idle_test");
+        myEnemy->Init(500.0f, 0.0f, 85.0f, 60.0f, "shadowspritesheettest");
 
         myEnemy->SetVelocity(0.0f, 0.0f);
     }

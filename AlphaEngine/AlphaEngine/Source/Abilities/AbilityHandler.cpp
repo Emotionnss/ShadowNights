@@ -21,11 +21,11 @@ void AbilityHandler::AbilityUpdate(float deltaTime)
 	timeStop.Update(deltaTime);
 	if (AEInputCheckTriggered(AEVK_F))
 	{
-		timeStop.ToggleTime(player->GameObject.GetTransform().GetPosition());
+		timeStop.ToggleTime(player->GetTransform().GetPosition());
 	}
 	if (timeStop.TimeStopped())
 	{
-		for (BaseProjectile* proj : player->projectileList)
+		for (BaseProjectile* proj : player->GetProjectileList())
 		{
 			if (AreCirclesIntersecting(proj->transform.GetPosition().x, proj->transform.GetPosition().y, proj->size,
 				timeStop.zoneTransform.GetPosition().x, timeStop.zoneTransform.GetPosition().y, timeStop.GetScale()))
@@ -36,7 +36,7 @@ void AbilityHandler::AbilityUpdate(float deltaTime)
 	} 
 	else if(!timeStop.TimeStopped())
 	{
-		for (BaseProjectile* proj : player->projectileList)
+		for (BaseProjectile* proj : player->GetProjectileList())
 		{
 			proj->speed = originalProjSpeed;
 		}

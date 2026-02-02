@@ -1,26 +1,27 @@
 #include "Player.h"
-#include "../Projectiles/BaseProjectile.h"
-#include <iostream>
-#include "../System/CSVManager.h"
-#include <algorithm>
+
 Player::Player()
 	: input{ 0.f, 0.f }
-	, map {map->GetInstance()}
+	, map{ Map::GetInstance() } // Might convert to function for cleaner execution
 	, speed{ 500.f }
+	, maxSpeed{ 800.f }
+	, friction{ 0.75f }
 	, size{ 100.f }
 	, gravity{ -1400.f }
 	, isGrounded{ false }
 {
-	GameObject.GetTransform().SetScale(size, size);
-	//transform.SetScale(size, size);
-	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
+	SetStatic(false);
+
+	GetTransform().SetScale(size, size);
+
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
 	AEVec2Set(&cameraOffset, 400.f, -50.f);
 
-	GameObject.sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "ame"));
-	GameObject.sprite->PlayAnimation("bounce", -1, 1.f);
+	sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "ame"));
+	sprite->SetDefaultAnimation("bounce");
+	sprite->PlayDefaultAnimation(-1, 1.f);
 
-	proj = nullptr;
+	SetAcceleration(4000.f, 4000.f);
 }
 
 Player::~Player()
@@ -28,84 +29,58 @@ Player::~Player()
 	for (BaseProjectile* pProj : projectileList)
 	{
 		if (pProj)
+		{
 			delete pProj;
+		}
 	}
 	projectileList.clear();
-
-	delete GameObject.sprite;
-	GameObject.sprite = nullptr;
 }
 
 void Player::HandleInput()
 {
-	// Zero Out Input Vector
 	AEVec2Zero(&input);
 
 	if (AEInputCheckCurr(AEVK_D))
 	{
-		playerDirection = RIGHT;
 		input.x += 1.f;
 	}
 
 	if (AEInputCheckCurr(AEVK_A))
 	{
-		playerDirection = LEFT;
 		input.x -= 1.f;
 	}
 
-	// Jump (Triggered)
-	if (AEInputCheckTriggered(AEVK_W) && isGrounded)
+	if (AEInputCheckTriggered(AEVK_SPACE) && isGrounded)
 	{
-		GameObject.SetVelocity(GameObject.GetVelocity().x, 900.f);
-		//velocity.y = 900.f;
+		SetVelocity(GetVelocity().x, 900.f);
 		isGrounded = false;
 	}
-	else if (!AEInputCheckCurr(AEVK_W) && GameObject.GetVelocity().y > 0)
+	else if (!AEInputCheckCurr(AEVK_SPACE) && GetVelocity().y > 0)
 	{
-		GameObject.SetVelocity(GameObject.GetVelocity().x, GameObject.GetVelocity().y * 0.5f);
-		//velocity.y *= 0.5f;
+		SetVelocity(GetVelocity().x, GetVelocity().y * 0.5f);
 	}
 
+	if (AEInputCheckTriggered(AEVK_LBUTTON))
+	{
+		s32 xDir, yDir;
+		AEInputGetCursorPosition(&xDir, &yDir);
+		AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
+
+		AEVec2 playerDir = ScreenToWorldPos(mousePos);
+
+		projectileList.push_back(new BaseProjectile(GetTransform().GetPosition(), playerDir));
+	}
 }
 
-void Player::Update(float deltaTime)
+void Player::ComputeCollision(AEVec2 position)
 {
-	const float playerAcceleration = 4000.f;
-	const float maxSpeed = 800.f;
-	const float friction = 0.75f;
-	isGrounded = false;
+	AEVec2 halfSize{ size * 0.5f, size * 0.5f };
 
-	if (map == nullptr)
-	{
-		map = Map::GetInstance();
-	}
+	float left = position.x - halfSize.x;
+	float right = position.x + halfSize.x;
+	float bottom = position.y - halfSize.y;
+	float top = position.y + halfSize.y;
 
-	//* Gather Input Movement
-	if (input.x != 0.f)
-	{
-		GameObject.SetVelocity(GameObject.GetVelocity().x + input.x * playerAcceleration * deltaTime, GameObject.GetVelocity().y);
-	}
-	else
-	{
-		GameObject.SetVelocity(GameObject.GetVelocity().x * friction * deltaTime, GameObject.GetVelocity().y);
-	}
-
-	GameObject.SetVelocity(AEClamp(GameObject.GetVelocity().x, -maxSpeed, maxSpeed), GameObject.GetVelocity().y + gravity * deltaTime);
-
-	// Computed Movement
-	AEVec2 position = GameObject.GetTransform().GetPosition();
-	position.x += GameObject.GetVelocity().x * deltaTime;
-	position.y += GameObject.GetVelocity().y * deltaTime;
-
-	AEVec2 halfSize{ size / 2.f, size / 2.f };
-
-	// Min and Max Position of player
-	f32 left = position.x - halfSize.x;
-	f32 right = position.x + halfSize.x;
-	f32 bottom = position.y - halfSize.y;
-	f32 top = position.y + halfSize.y;
-
-	// Checks for tiles near player
 	AEVec2 minTile = map->GetTilePos(left, bottom);
 	AEVec2 maxTile = map->GetTilePos(right, top);
 
@@ -114,135 +89,110 @@ void Player::Update(float deltaTime)
 	int yMinTile = static_cast<int>((std::min)(minTile.y, maxTile.y));
 	int yMaxTile = static_cast<int>((std::max)(minTile.y, maxTile.y));
 
-	// Loops through tile map
 	for (int y = yMinTile; y <= yMaxTile; ++y)
 	{
 		for (int x = xMinTile; x <= xMaxTile; ++x)
 		{
-			// Out of bounds
 			if (x < 0 || y < 0 || y >= map->GetNumRow() || x >= map->GetNumCol())
+				continue;
+
+			Tile& tile = map->GetMap()[y][x];
+			if (!map->CheckTile(tile.tileType))
+				continue;
+
+			AEVec2 tilePos = tile.transform.GetPosition();
+			AEVec2 tileHalf{ map->GetTileSize() * 0.5f, map->GetTileSize() * 0.5f };
+
+			float dx = position.x - tilePos.x;
+			float px = (halfSize.x + tileHalf.x) - fabsf(dx);
+			if (px <= 0) continue;
+
+			float dy = position.y - tilePos.y;
+			float py = (halfSize.y + tileHalf.y) - fabsf(dy);
+			if (py <= 0) continue;
+
+			if (tile.tileType == FLOOR)
 			{
+				if (GetVelocity().y < 0.f)
+				{
+					float prevBottom = position.y - halfSize.y - GetVelocity().y;
+					float tileTop = tilePos.y + tileHalf.y;
+
+					if (prevBottom >= tileTop)
+					{
+						position.y += py;
+						SetVelocity(GetVelocity().x, 0.f);
+						isGrounded = true;
+					}
+				}
 				continue;
 			}
 
-			Tile &tile = map->GetMap()[y][x];
-
-			if (!map->CheckTile(tile.tileType))
+			if (px < py)
 			{
-				continue;
+				position.x += (dx > 0) ? px : -px;
+				SetVelocity(0.f, GetVelocity().y);
 			}
 			else
 			{
-				std::cout << "Colliding with tile type: " << tile.tileType << std::endl;
-			}
-
-			AEVec2 tilePosition = tile.transform.GetPosition();
-			AEVec2 tileHalf = { map->GetTileSize() * 0.5f, map->GetTileSize() * 0.5f };
-
-			// Checks between x pos of player and tiles
-			float dx = position.x - tilePosition.x;
-			float px = (halfSize.x + tileHalf.x) - fabs(dx);
-
-			if (px > 0)
-			{
-				float dy = position.y - tilePosition.y;
-				float py = (halfSize.y + tileHalf.y) - fabs(dy);
-
-				if (py > 0)
-				{
-					// Resolve smaller axis
-					if (px < py)
-					{
-						if (dx > 0)
-						{
-							position.x += px;
-						}
-						else
-						{
-							position.x += -px;
-						}
-
-						GameObject.SetVelocity(0.f, GameObject.GetVelocity().y);
-					}
-					else
-					{
-						if (dy > 0)
-						{
-							position.y += py;
-						}
-						else
-						{
-							position.y += -py;
-						}
-						GameObject.SetVelocity(GameObject.GetVelocity().x, 0.f);
-
-						if (dy > 0 && GameObject.GetVelocity().y <= 0.f)
-						{
-							isGrounded = true;
-						}
-					}
-				}
+				position.y += (dy > 0) ? py : -py;
+				SetVelocity(GetVelocity().x, 0.f);
+				if (dy > 0) isGrounded = true;
 			}
 		}
 	}
+}
 
-	// Grounded Catch
-	if (position.y <= -400.f)
+void Player::Update(float deltaTime)
+{
+	// Apply Input Forces
+	AEVec2 currentForces{ 0.f, gravity }; // Gravity is applied
+	if (input.x != 0.f)
 	{
-		position.y = -400.f;
-		GameObject.SetVelocity(GameObject.GetVelocity().x, 0.f);
-		isGrounded = true;
+		currentForces.x = input.x * acceleration.x;
+	}
+	else
+	{
+		AEVec2 velocity = GetVelocity();
+		velocity.x *= friction;
+		SetVelocity(velocity.x, velocity.y);
 	}
 
-	// Apply Physics Movement
-	GameObject.GetTransform().SetPosition(position.x, position.y);
+	SetAcceleration(currentForces.x, currentForces.y);
 
-	// Apply Camera Movement
-	AEVec2 cameraLerpVector{ GameObject.GetTransform().GetPosition().x + cameraOffset.x * input.x,
-							GameObject.GetTransform().GetPosition().y + cameraOffset.y };
+	GameObject::Update(deltaTime);
 
-	// Constant is for tracking speed
-	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpVector, deltaTime * 5.0f);
+	AEVec2 position = GetTransform().GetPosition();
+
+	//ComputeCollision(position);
+
+	GetTransform().SetPosition(position.x, position.y);
+
+	AEVec2 cameraLerpVector{ GetTransform().GetPosition().x + cameraOffset.x * input.x,
+							GetTransform().GetPosition().y + cameraOffset.y };
+	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpVector, deltaTime * 4.0f);
 	AEGfxSetCamPosition(cameraPosition.x, cameraPosition.y);
 
-	if (AEInputCheckTriggered(AEVK_LBUTTON))
+	// Update projectiles and remove dead ones
+	for (auto it = projectileList.begin(); it != projectileList.end(); )
 	{
-		s32 xDir, yDir;
-		AEInputGetCursorPosition(&xDir, &yDir);
-		AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
-		AEVec2 playerDir = ScreenToWorldPos(mousePos);
-
-		projectileList.push_back(new BaseProjectile(position, playerDir));
-	}
-	for (int i = 0; i < projectileList.size(); i++)
-	{
-		BaseProjectile* pProj = projectileList[i];
-
-		pProj->Update(deltaTime);
-		if (pProj->GetLifespan() <= 0.f)
+		(*it)->Update(deltaTime);
+		if ((*it)->GetLifespan() <= 0.f)
 		{
-			delete pProj; // free memory
-			projectileList.erase(projectileList.begin() + i);
-			i--;
+			delete* it; // Manually delete the object first
+			it = projectileList.erase(it);
 		}
+		else
+			++it;
 	}
-
-	GameObject.sprite->Update();
-	//sprite->Update();
 }
 
 void Player::Draw(AEGfxVertexList* mesh)
 {
-	for (BaseProjectile* pProj : projectileList)
-	{
-		pProj->Draw(mesh);
-	}
+	// Draw projectiles first
+	for (const auto& p : projectileList)
+		p->Draw(mesh);
 
-	/*AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	AEGfxSetColorToAdd(-1.f, -1.f, 0.7f, 0.0f);
-	AEGfxSetTransform(transform.GetMatrix().m);
-	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);*/
-
-	GameObject.sprite->Render(GameObject.GetTransform());
-	//sprite->Render(transform);
+	// Draw player sprite/transform via GameObject::Draw
+	GameObject::Draw();
 }

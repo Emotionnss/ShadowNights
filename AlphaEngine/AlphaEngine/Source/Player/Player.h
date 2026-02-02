@@ -1,64 +1,49 @@
 #pragma once
-#include "../System/SingletonTemplate.h"
-#include "../Sprite/Sprite.h"
-#include "AEEngine.h"
-#include "Transform2D.h"
-#include "../Projectiles/BaseProjectile.h"
-#include "GameObject.h"
-#include <vector>
-#include "../utils.h"
-#include "../System/Map.h"
 
-class Player : public SingletonTemplate<Player>
-{	
+#include "AEEngine.h"
+#include "../System/SingletonTemplate.h"
+#include "GameObject.h"
+#include "../System/Map.h"
+#include "../System/CSVManager.h"
+#include "../utils.h"
+
+#include "../Projectiles/BaseProjectile.h"
+
+#include <memory>
+#include <iostream>
+#include <vector>
+
+class Player : public GameObject, public SingletonTemplate<Player>
+{
 	friend class SingletonTemplate<Player>;
 public:
 	Player();
-	~Player();
+	~Player() override;
 
-	// Handle Inputs
 	void HandleInput();
+	void ComputeCollision(AEVec2 position);
 
-	// Update Logic
 	void Update(float deltaTime);
 
-	// Render Logic
 	void Draw(AEGfxVertexList* mesh);
 
-	// Player's Transform Properties
-	
-	//Transform2D transform;
-	GameObject GameObject;
-
-	// Player's Sprite
-	//Sprite* sprite;
-
-	std::vector<BaseProjectile*> projectileList;
+	void SpawnProjectile(const AEVec2& spawnPos, const AEVec2& direction);
+	std::vector<BaseProjectile*> GetProjectileList() { return projectileList; }
+	//std::vector<std::unique_ptr<BaseProjectile>> GetProjectileList() { return projectileList; }
 
 private:
-	BaseProjectile* proj;
-	// Future Proofing
-	enum Direction
-	{
-		LEFT = -1,
-		RIGHT = 1,
-		IDLE = 0
-	};
-
+	enum Direction { LEFT = -1, RIGHT = 1, IDLE = 0 };
 	Direction playerDirection = IDLE;
 
-	// Player input handler
 	AEVec2 input;
-
-	// Player jump
-	//AEVec2 velocity;
 	bool isGrounded;
 
-	float speed, size, gravity;
+	float speed, maxSpeed, friction, size, gravity;
 
-	// For Camera System
-	// Honestly, I don't even know where else to put it
 	AEVec2 cameraPosition, cameraOffset;
 
-	Map *map;
+	Map* map;
+
+	std::vector<BaseProjectile*> projectileList;
+	//std::vector<std::unique_ptr<BaseProjectile>> projectileList;
 };

@@ -5,30 +5,33 @@
 
 class GameObject {
 public:
-    GameObject();
+	GameObject();
 
-    virtual ~GameObject();
+	virtual ~GameObject();
 
-    virtual void Init() {}
+	virtual void Init() {}
 
-    virtual void Update(float deltaTime);
+	virtual void Update(float deltaTime);
 
-    virtual void Draw();
+	virtual void Draw();
 
-    Transform2D& GetTransform() { return transform; }
+	Transform2D& GetTransform() { return transform; }
 
-    void SetVelocity(float x, float y) { velocity.x = x; velocity.y = y; }
+	void SetVelocity(float x, float y) { velocity.x = x; velocity.y = y; }
+	const AEVec2 GetVelocity() const { return velocity; }
 
-    const AEVec2 GetVelocity() { return velocity; }
+	void SetAcceleration(float x, float y) { acceleration.x = x; acceleration.y = y; }
+	const AEVec2 GetAcceleration() { return acceleration; };
 
-    Sprite* sprite;
+	void SetStatic(bool state) { isStatic = state; }
+	bool const GetStatic() { return isStatic; }
 
+	Sprite* sprite;
 protected:
-    Transform2D transform;
+	Transform2D transform;
 
-    AEVec2 velocity;
-    AEVec2 acceleration;
-    float friction;
-    bool isStatic;
-
+	AEVec2 velocity;
+	AEVec2 acceleration;
+	float friction;
+	bool isStatic;
 };

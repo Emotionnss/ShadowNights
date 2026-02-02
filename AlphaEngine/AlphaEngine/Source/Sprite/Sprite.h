@@ -23,7 +23,6 @@ private:
 	//Spritesheet info
 	u32 spritesheetRows;
 	u32 spritesheetColumns;
-	u32 spritesheetMaxFrames;
 	f32 spriteUVWidth;
 	f32 spriteUVHeight;
 	std::string spriteName;
@@ -38,6 +37,7 @@ private:
 	s32 playCount;
 
 	std::string currentAnimationName;
+	std::string defaultAnimationName;
 	std::unordered_map<std::string, Animation*> animationMap;
 
 public:
@@ -95,6 +95,21 @@ public:
 	@return void
 	*/
 	void PlayAnimation(std::string animName, s32 count, f32 animTime);
+
+	/*!
+	@brief	Set a default animation to fall back on if current anim ends
+	@param	std::string animName - name of animation
+	@return void
+	*/
+	void SetDefaultAnimation(std::string animName);
+
+	/*!
+	@brief	Play default animation (calls PlayAnimation())
+	@param	s32 playCount - number of times to play
+	@param	f32 animTime - duration of entire animation
+	@return void
+	*/
+	void PlayDefaultAnimation(s32 count = -1, f32 animTime = 1.0f);
 
 	/*!
 	@brief	Get the current animation

@@ -9,7 +9,7 @@ void TestScene2::Load() {
     meshManager = MeshManager::GetInstance();
     map = Map::GetInstance();
     
-    map->LoadMap("Level1");
+    map->LoadMap("Level2");
 }
 
 void TestScene2::Init() {

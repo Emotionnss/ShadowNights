@@ -35,19 +35,19 @@ void Animation::AddFrame(u32 frame)
 	frames.push_back(frame);
 }
 
-void Animation::SetAnimation(s32 repeatCount, f32 animTime)
+void Animation::SetAnimation(s32 count, f32 time)
 {
-	SetRepeatCount(repeatCount);
-	SetAnimTime(animTime);
+	SetRepeatCount(count);
+	SetAnimTime(time);
 	SetActive(true);
 }
 
-u32 Animation::GetFrame(u32 frameNum) const
+size_t Animation::GetFrame(u32 frameNum) const
 {
 	return frameNum > frames.size() ? frames.size() : frameNum;
 }
 
-u32 Animation::GetFramesSize() const
+size_t Animation::GetFramesSize() const
 {
 	return frames.size();
 }
@@ -57,9 +57,9 @@ f32 Animation::GetAnimTime() const
 	return animTime;
 }
 
-void Animation::SetAnimTime(f32 animTime)
+void Animation::SetAnimTime(f32 time)
 {
-	this->animTime = animTime;
+	animTime = time;
 }
 
 s32 Animation::GetRepeatCount() const
@@ -67,9 +67,9 @@ s32 Animation::GetRepeatCount() const
 	return repeatCount;
 }
 
-void Animation::SetRepeatCount(s32 repeatCount)
+void Animation::SetRepeatCount(s32 count)
 {
-	this->repeatCount = repeatCount;
+	repeatCount = count;
 }
 
 bool Animation::GetActive() const
@@ -77,7 +77,7 @@ bool Animation::GetActive() const
 	return active;
 }
 
-void Animation::SetActive(bool active)
+void Animation::SetActive(bool activeStatus)
 {
-	this->active = active;
+	active = activeStatus;
 }

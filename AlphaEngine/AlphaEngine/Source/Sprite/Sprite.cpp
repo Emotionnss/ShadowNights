@@ -14,7 +14,6 @@ Sprite::Sprite() :
 	tex{ nullptr },
 	spritesheetRows{ 0 },
 	spritesheetColumns{ 0 },
-	spritesheetMaxFrames{ 0 },
 	spriteUVWidth{ 0.0f },
 	spriteUVHeight{ 0.0f },
 	animationTimer{ 0.0f },
@@ -33,7 +32,6 @@ Sprite::Sprite(std::vector<std::string> spriteInfo) :
 	tex{ nullptr },
 	spritesheetRows{ std::stoul(spriteInfo[1]) },
 	spritesheetColumns{ std::stoul(spriteInfo[2]) },
-	spritesheetMaxFrames{ std::stoul(spriteInfo[3]) },
 	spriteUVWidth{ 1.f / spritesheetColumns },
 	spriteUVHeight{ 1.f / spritesheetRows },
 	animationTimer{ 0.0f },
@@ -95,7 +93,7 @@ void Sprite::Update()
 	if (currentAnim->GetActive())
 	{
 		//Get the current frame
-		currentAnimationFrame = currentAnim->GetFrame(std::fmin(currentAnim->GetFramesSize() - 1, static_cast<int>(animationTimer / animationDurationPerFrame)));
+		currentAnimationFrame = currentAnim->GetFrame(std::fmin(static_cast<u32>(currentAnim->GetFramesSize() - 1), static_cast<u32>(animationTimer / animationDurationPerFrame)));
 
 		//Checks if animation reached end
 		if (animationTimer >= currentAnim->GetAnimTime())
@@ -153,10 +151,11 @@ void Sprite::AddAnimation(std::string animName, u32 startFrame, u32 endFrame)
 		Animation* animation = new Animation{ startFrame, endFrame };
 		animationMap.insert({ animName, animation });
 
-		//Set current animation if it doesnt exist
+		//Set current & default animation if it doesnt exist
 		if (currentAnimationName == "")
 		{
-			currentAnimationName = animName;
+			currentAnimationName = defaultAnimationName = animName;
+			PlayDefaultAnimation();
 		}
 	}
 }
@@ -175,6 +174,16 @@ void Sprite::PlayAnimation(std::string animName, s32 count, f32 animTime)
 		//Set animation duration per frame
 		animationDurationPerFrame = currentAnimation->GetAnimTime() / currentAnimation->GetFramesSize();
 	}
+}
+
+void Sprite::SetDefaultAnimation(std::string animName)
+{
+	defaultAnimationName = animName;
+}
+
+void Sprite::PlayDefaultAnimation(s32 count, f32 animTime)
+{
+	PlayAnimation(defaultAnimationName, count, animTime);
 }
 
 Animation* Sprite::GetCurrentAnimation() const

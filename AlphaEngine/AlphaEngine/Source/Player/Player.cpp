@@ -243,8 +243,8 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 	matrix.SetRotation(0);
 	matrix.SetPosition(CamPos.x, CamPos.y + 350.f);
 
-	currentHP = AEClamp(currentHP, 0.f, maxHP);
-	matrix.SetScale(currentHP * 5.f, 55.f);
+	value = AEClamp(value, 0.f, value);
+	matrix.SetScale(value * 5.f, 55.f);
 
 	AEGfxSetTransform(matrix.GetMatrix().m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);

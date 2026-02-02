@@ -525,7 +525,7 @@ bool Map::CheckTile(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits)
 
 bool Map::CheckTile(TILE_TYPE type)
 {
-	return (type >= FLOOR && type <= LEFT_PLATFORM);
+	return (type >= FLOOR && type <= RIGHT_PLATFORM);
 }
 
 void Map::RenderPathDebug(std::vector<AEVec2> const& path)

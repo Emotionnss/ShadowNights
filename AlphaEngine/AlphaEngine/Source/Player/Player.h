@@ -21,15 +21,13 @@ public:
 	~Player() override;
 
 	void HandleInput();
-	void ComputeCollision(AEVec2 position);
+	void ComputeCollision(AEVec2 &position);
 
-	void Update(float deltaTime);
+	void Update(float deltaTime) override;
 
 	void Draw(AEGfxVertexList* mesh);
 
-	void SpawnProjectile(const AEVec2& spawnPos, const AEVec2& direction);
 	std::vector<BaseProjectile*> GetProjectileList() { return projectileList; }
-	//std::vector<std::unique_ptr<BaseProjectile>> GetProjectileList() { return projectileList; }
 
 private:
 	enum Direction { LEFT = -1, RIGHT = 1, IDLE = 0 };
@@ -45,5 +43,4 @@ private:
 	Map* map;
 
 	std::vector<BaseProjectile*> projectileList;
-	//std::vector<std::unique_ptr<BaseProjectile>> projectileList;
 };

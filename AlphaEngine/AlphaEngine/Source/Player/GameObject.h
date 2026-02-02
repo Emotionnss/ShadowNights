@@ -2,6 +2,7 @@
 #include "AEEngine.h"
 #include "Transform2D.h"
 #include "../Sprite/Sprite.h"
+#include "../System/MeshManager.h"
 
 class GameObject {
 public:

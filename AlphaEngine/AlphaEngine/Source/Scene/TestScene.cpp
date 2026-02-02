@@ -39,15 +39,17 @@ void TestScene::Update() {
         myEnemy->Update(dt);
     }
 
+    /*
     if (AEInputCheckTriggered(VK_SPACE)) {
         std::cout << "DEBUG: Space IS Held Down!" << std::endl;
         SceneManager::ChangeScene(new TestScene2());
         return;
     }
+    */
 }
 
 void TestScene::Draw() {
-    AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+    AEGfxSetBackgroundColor(0.4f, 0.4f, 0.4f);
     map->RenderMap();
 
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -68,7 +70,7 @@ void TestScene::Draw() {
 
     AEGfxSetColorToAdd(1.f, 1.f, 1.f, 1.f);
     AEGfxSetTransform(finalMtx.m);
-    AEGfxSetTransparency(1.0f);
+    //AEGfxSetTransparency(1.0f);
 
     AEGfxMeshDraw(meshManager->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);
 }

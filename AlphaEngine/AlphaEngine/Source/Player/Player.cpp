@@ -3,10 +3,10 @@
 Player::Player()
 	: input{ 0.f, 0.f }
 	, map{ Map::GetInstance() } // Might convert to function for cleaner execution
-	, speed{ 500.f }
+	, speed{ 4000.f }
 	, maxSpeed{ 800.f }
 	, friction{ 0.75f }
-	, size{ 100.f }
+	, size{ 70.f }
 	, gravity{ -1400.f }
 	, isGrounded{ false }
 {
@@ -15,7 +15,7 @@ Player::Player()
 	GetTransform().SetScale(size, size);
 
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
-	AEVec2Set(&cameraOffset, 400.f, -50.f);
+	AEVec2Set(&cameraOffset, 200.f, -50.f);
 
 	sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "ame"));
 	sprite->SetDefaultAnimation("bounce");
@@ -34,6 +34,12 @@ Player::~Player()
 		}
 	}
 	projectileList.clear();
+
+	if (sprite)
+	{
+		delete sprite;
+		sprite = nullptr;
+	}
 }
 
 void Player::HandleInput()
@@ -42,12 +48,12 @@ void Player::HandleInput()
 
 	if (AEInputCheckCurr(AEVK_D))
 	{
-		input.x += 1.f;
+		Player::input.x += 1.f;
 	}
 
 	if (AEInputCheckCurr(AEVK_A))
 	{
-		input.x -= 1.f;
+		Player::input.x -= 1.f;
 	}
 
 	if (AEInputCheckTriggered(AEVK_SPACE) && isGrounded)
@@ -72,9 +78,10 @@ void Player::HandleInput()
 	}
 }
 
-void Player::ComputeCollision(AEVec2 position)
+void Player::ComputeCollision(AEVec2& position)
 {
 	AEVec2 halfSize{ size * 0.5f, size * 0.5f };
+	AEVec2 oldPosition = GetTransform().GetPosition();
 
 	float left = position.x - halfSize.x;
 	float right = position.x + halfSize.x;
@@ -113,31 +120,35 @@ void Player::ComputeCollision(AEVec2 position)
 
 			if (tile.tileType == FLOOR)
 			{
-				if (GetVelocity().y < 0.f)
-				{
-					float prevBottom = position.y - halfSize.y - GetVelocity().y;
-					float tileTop = tilePos.y + tileHalf.y;
+				float prevBottom = oldPosition.y - halfSize.y;
+				float tileTop = tilePos.y + tileHalf.y;
 
-					if (prevBottom >= tileTop)
-					{
-						position.y += py;
-						SetVelocity(GetVelocity().x, 0.f);
-						isGrounded = true;
-					}
+				if (prevBottom >= tileTop && GetVelocity().y <= 0.f)
+				{
+					position.y = tilePos.y + tileHalf.y + halfSize.y;
+					SetVelocity(GetVelocity().x, 0.f);
+					isGrounded = true;
 				}
+
 				continue;
 			}
 
 			if (px < py)
 			{
-				position.x += (dx > 0) ? px : -px;
-				SetVelocity(0.f, GetVelocity().y);
+				if ((dx > 0 && GetVelocity().x < 0) || (dx < 0 && GetVelocity().x > 0))
+				{
+					position.x += (dx > 0) ? px : -px;
+					SetVelocity(0.f, GetVelocity().y);
+				}
 			}
 			else
 			{
-				position.y += (dy > 0) ? py : -py;
-				SetVelocity(GetVelocity().x, 0.f);
-				if (dy > 0) isGrounded = true;
+				if ((dy > 0 && GetVelocity().y < 0) || (dy < 0 && GetVelocity().y > 0))
+				{
+					position.y += (dy > 0) ? py : -py;
+					SetVelocity(GetVelocity().x, 0.f);
+					if (dy > 0) isGrounded = true;
+				}
 			}
 		}
 	}
@@ -145,32 +156,52 @@ void Player::ComputeCollision(AEVec2 position)
 
 void Player::Update(float deltaTime)
 {
-	// Apply Input Forces
-	AEVec2 currentForces{ 0.f, gravity }; // Gravity is applied
+	//1. Apply forces / acceleration
+	//2. Calculate new velocity
+	//3. Calculate new position(based on velocity)
+	//4. Check collisions against new position
+	//5. Correct position if colliding
+	//6. Update transform with corrected position
+
+	HandleInput();
+
+	// Set up forces based on input
+	AEVec2 currentForces{ 0.f, gravity }; // Clamp fall speed next time
+
 	if (input.x != 0.f)
 	{
-		currentForces.x = input.x * acceleration.x;
+		currentForces.x = input.x * speed;
 	}
 	else
 	{
-		AEVec2 velocity = GetVelocity();
-		velocity.x *= friction;
-		SetVelocity(velocity.x, velocity.y);
+		// Apply friction to velocity directly
+		AEVec2 vel = GetVelocity();
+		vel.x *= friction;
+		SetVelocity(vel.x, vel.y);
 	}
 
 	SetAcceleration(currentForces.x, currentForces.y);
 
-	GameObject::Update(deltaTime);
+	AEVec2 currentPosition = GetTransform().GetPosition();
+	AEVec2 currentVelocity = GetVelocity();
 
-	AEVec2 position = GetTransform().GetPosition();
+	currentVelocity.x += currentForces.x * deltaTime;
+	currentVelocity.y += currentForces.y * deltaTime;
 
-	//ComputeCollision(position);
+	currentVelocity.x = AEClamp(currentVelocity.x, -maxSpeed, maxSpeed);
+	SetVelocity(currentVelocity.x, currentVelocity.y);
 
-	GetTransform().SetPosition(position.x, position.y);
+	AEVec2 predictedPos = currentPosition;
+	predictedPos.x += currentVelocity.x * deltaTime;
+	predictedPos.y += currentVelocity.y * deltaTime;
+
+	ComputeCollision(predictedPos);
+
+	GetTransform().SetPosition(predictedPos.x, predictedPos.y);
 
 	AEVec2 cameraLerpVector{ GetTransform().GetPosition().x + cameraOffset.x * input.x,
 							GetTransform().GetPosition().y + cameraOffset.y };
-	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpVector, deltaTime * 4.0f);
+	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpVector, deltaTime * 5.f);
 	AEGfxSetCamPosition(cameraPosition.x, cameraPosition.y);
 
 	// Update projectiles and remove dead ones
@@ -185,6 +216,11 @@ void Player::Update(float deltaTime)
 		else
 			++it;
 	}
+
+	if (sprite)
+	{
+		sprite->Update();
+	}
 }
 
 void Player::Draw(AEGfxVertexList* mesh)
@@ -192,6 +228,16 @@ void Player::Draw(AEGfxVertexList* mesh)
 	// Draw projectiles first
 	for (const auto& p : projectileList)
 		p->Draw(mesh);
+
+	/*
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(0.0f);
+	AEGfxSetTransform(transform.GetMatrix().m);
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+	*/
 
 	// Draw player sprite/transform via GameObject::Draw
 	GameObject::Draw();

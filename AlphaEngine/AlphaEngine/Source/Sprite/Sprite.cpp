@@ -52,7 +52,10 @@ Sprite::Sprite(std::vector<std::string> spriteInfo) :
 	std::vector<std::vector<std::string>> animInfo = CSVManager::ReadAnimationInfo(spriteInfo[0]);
 	for (std::vector<std::string> info : animInfo)
 	{
-		AddAnimation(info[1], std::stoul(info[2]), std::stoul(info[3]));
+		AddAnimation(
+			info[1],													  //Name
+			std::stoul(info[2]) * spritesheetRows,						  //Row index
+			std::stoul(info[2]) * spritesheetRows + std::stoul(info[3])); //Column index
 	}
 }
 

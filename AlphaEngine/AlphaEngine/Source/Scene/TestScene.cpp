@@ -19,7 +19,7 @@ void TestScene::Init() {
 
     if (myEnemy) {
 
-        myEnemy->Init(500.0f, -300.0f, 85.0f, 60.0f, "shadow1 - Idle_test");
+        myEnemy->Init(500.0f, 0.0f, 85.0f, 60.0f, "shadow1 - Idle_test");
 
         myEnemy->SetVelocity(0.0f, 0.0f);
     }
@@ -45,7 +45,7 @@ void TestScene::Update() {
 }
 
 void TestScene::Draw() {
-    AEGfxSetBackgroundColor(2.0f, 2.0f, 2.0f);
+    AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
     map->RenderMap();
 
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);

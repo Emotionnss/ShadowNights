@@ -7,6 +7,9 @@ void TestScene2::Load() {
     AEGfxReset();
 
     meshManager = MeshManager::GetInstance();
+    map = Map::GetInstance();
+    
+    map->LoadMap("Level1");
 }
 
 void TestScene2::Init() {
@@ -30,6 +33,9 @@ void TestScene2::Update() {
 }
 
 void TestScene2::Draw() {
+
+    map->RenderMap();
+
     AEGfxSetCamPosition(0.0f, 0.0f);
     AEGfxSetBackgroundColor(0.2f, 0.2f, 0.2f); // Dark Grey BG to differentiate scenes
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);

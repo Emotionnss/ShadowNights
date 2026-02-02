@@ -3,6 +3,7 @@
 #include "AEEngine.h"
 #include "../../Source/Scene/BaseScene.h"
 #include "../System/MeshManager.h"
+#include "../System/Map.h"
 
 class TestScene2 : public BaseScene {
 public:
@@ -18,6 +19,8 @@ private:
     float speed = 200.0f;
 
     MeshManager* meshManager = nullptr;
+
+    Map* map = nullptr;
 
 };
 

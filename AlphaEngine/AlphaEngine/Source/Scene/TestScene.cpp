@@ -10,6 +10,8 @@ void TestScene::Load() {
     map = Map::GetInstance();
     player = Player::GetInstance();
 
+    map->LoadMap("SmallMap");
+
     myEnemy = new BaseEnemy();
 }
 

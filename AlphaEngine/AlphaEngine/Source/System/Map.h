@@ -84,6 +84,7 @@ private:
 	static const char* TILE_ASSETS_FILE_PATH;
 	const f32 TILE_WIDTH = 75.f;
 	const f32 TILE_HEIGHT = 75.f;
+	bool firstLoad = false;
 	s32 NUM_COLUMN;
 	s32 NUM_ROW;
 
@@ -221,7 +222,7 @@ public:
 	@param	bool clear - whether to clear the map or not (used when first initialising the map)
 	@return void
 	*/
-	void ResetMap(bool clear);
+	void ResetMap();
 
 	/*!
 	@brief	Clears the map to prevent memory leak

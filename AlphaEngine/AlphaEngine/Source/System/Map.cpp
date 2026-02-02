@@ -16,8 +16,6 @@ Map::Map()
 {
 	LoadMapTileImages();
 
-	LoadMap("TestMap");
-
 	meshManager = MeshManager::GetInstance();
 }
 
@@ -194,10 +192,17 @@ bool Map::LoadMap(std::string fileName)
 	}
 
 	//Reset the map
+	ClearMap(firstLoad);
+
+	if (!firstLoad)
+	{
+		firstLoad = true;
+	}
+
 	NUM_ROW = static_cast<s32>(mapData.size());
 	NUM_COLUMN = static_cast<s32>(mapData[0].size());
 
-	ResetMap(false);
+	ResetMap();
 
 	//Nested for loop to store the tile data read from file
 	for (s32 i = 0; i < NUM_ROW; i++)
@@ -283,12 +288,10 @@ void Map::RenderMap()
 	}
 }
 
-void Map::ResetMap(bool clear)
+void Map::ResetMap()
 {
-	ClearMap(clear);
-
 	//Resets the map with new blank data
-	map = new Tile * [NUM_ROW];
+	map = new Tile*[NUM_ROW];
 
 	for (s32 i = 0; i < NUM_ROW; i++)
 	{

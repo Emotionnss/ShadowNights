@@ -52,8 +52,8 @@ Sprite::Sprite(std::vector<std::string> spriteInfo) :
 	{
 		AddAnimation(
 			info[1],													  //Name
-			std::stoul(info[2]) * spritesheetRows,						  //Row index
-			std::stoul(info[2]) * spritesheetRows + std::stoul(info[3])); //Column index
+			std::stoul(info[2]) * spritesheetColumns,						  //Row index
+			std::stoul(info[2]) * spritesheetColumns + std::stoul(info[3])); //Column index
 	}
 }
 
@@ -93,6 +93,7 @@ void Sprite::Update()
 	if (currentAnim->GetActive())
 	{
 		//Get the current frame
+
 		currentAnimationFrame = currentAnim->GetFrame(std::fmin(static_cast<u32>(currentAnim->GetFramesSize() - 1), static_cast<u32>(animationTimer / animationDurationPerFrame)));
 
 		//Checks if animation reached end

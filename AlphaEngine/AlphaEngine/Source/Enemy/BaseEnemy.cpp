@@ -14,7 +14,7 @@ void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     transform.SetScale(w, h);
 
     sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));
-    sprite->PlayAnimation("idle", -1, 1.0f);
+    sprite->PlayAnimation("walk", -1, 1.0f);
 }
 
 void BaseEnemy::Update(float deltaTime)

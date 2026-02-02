@@ -42,14 +42,14 @@ void Animation::SetAnimation(s32 count, f32 time)
 	SetActive(true);
 }
 
-size_t Animation::GetFrame(u32 frameNum) const
+u32 Animation::GetFrame(u32 frameNum) const
 {
-	return frameNum > frames.size() ? frames.size() : frameNum;
+	return frameNum > frames.size() ? static_cast<u32>(frames[0] + frames.size()) : static_cast<u32>(frames[frameNum]);
 }
 
-size_t Animation::GetFramesSize() const
+u32 Animation::GetFramesSize() const
 {
-	return frames.size();
+	return static_cast<u32>(frames.size());
 }
 
 f32 Animation::GetAnimTime() const

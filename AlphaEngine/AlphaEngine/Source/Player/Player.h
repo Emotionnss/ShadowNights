@@ -21,15 +21,21 @@ public:
 	~Player() override;
 
 	void HandleInput();
-	void ComputeCollision(AEVec2 &position);
+	void ComputeCollision(AEVec2& position);
 
 	void Update(float deltaTime) override;
 
 	void Draw(AEGfxVertexList* mesh);
+	void DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matrix);
+
+	void TakeDamage(int value) { currentHP -= value; }
 
 	std::vector<BaseProjectile*> GetProjectileList() { return projectileList; }
 
 private:
+
+	Transform2D healthbar;
+
 	enum Direction { LEFT = -1, RIGHT = 1, IDLE = 0 };
 	Direction playerDirection = IDLE;
 
@@ -37,6 +43,8 @@ private:
 	bool isGrounded;
 
 	float speed, maxSpeed, friction, size, gravity;
+
+	float maxHP, currentHP;
 
 	AEVec2 cameraPosition, cameraOffset;
 

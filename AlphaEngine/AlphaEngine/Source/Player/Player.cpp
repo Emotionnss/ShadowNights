@@ -4,6 +4,8 @@ Player::Player()
 	: input{ 0.f, 0.f }
 	, map{ Map::GetInstance() } // Might convert to function for cleaner execution
 	, speed{ 4000.f }
+	, maxHP{ 100.f }
+	, currentHP{ maxHP }
 	, maxSpeed{ 800.f }
 	, friction{ 0.75f }
 	, size{ 70.f }
@@ -223,6 +225,31 @@ void Player::Update(float deltaTime)
 	}
 }
 
+void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matrix)
+{
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(0.25f);
+	AEGfxSetColorToMultiply(1.f, 0.0f, 0.0f, 1.0f);
+	AEGfxSetColorToAdd(1.f, 0.f, 0.f, 1.f);
+
+	if (AEInputCheckTriggered(AEVK_1))
+	{
+		TakeDamage(10);
+	}
+
+	AEVec2 CamPos;
+	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
+	matrix.SetRotation(0);
+	matrix.SetPosition(CamPos.x, CamPos.y + 350.f);
+
+	currentHP = AEClamp(currentHP, 0.f, maxHP);
+	matrix.SetScale(currentHP * 5.f, 55.f);
+
+	AEGfxSetTransform(matrix.GetMatrix().m);
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+}
+
 void Player::Draw(AEGfxVertexList* mesh)
 {
 	// Draw projectiles first
@@ -239,6 +266,9 @@ void Player::Draw(AEGfxVertexList* mesh)
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 	*/
 
+	DrawHealthBar(mesh, currentHP, healthbar);
+
 	// Draw player sprite/transform via GameObject::Draw
 	GameObject::Draw();
+
 }

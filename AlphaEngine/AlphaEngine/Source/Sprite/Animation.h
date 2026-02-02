@@ -59,16 +59,16 @@ public:
 	/*!
 	@brief	Get frame w.r.t animation frame vector
 	@param	u32 frameNum - index for frame
-	@return size_t - frame
+	@return u32 - frame
 	*/
-	size_t GetFrame(u32 frameNum) const;
+	u32 GetFrame(u32 frameNum) const;
 
 	/*!
 	@brief	Get number of frames
 	@param	void
-	@return size_t - number of frames
+	@return u32 - number of frames
 	*/
-	size_t GetFramesSize() const;
+	u32 GetFramesSize() const;
 
 	/*!
 	@brief	Get animation time

@@ -24,6 +24,7 @@ public:
     // Accessor for TestScene to check collisions
     std::vector<EnemyProjectile*>& GetProjectiles() { return enemyProjectiles; }
 
+    bool isStopped();
 private:
     Sprite* sprite = nullptr;
 
@@ -51,4 +52,7 @@ private:
     // Animation Helper
     std::string currentAnimState = "";
     void PlayAnim(std::string name);
+
+    //stopped in timestop zone
+    bool stopped = false;
 };

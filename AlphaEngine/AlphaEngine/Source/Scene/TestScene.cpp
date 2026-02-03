@@ -145,8 +145,8 @@ void TestScene::Draw() {
 
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-    player->Draw(meshManager->GetMesh(SQUARE));
     abilityHandler->Draw();
+    player->Draw(meshManager->GetMesh(SQUARE));
 
     if (myEnemy) {
         myEnemy->Draw();

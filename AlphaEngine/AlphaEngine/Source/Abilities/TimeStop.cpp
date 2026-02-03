@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../utils.h"
 #include "../System/CSVManager.h"
+
 void TimeStop::Init()
 {
 	meshManager = MeshManager::GetInstance();
@@ -9,6 +10,7 @@ void TimeStop::Init()
     active = false;
     sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "timestop"));
     //sprite->PlayAnimation("spawn", 1, 1.f);
+    
 }
 
 void TimeStop::Update(float dt)
@@ -26,6 +28,7 @@ void TimeStop::Update(float dt)
                 proj->stopped = true;
             }
         }
+
     }
     else
     {
@@ -67,7 +70,6 @@ void TimeStop::ToggleTime(AEVec2 position)
         active = true;
         SetZonePos(position);
     }
-    std::cout << "ZA WORLDO" << std::endl;
 }
 
 bool TimeStop::TimeStopped()
@@ -83,11 +85,14 @@ f32 TimeStop::GetScale()
 void TimeStop::SetZonePos(AEVec2 position)
 {
     zoneTransform.SetPosition(position);
+    spriteTransform.SetPosition(position);
 }
 
 void TimeStop::SetZoneScale()
 {
     zoneTransform.SetScale(zoneScale, zoneScale);
+    spriteTransform.SetScale(zoneScale*2.f, zoneScale*2.f);
+
 }
 
 void TimeStop::Draw()
@@ -95,20 +100,19 @@ void TimeStop::Draw()
     //zone for timestop
     AEGfxSetRenderMode(AE_GFX_RM_COLOR); 
     AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-    AEGfxSetTransparency(0.25f);
-    AEGfxSetColorToMultiply(0.0f, 1.0f, 1.0f, 1.0f);
-    AEGfxSetColorToAdd(0.f, 0.f, 255.f, 0.f);
-    AEGfxSetTransform(zoneTransform.GetMatrix().m);
     if (active)
     {
-        sprite->Render(zoneTransform);
+        AEGfxSetTransparency(0.25f);
+        AEGfxSetColorToMultiply(0.0f, 1.0f, 1.0f, 1.0f);
+        AEGfxSetColorToAdd(0.f, 0.f, 255.f, 0.f);
+        AEGfxSetTransform(zoneTransform.GetMatrix().m);
+        AEGfxMeshDraw(meshManager->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
+        sprite->Render(spriteTransform);
     }
-    //if (active)
-    //{
-    //    AEGfxMeshDraw(meshManager->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
-    //}
 
     //resource bar for timestop
+    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+    AEGfxSetBlendMode(AE_GFX_BM_BLEND);
     AEGfxSetTransparency(1.f);
     AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
     AEGfxSetColorToAdd(1.f, 1.f, 255.f, 0.f);
@@ -120,4 +124,9 @@ void TimeStop::Free()
 {
     meshManager = nullptr;
     player = nullptr;
+    if (sprite)
+    {
+        delete sprite;
+        sprite = nullptr;
+    }
 }

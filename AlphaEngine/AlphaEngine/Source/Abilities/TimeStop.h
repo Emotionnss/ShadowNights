@@ -2,6 +2,7 @@
 #include "../Player/Transform2D.h"
 #include "../Player/Player.h"
 #include "../Sprite/Sprite.h"
+#include "../Enemy/BaseEnemy.h"
 #pragma once
 class TimeStop
 {
@@ -10,16 +11,19 @@ private:
 	f32 originalScale = 1.f;
 	f32 zoneScale = 1.f;
 	f32 maxScale = 500.f;
+
 	MeshManager* meshManager = nullptr;
 	Player *player = nullptr;
+	BaseEnemy* enemy = nullptr;
 	f32 resource{ 100 };
 	f32 maxResource{ 100 };
 	f32 timeStopped{ 0.f };
 	f32 originalProjSpeed{ 500.f };
-	Sprite* sprite;
+	Sprite* sprite = nullptr;
 public:
 	Transform2D resourceBarTfm{};
 	Transform2D zoneTransform{};
+	Transform2D spriteTransform{};
 	void Init();
 	void Update(float deltaTime);
 	void ToggleTime(AEVec2 position);

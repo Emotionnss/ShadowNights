@@ -6,14 +6,11 @@ AbilityHandler::AbilityHandler()
 {
 	timeStop.Init();
 	player = Player::GetInstance();
-	//std::cout << "abil timestop instance:" << &timeStop << "\n";
-	//std::cout << "abil handler player: " << &player << "\n";
 }
 
 AbilityHandler::~AbilityHandler()
 {
 	timeStop.Free();
-	//player->DestroyInstance();
 }
 
 void AbilityHandler::AbilityUpdate(float deltaTime)

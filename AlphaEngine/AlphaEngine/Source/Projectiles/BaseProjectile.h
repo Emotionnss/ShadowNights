@@ -15,6 +15,7 @@ public:
 
 	float speed = 1.f, size = 1.f;
 
+	bool stopped{};
 	BaseProjectile();
 	BaseProjectile(AEVec2 pos, AEVec2 dir);
 	~BaseProjectile();
@@ -25,5 +26,6 @@ public:
 	void Exit();
 
 	float GetLifespan();
+	float SetLifespan();
 };
 

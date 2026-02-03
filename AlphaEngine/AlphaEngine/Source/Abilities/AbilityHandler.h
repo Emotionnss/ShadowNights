@@ -6,7 +6,6 @@ class AbilityHandler
 private:
 	TimeStop timeStop;
 	Player* player = nullptr;
-	float originalProjSpeed{500.f};
 public:
 	AbilityHandler();
 	~AbilityHandler();

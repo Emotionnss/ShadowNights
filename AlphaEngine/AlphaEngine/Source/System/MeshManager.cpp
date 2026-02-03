@@ -13,6 +13,8 @@ MeshManager::MeshManager()
 {
     meshList.insert({ SQUARE, MeshBuilder::CreateSquareMesh() });
     meshList.insert({ TEXTURE_SQUARE, MeshBuilder::CreateSquareMesh(true) });
+    meshList.insert({ CORNER_SQUARE, MeshBuilder::CreateCornerSquareMesh() });
+    meshList.insert({ CORNER_TEXTURE_SQUARE, MeshBuilder::CreateCornerSquareMesh(true) });
     meshList.insert({ TRIANGLE, MeshBuilder::CreateTriangle() });
     meshList.insert({ CIRCLE, MeshBuilder::CreateCircle() });
     meshList.insert({ LINE, MeshBuilder::CreateLine() });

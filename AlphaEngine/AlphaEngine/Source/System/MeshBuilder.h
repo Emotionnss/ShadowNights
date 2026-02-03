@@ -21,6 +21,13 @@ public:
 	static AEGfxVertexList* CreateSquareMesh(bool texture = false);
 
 	/*!
+	@brief	Create a square mesh with an origin at its bottom left corner
+	@param	bool texture - true to create mesh that has uv coords, false to create a mesh without uv coords
+	@return AEGfxVertexList* - vertex list of the mesh that has been created
+	*/
+	static AEGfxVertexList* CreateCornerSquareMesh(bool texture = false);
+
+	/*!
 	@brief	Create a triangle mesh
 	@param	void
 	@return AEGfxVertexList* - vertex list of the mesh that has been created

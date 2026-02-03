@@ -23,24 +23,6 @@ void AbilityHandler::AbilityUpdate(float deltaTime)
 	{
 		timeStop.ToggleTime(player->GetTransform().GetPosition());
 	}
-	if (timeStop.TimeStopped())
-	{
-		for (BaseProjectile* proj : player->GetProjectileList())
-		{
-			if (AreCirclesIntersecting(proj->transform.GetPosition().x, proj->transform.GetPosition().y, proj->size,
-				timeStop.zoneTransform.GetPosition().x, timeStop.zoneTransform.GetPosition().y, timeStop.GetScale()))
-			{
-				proj->speed = 0;
-			}
-		}
-	} 
-	else if(!timeStop.TimeStopped())
-	{
-		for (BaseProjectile* proj : player->GetProjectileList())
-		{
-			proj->speed = originalProjSpeed;
-		}
-	}
 	
 }
 

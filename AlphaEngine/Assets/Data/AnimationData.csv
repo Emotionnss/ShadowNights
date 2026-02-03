@@ -1,3 +1,4 @@
 ame,bounce,0,18
 shadow1 - Idle_test,idle,0,12
 shadowspritesheettest,walk,10,5
+timestop,spawn,0,6

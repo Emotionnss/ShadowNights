@@ -60,7 +60,7 @@ void Player::HandleInput()
 
 	if (AEInputCheckTriggered(AEVK_SPACE) && isGrounded)
 	{
-		SetVelocity(GetVelocity().x, 900.f);
+		SetVelocity(GetVelocity().x, 1000.f);
 		isGrounded = false;
 	}
 	else if (!AEInputCheckCurr(AEVK_SPACE) && GetVelocity().y > 0)

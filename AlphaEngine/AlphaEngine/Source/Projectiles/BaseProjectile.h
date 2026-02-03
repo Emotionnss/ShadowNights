@@ -5,10 +5,10 @@ class BaseProjectile
 {
 private:
 	float timeLeft = 2.f;
-	float currLifespan = timeLeft;
 	AEVec2 direction;
 
 public:
+	float currLifespan = timeLeft;
 	Transform2D transform;
 	AEGfxTexture* projTex;
 	AEGfxVertexList* Texmesh = nullptr;

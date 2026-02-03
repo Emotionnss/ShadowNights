@@ -28,8 +28,8 @@ public:
 	bool const GetStatic() { return isStatic; }
 
 	Sprite* sprite;
-protected:
 	Transform2D transform;
+protected:
 
 	AEVec2 velocity;
 	AEVec2 acceleration;

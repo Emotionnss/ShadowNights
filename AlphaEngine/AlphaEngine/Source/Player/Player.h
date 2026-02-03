@@ -32,6 +32,8 @@ public:
 
 	std::vector<BaseProjectile*> GetProjectileList() { return projectileList; }
 
+	std::vector<BaseProjectile*> projectileList;
+
 private:
 
 	Transform2D healthbar;
@@ -50,5 +52,5 @@ private:
 
 	Map* map;
 
-	std::vector<BaseProjectile*> projectileList;
+	
 };

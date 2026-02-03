@@ -47,6 +47,43 @@ AEGfxVertexList* MeshBuilder::CreateSquareMesh(bool texture)
     return mesh;
 }
 
+AEGfxVertexList* MeshBuilder::CreateCornerSquareMesh(bool texture)
+{
+    AEGfxVertexList* mesh;
+
+    std::array<f32, 2> uvCoords{};
+
+    if (texture)
+    {
+        //This is square with UV coords
+        uvCoords[1] = { 1.0f };
+    }
+
+    AEGfxMeshStart();
+
+    // Now it's a square lol
+    AEGfxTriAdd(
+        0.0, 1.0f, 0xFFFFFFFF, uvCoords[0], uvCoords[1],
+        1.0f, 1.0f, 0xFFFFFFFF, uvCoords[1], uvCoords[1],
+        0.0f, 0.0f, 0xFFFFFFFF, uvCoords[0], uvCoords[0]);
+
+    AEGfxTriAdd(
+        0.0f, 0.0f, 0xFFFFFFFF, uvCoords[1], uvCoords[1],
+        1.0f, 0.0f, 0xFFFFFFFF, uvCoords[1], uvCoords[0],
+        1.0f, 1.0f, 0xFFFFFFFF, uvCoords[0], uvCoords[0]);
+
+    mesh = AEGfxMeshEnd();
+
+    if (mesh == nullptr) {
+        std::cout << "ERROR: Square Mesh Creation Failed!" << std::endl;
+    }
+    else {
+        std::cout << "SUCCESS: Square Mesh Created." << std::endl;
+    }
+
+    return mesh;
+}
+
 AEGfxVertexList* MeshBuilder::CreateTriangle()
 {
     AEGfxVertexList* mesh;
@@ -131,7 +168,7 @@ AEGfxVertexList* MeshBuilder::CreateSpriteMesh(f32 spriteUVWidth, f32 spriteUVHe
 
     // Now it's a square lol
     AEGfxTriAdd(
-        -0.5f, -0.5f, 0xFFFFFFFF, 0.0f, spriteUVWidth,
+        -0.5f, -0.5f, 0xFFFFFFFF, 0.0f, spriteUVHeight,
         0.5f, -0.5f, 0xFFFFFFFF, spriteUVWidth, spriteUVHeight,
         -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 

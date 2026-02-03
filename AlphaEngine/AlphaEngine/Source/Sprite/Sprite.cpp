@@ -93,8 +93,7 @@ void Sprite::Update()
 	if (currentAnim->GetActive())
 	{
 		//Get the current frame
-
-		currentAnimationFrame = currentAnim->GetFrame(std::fmin(static_cast<u32>(currentAnim->GetFramesSize() - 1), static_cast<u32>(animationTimer / animationDurationPerFrame)));
+		currentAnimationFrame = currentAnim->GetFrame(static_cast<u32>(std::fmin(static_cast<u32>(currentAnim->GetFramesSize() - 1), static_cast<u32>(animationTimer / animationDurationPerFrame))));
 
 		//Checks if animation reached end
 		if (animationTimer >= currentAnim->GetAnimTime())

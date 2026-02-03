@@ -54,18 +54,21 @@ void BaseProjectile::Init()
 }
 void BaseProjectile::Update(float deltaTime)
 {
-	if (currLifespan > 0.f)
+	if (currLifespan > 0.f && !stopped)
 	{
 		currLifespan -= 1.f * deltaTime;
 	}
 
-	AEVec2 position = transform.GetPosition();
-	position.x += speed * direction.x * deltaTime;
-	position.y += speed * direction.y * deltaTime;
+	if (!stopped)
+	{
+		AEVec2 position = transform.GetPosition();
+		position.x += speed * direction.x * deltaTime;
+		position.y += speed * direction.y * deltaTime;
 
-	float angle = transform.GetRotation();
-	transform.SetRotation(atan2f(direction.y, direction.x) + (PI*1.25f));
-	transform.SetPosition(position.x, position.y);
+		float angle = transform.GetRotation();
+		transform.SetRotation(atan2f(direction.y, direction.x) + (PI * 1.25f));
+		transform.SetPosition(position.x, position.y);
+	}
 }
 
 void BaseProjectile::Draw(AEGfxVertexList* mesh)

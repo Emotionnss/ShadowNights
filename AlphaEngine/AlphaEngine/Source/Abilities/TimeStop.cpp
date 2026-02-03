@@ -1,36 +1,58 @@
 #include "TimeStop.h"
 #include <iostream>
-
+#include "../utils.h"
+#include "../System/CSVManager.h"
 void TimeStop::Init()
 {
 	meshManager = MeshManager::GetInstance();
     player = Player::GetInstance();
-    //meshManager->CreateCircle();
-    //meshManager->CreateSquareMesh();
-    //std::cout << "TImestop mesh manager address:" << &meshManager << "\n";
-    //std::cout << "TImestop active address:" << &active << "\n";
-    //std::cout << "TImestop trm address:" << &zoneTransform << "\n";
     active = false;
+    sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "timestop"));
+    //sprite->PlayAnimation("spawn", 1, 1.f);
 }
 
 void TimeStop::Update(float dt)
 {
-    //std::cout << resource << "\n";
     if (active)
     {
+        timeStopped += 1 * dt;
         resource -= 30 * dt;
+        zoneScale += 1500 * dt;
+        for (BaseProjectile* proj : player->GetProjectileList())
+        {
+            if (AreCirclesIntersecting(proj->transform.GetPosition().x, proj->transform.GetPosition().y, proj->size,
+                zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))
+            {
+                proj->stopped = true;
+            }
+        }
     }
     else
     {
-        resource += 30 * dt;
+        for (BaseProjectile* proj : player->GetProjectileList())
+        {
+            if (AreCirclesIntersecting(proj->transform.GetPosition().x, proj->transform.GetPosition().y, proj->size,
+                zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))
+            {
+                proj->stopped = false;
+            }
+        }
+        resource += 100 * dt;
+        zoneScale = originalScale;
+
     }
+    zoneScale = AEClamp(zoneScale, originalScale, maxScale);
+    SetZoneScale();
+    f32 camX{}, camY{};
+    AEGfxGetCamPosition(&camX, &camY);
     resource = AEClamp(resource, 0, maxResource);
     resourceBarTfm.SetScale(20, (resource / maxResource * 100.f));
-    resourceBarTfm.SetPosition(player->GetTransform().GetPosition().x + 450, player->GetTransform().GetPosition().y - 200.f);
+    resourceBarTfm.SetPosition(camX + 450.f, camY - 200.f);
     if (resource <= 0)
     {
         active = false;
     }
+    sprite->Update();
 }
 
 void TimeStop::ToggleTime(AEVec2 position)
@@ -43,7 +65,7 @@ void TimeStop::ToggleTime(AEVec2 position)
     else if (active == false)
     {
         active = true;
-        SpawnZone(position);
+        SetZonePos(position);
     }
     std::cout << "ZA WORLDO" << std::endl;
 }
@@ -53,20 +75,19 @@ bool TimeStop::TimeStopped()
     return active;
 }
 
-float TimeStop::GetScale()
+f32 TimeStop::GetScale()
 {
     return zoneScale;
 }
 
-void TimeStop::SpawnZone(AEVec2 position)
+void TimeStop::SetZonePos(AEVec2 position)
 {
-    std::cout << "MADE\n";
-
-    zoneTransform.SetScale(zoneScale, zoneScale);
     zoneTransform.SetPosition(position);
-    
-    
-    active = true;
+}
+
+void TimeStop::SetZoneScale()
+{
+    zoneTransform.SetScale(zoneScale, zoneScale);
 }
 
 void TimeStop::Draw()
@@ -80,15 +101,19 @@ void TimeStop::Draw()
     AEGfxSetTransform(zoneTransform.GetMatrix().m);
     if (active)
     {
-        AEGfxMeshDraw(meshManager->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
+        sprite->Render(zoneTransform);
     }
+    //if (active)
+    //{
+    //    AEGfxMeshDraw(meshManager->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+    //}
 
     //resource bar for timestop
     AEGfxSetTransparency(1.f);
     AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
     AEGfxSetColorToAdd(1.f, 1.f, 255.f, 0.f);
     AEGfxSetTransform(resourceBarTfm.GetMatrix().m);
-    AEGfxMeshDraw(meshManager->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);
+    AEGfxMeshDraw(meshManager->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
 }
 
 void TimeStop::Free()

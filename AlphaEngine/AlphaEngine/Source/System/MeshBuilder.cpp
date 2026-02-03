@@ -168,7 +168,7 @@ AEGfxVertexList* MeshBuilder::CreateSpriteMesh(f32 spriteUVWidth, f32 spriteUVHe
 
     // Now it's a square lol
     AEGfxTriAdd(
-        -0.5f, -0.5f, 0xFFFFFFFF, 0.0f, spriteUVWidth,
+        -0.5f, -0.5f, 0xFFFFFFFF, 0.0f, spriteUVHeight,
         0.5f, -0.5f, 0xFFFFFFFF, spriteUVWidth, spriteUVHeight,
         -0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 

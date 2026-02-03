@@ -8,12 +8,11 @@ void TimeStop::Init()
     player = Player::GetInstance();
     active = false;
     sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "timestop"));
-    sprite->PlayAnimation("spawn", 1, 1.f);
+    //sprite->PlayAnimation("spawn", 1, 1.f);
 }
 
 void TimeStop::Update(float dt)
 {
-    sprite->Update();
     if (active)
     {
         timeStopped += 1 * dt;
@@ -53,7 +52,7 @@ void TimeStop::Update(float dt)
     {
         active = false;
     }
-
+    sprite->Update();
 }
 
 void TimeStop::ToggleTime(AEVec2 position)

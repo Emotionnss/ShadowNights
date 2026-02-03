@@ -1,6 +1,8 @@
 #pragma once
 #include "../Player/GameObject.h"
 #include "../Sprite/Sprite.h"
+#include "../Projectiles/EnemyProjectile.h"
+#include <vector>
 #include <string>
 
 class BaseEnemy : public GameObject
@@ -13,11 +15,14 @@ public:
     void Update(float deltaTime) override;
     void Draw() override;
 
-    // [NEW] Call this when hit by projectile
+    // Call this when hit by player projectile
     void TakeDamage();
 
-    // [NEW] Check if animation is finished so TestScene can delete me
+    // Check if death animation is done so TestScene can delete me
     bool IsReadyToDelete();
+
+    // Accessor for TestScene to check collisions
+    std::vector<EnemyProjectile*>& GetProjectiles() { return enemyProjectiles; }
 
 private:
     Sprite* sprite = nullptr;
@@ -34,11 +39,16 @@ private:
     float attackTimer = 0.0f;
     float detectionRadius = 150.0f;
 
-    // [NEW] Death Logic
+    // Death Logic
     bool isDying = false;
     float deathTimer = 0.0f;
 
-    // Helper to switch animations
+    // [NEW] Projectile Logic
+    std::vector<EnemyProjectile*> enemyProjectiles;
+    bool hasFired = false; // Flag to ensure we shoot only once per attack
+    void Shoot();          // Internal helper to spawn projectile
+
+    // Animation Helper
     std::string currentAnimState = "";
     void PlayAnim(std::string name);
 };

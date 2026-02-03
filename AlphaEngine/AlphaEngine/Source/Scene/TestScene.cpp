@@ -23,6 +23,26 @@ void TestScene::Init() {
     if (myEnemy) {
         myEnemy->Init(900.0f, 300.0f, 85.0f, 60.0f, "shadow1");
         myEnemy->SetVelocity(0.0f, 0.0f);
+        std::vector<EnemyProjectile*>& enemyProjs = myEnemy->GetProjectiles();
+        for (int i = 0; i < enemyProjs.size(); i++)
+        {
+            AEVec2 projPos = enemyProjs[i]->GetTransform().GetPosition();
+            AEVec2 projHalf = { 20.0f, 20.0f };
+
+            AEVec2 playerPos = player->GetTransform().GetPosition();
+            AEVec2 playerHalf = { 35.0f, 35.0f };
+
+            if (AABBOverlap(projPos, projHalf, playerPos, playerHalf))
+            {
+                // Deal Damage
+                player->TakeDamage(10);
+
+                // Destroy Bullet
+                delete enemyProjs[i];
+                enemyProjs.erase(enemyProjs.begin() + i);
+                i--;
+            }
+        }
     }
 }
 
@@ -35,6 +55,38 @@ void TestScene::Update() {
 
     if (myEnemy) {
         myEnemy->Update(dt);
+    }
+
+    //CHECK IF ENEMY PROJECTILES HIT PLAYER
+    if (myEnemy)
+    {
+        std::vector<EnemyProjectile*>& enemyProjs = myEnemy->GetProjectiles();
+
+        for (int i = 0; i < enemyProjs.size(); i++)
+        {
+            EnemyProjectile* proj = enemyProjs[i];
+
+            // 1. Get Hitbox Info
+            AEVec2 projPos = proj->GetTransform().GetPosition();
+            AEVec2 projHalf = { 20.0f, 20.0f }; // 40x40 size (Half is 20)
+
+            AEVec2 playerPos = player->GetTransform().GetPosition();
+            AEVec2 playerHalf = { 35.0f, 35.0f }; // 70x70 size (Half is 35)
+
+            // 2. Check Overlap
+            if (AABBOverlap(projPos, projHalf, playerPos, playerHalf))
+            {
+                std::cout << "OUCH! Player Hit!" << std::endl;
+
+                // Deal Damage to Player
+                player->TakeDamage(10);
+
+                // Destroy the Projectile immediately
+                delete proj;
+                enemyProjs.erase(enemyProjs.begin() + i);
+                i--; // Adjust index since we removed an item
+            }
+        }
     }
 
     // --- PROJECTILE LOGIC ---

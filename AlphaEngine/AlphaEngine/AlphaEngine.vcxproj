@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Projectiles\EnemyProjectile.cpp" />
     <ClCompile Include="Source\Enemy\BaseEnemy.cpp" />
     <ClCompile Include="Source\Abilities\AbilityHandler.cpp" />
     <ClCompile Include="Source\Sprite\Animation.cpp" />
@@ -34,6 +35,7 @@
     <ClCompile Include="Source\Abilities\TimeStop.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Projectiles\EnemyProjectile.h" />
     <ClInclude Include="Source\Enemy\BaseEnemy.h" />
     <ClInclude Include="Source\Abilities\AbilityHandler.h" />
     <ClInclude Include="Source\Sprite\Animation.h" />

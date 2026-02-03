@@ -19,6 +19,12 @@ BaseEnemy::~BaseEnemy()
         delete sprite;
         sprite = nullptr;
     }
+
+    // [NEW] Clean up all active projectiles when enemy dies
+    for (EnemyProjectile* p : enemyProjectiles) {
+        delete p;
+    }
+    enemyProjectiles.clear();
 }
 
 void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
@@ -33,8 +39,10 @@ void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     moveSpeed = 100.0f;
     velocity = { moveSpeed, 0.0f };
     isGrounded = false;
+
     isAttacking = false;
     attackTimer = 0.0f;
+    hasFired = false; // Reset firing flag
 
     // Reset Death State
     isDying = false;
@@ -44,41 +52,67 @@ void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     PlayAnim("walkright");
 }
 
-// [NEW] Trigger Death
 void BaseEnemy::TakeDamage()
 {
     if (!isDying)
     {
         isDying = true;
         velocity = { 0.0f, 0.0f }; // Freeze!
-        deathTimer = 1.0f;         // Time to play "Death" animation
-        PlayAnim("shadowdeath");         // Make sure CSV has "Death" row
+        deathTimer = 1.0f;         // Duration of death anim
+        PlayAnim("shadowdeath");
     }
 }
 
-// [NEW] Helper for TestScene
 bool BaseEnemy::IsReadyToDelete()
 {
     return isDying && (deathTimer <= 0.0f);
 }
 
+// [NEW] Shoot Function
+void BaseEnemy::Shoot()
+{
+    // Determine direction based on visual scale (Face Right vs Left)
+    float dir = transform.GetScale().x;
+
+    // Spawn projectile at Enemy's current position
+    // Note: You might want to offset Y slightly so it comes from the "hand" not the feet
+    AEVec2 spawnPos = transform.GetPosition();
+    spawnPos.y += 10.0f;
+
+    EnemyProjectile* newProj = new EnemyProjectile(spawnPos, dir);
+    enemyProjectiles.push_back(newProj);
+}
+
 void BaseEnemy::Update(float deltaTime)
 {
     // ------------------------------------------
-    // 0. DEATH STATE (HIGHEST PRIORITY)
+    // 1. UPDATE PROJECTILES (Always do this!)
+    // ------------------------------------------
+    for (int i = 0; i < enemyProjectiles.size(); i++)
+    {
+        enemyProjectiles[i]->Update(deltaTime);
+
+        // Remove if expired
+        if (enemyProjectiles[i]->IsDead())
+        {
+            delete enemyProjectiles[i];
+            enemyProjectiles.erase(enemyProjectiles.begin() + i);
+            i--;
+        }
+    }
+
+    // ------------------------------------------
+    // 2. DEATH STATE (Highest Priority)
     // ------------------------------------------
     if (isDying)
     {
         deathTimer -= deltaTime;
-        // Continue playing animation
         if (sprite) sprite->Update();
-
-        // Skip all movement and collision logic below!
-        return;
+        return; // Stop here
     }
 
     // ------------------------------------------
-    // 1. CONFIG & DATA
+    // 3. CONFIG & DATA
     // ------------------------------------------
     const float gravity = -1400.f;
     float colliderWidth = 40.0f;
@@ -95,9 +129,8 @@ void BaseEnemy::Update(float deltaTime)
     float dist = sqrt(dx * dx + dy * dy);
 
     // ------------------------------------------
-    // 2. STATE MACHINE (Attack vs Patrol)
+    // 4. STATE MACHINE (Attack vs Patrol)
     // ------------------------------------------
-
     float visualWidth = fabs(transform.GetScale().x);
     float visualHeight = transform.GetScale().y;
 
@@ -106,12 +139,21 @@ void BaseEnemy::Update(float deltaTime)
         velocity.x = 0.0f;
         attackTimer -= deltaTime;
 
+        // Face the player
         if (dx > 0) transform.SetScale(visualWidth, visualHeight);
         else        transform.SetScale(-visualWidth, visualHeight);
+
+        // [NEW] SHOOT LOGIC
+        if (!hasFired)
+        {
+            Shoot();
+            hasFired = true; // Lock: Only shoot once per attack cycle
+        }
 
         if (attackTimer <= 0.0f)
         {
             isAttacking = false;
+            hasFired = false; // Reset for next time
             PlayAnim("walkright");
         }
     }
@@ -120,7 +162,7 @@ void BaseEnemy::Update(float deltaTime)
         if (dist < detectionRadius)
         {
             isAttacking = true;
-            attackTimer = 1.0f;
+            attackTimer = 1.0f; // Attack lasts 1 second
             PlayAnim("attack1");
         }
         else
@@ -134,7 +176,7 @@ void BaseEnemy::Update(float deltaTime)
     }
 
     // ------------------------------------------
-    // 3. PHYSICS & COLLISION
+    // 5. PHYSICS & COLLISION
     // ------------------------------------------
     velocity.y += gravity * deltaTime;
 
@@ -144,6 +186,7 @@ void BaseEnemy::Update(float deltaTime)
 
     AEVec2 halfSize{ colliderWidth / 2.f, colliderHeight / 2.f };
 
+    // Standard Map Collision Logic
     float left = position.x - halfSize.x;
     float right = position.x + halfSize.x;
     float bottom = position.y - halfSize.y;
@@ -223,6 +266,12 @@ void BaseEnemy::Update(float deltaTime)
 void BaseEnemy::Draw()
 {
     if (sprite) sprite->Render(transform);
+
+    // [NEW] Draw Projectiles
+    for (EnemyProjectile* p : enemyProjectiles)
+    {
+        p->Draw();
+    }
 }
 
 void BaseEnemy::PlayAnim(std::string name)

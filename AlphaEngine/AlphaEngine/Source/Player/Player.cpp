@@ -158,17 +158,10 @@ void Player::ComputeCollision(AEVec2& position)
 
 void Player::Update(float deltaTime)
 {
-	//1. Apply forces / acceleration
-	//2. Calculate new velocity
-	//3. Calculate new position(based on velocity)
-	//4. Check collisions against new position
-	//5. Correct position if colliding
-	//6. Update transform with corrected position
 
 	HandleInput();
 
-	// Set up forces based on input
-	AEVec2 currentForces{ 0.f, gravity }; // Clamp fall speed next time
+	AEVec2 currentForces{ 0.f, gravity };
 
 	if (input.x != 0.f)
 	{
@@ -176,7 +169,6 @@ void Player::Update(float deltaTime)
 	}
 	else
 	{
-		// Apply friction to velocity directly
 		AEVec2 vel = GetVelocity();
 		vel.x *= friction;
 		SetVelocity(vel.x, vel.y);
@@ -212,7 +204,7 @@ void Player::Update(float deltaTime)
 		(*it)->Update(deltaTime);
 		if ((*it)->GetLifespan() <= 0.f)
 		{
-			delete* it; // Manually delete the object first
+			delete* it;
 			it = projectileList.erase(it);
 		}
 		else
@@ -230,6 +222,7 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(0.25f);
+
 	AEGfxSetColorToMultiply(1.f, 0.0f, 0.0f, 1.0f);
 	AEGfxSetColorToAdd(1.f, 0.f, 0.f, 1.f);
 
@@ -240,14 +233,24 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 
 	AEVec2 CamPos;
 	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
+
 	matrix.SetRotation(0);
 	matrix.SetPosition(CamPos.x, CamPos.y + 350.f);
-
-	value = AEClamp(value, 0.f, value);
-	matrix.SetScale(value * 5.f, 55.f);
+	float safeValue = AEClamp(value, 0.f, maxHP);
+	matrix.SetScale(safeValue * 5.f, 55.f);
 
 	AEGfxSetTransform(matrix.GetMatrix().m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+}
+
+void Player::TakeDamage(float damage)
+{
+	currentHP -= damage;
+
+	if (currentHP < 0) {
+		currentHP = 0;
+	}
+
 }
 
 void Player::Draw(AEGfxVertexList* mesh)

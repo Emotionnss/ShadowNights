@@ -28,6 +28,8 @@ public:
 	void Draw(AEGfxVertexList* mesh);
 	void DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matrix);
 
+	void TakeDamage(float damage);
+
 	void TakeDamage(int value) { currentHP -= value; }
 
 	std::vector<BaseProjectile*> GetProjectileList() { return projectileList; }

@@ -1,5 +1,6 @@
 #include "BaseProjectile.h"
 #include <iostream>
+#include "../System/MeshManager.h"
 
 BaseProjectile::BaseProjectile()
 {
@@ -18,34 +19,11 @@ BaseProjectile::BaseProjectile(AEVec2 pos, AEVec2 dir)
 	transform.SetPosition(pos.x, pos.y);
 
 	projTex = AEGfxTextureLoad("Assets/Weapons/knife.png");
-	if (projTex)
-	{
-		std::cout << "loaded successfully" << std::endl;
-	}
-
-	AEGfxMeshStart();
-	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-
-	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
-
-	// Saving the mesh (list of triangles) in pMesh
-	Texmesh = AEGfxMeshEnd();
 }
 
 BaseProjectile::~BaseProjectile()
 {
 	Exit();
-	if (Texmesh)
-	{
-		AEGfxMeshFree(Texmesh);
-		Texmesh = nullptr;
-	}
 }
 
 void BaseProjectile::Init()
@@ -83,7 +61,7 @@ void BaseProjectile::Draw(AEGfxVertexList* mesh)
 	AEGfxTextureSet(projTex, 0, 0);
 	
 	AEGfxSetTransform(transform.GetMatrix().m);
-	AEGfxMeshDraw(Texmesh, AE_GFX_MDM_TRIANGLES);
+	AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 }
 
 void BaseProjectile::Exit()

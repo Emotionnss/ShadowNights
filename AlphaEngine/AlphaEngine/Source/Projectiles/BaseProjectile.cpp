@@ -2,19 +2,11 @@
 #include <iostream>
 #include "../System/MeshManager.h"
 
-BaseProjectile::BaseProjectile()
-{
-	//speed = 500.f;
-	//size = 25.f;
-}
-
 BaseProjectile::BaseProjectile(AEVec2 pos, AEVec2 dir)
+	: direction{ dir }
+	, speed{ 500.f }
+	, size{ 25.f }
 {
-	direction = dir;
-
-	speed = 500.f;
-	size = 25.f;
-
 	transform.SetScale(size, size);
 	transform.SetPosition(pos.x, pos.y);
 
@@ -26,10 +18,6 @@ BaseProjectile::~BaseProjectile()
 	Exit();
 }
 
-void BaseProjectile::Init()
-{
-
-}
 void BaseProjectile::Update(float deltaTime)
 {
 	if (currLifespan > 0.f && !stopped)
@@ -72,4 +60,9 @@ void BaseProjectile::Exit()
 float BaseProjectile::GetLifespan()
 {
 	return currLifespan;
+}
+
+void BaseProjectile::SetLifespan(float time)
+{
+	currLifespan = time;
 }

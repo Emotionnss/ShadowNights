@@ -116,7 +116,7 @@ void TestScene::Update() {
                 myEnemy->TakeDamage();
 
                 // Destroy Projectile
-                pProj->currLifespan = -1.0f;
+                pProj->SetLifespan(-1.0f);
             }
         }
 

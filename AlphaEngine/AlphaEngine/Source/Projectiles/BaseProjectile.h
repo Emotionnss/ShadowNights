@@ -1,7 +1,7 @@
 #pragma once
 #include "../Player/Transform2D.h"
 
-class BaseProjectile
+class BaseProjectile 
 {
 private:
 	float timeLeft = 2.f;
@@ -11,7 +11,6 @@ public:
 	float currLifespan = timeLeft;
 	Transform2D transform;
 	AEGfxTexture* projTex;
-	AEGfxVertexList* Texmesh = nullptr;
 
 	float speed = 1.f, size = 1.f;
 

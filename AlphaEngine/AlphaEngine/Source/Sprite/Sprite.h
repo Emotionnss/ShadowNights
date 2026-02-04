@@ -74,6 +74,10 @@ public:
 	/*!
 	@brief	Render sprite
 	@param	Transform2D& transform - transform matrix of the object
+	@param	float alpha - tranparency value to render with
+	@param	float r - red value to render with
+	@param	float g - green value to render with
+	@param	float b - blue value to render with
 	@return void
 	*/
 	void Render(Transform2D& transform, float alpha = 1.0f, float r = 0.0f, float g = 0.0f, float b = 0.0f);

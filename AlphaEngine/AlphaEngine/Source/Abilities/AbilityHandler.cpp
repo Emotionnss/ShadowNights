@@ -4,21 +4,24 @@
 #include "../utils.h"
 AbilityHandler::AbilityHandler()
 {
-	timeStop.Init();
 	player = Player::GetInstance();
 }
 
 AbilityHandler::~AbilityHandler()
 {
-	timeStop.Free();
+	timeStop->Free();
 }
 
 void AbilityHandler::AbilityUpdate(float deltaTime)
 {
-	timeStop.Update(deltaTime);
+	timeStop->Update(deltaTime);
 	if (AEInputCheckTriggered(AEVK_F))
 	{
-		timeStop.ToggleTime(player->GetTransform().GetPosition());
+		timeStop->ToggleTime(player->GetTransform().GetPosition());
+	}
+	if (AEInputCheckTriggered(AEVK_Q))
+	{
+		
 	}
 	
 }
@@ -26,5 +29,5 @@ void AbilityHandler::AbilityUpdate(float deltaTime)
 void AbilityHandler::Draw()
 {
 
-	timeStop.Draw();
+	timeStop->Draw();
 }

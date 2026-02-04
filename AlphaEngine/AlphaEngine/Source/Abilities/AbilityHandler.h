@@ -1,10 +1,12 @@
 #pragma once
 #include "../Player/Player.h"
 #include "TimeStop.h"
+#include "TimeSlow.h"
 class AbilityHandler
 {
 private:
-	TimeStop timeStop;
+	//TimeSlow timeSlow{};
+	TimeStop *timeStop = new TimeStop();
 	Player* player = nullptr;
 public:
 	AbilityHandler();

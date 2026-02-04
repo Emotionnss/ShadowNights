@@ -3,21 +3,25 @@
 #include "../utils.h"
 #include "../System/CSVManager.h"
 
-void TimeStop::Init()
+//void TimeStop::Init()
+//{
+//	meshManager = MeshManager::GetInstance();
+//    player = Player::GetInstance();
+//    active = false;
+//    sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "timestop"));
+//    //sprite->PlayAnimation("spawn", 1, 1.f);
+//    
+//}
+TimeStop::TimeStop()
+    :meshManager{ MeshManager::GetInstance() }, player{ Player::GetInstance() }, active{ false }, spriteName{ "timestop" }
 {
-	meshManager = MeshManager::GetInstance();
-    player = Player::GetInstance();
-    active = false;
-    sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "timestop"));
-    //sprite->PlayAnimation("spawn", 1, 1.f);
-    
+    sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));
 }
 
 void TimeStop::Update(float dt)
 {
     if (active)
     {
-        timeStopped += 1 * dt;
         resource -= 30 * dt;
         zoneScale += 1500 * dt;
         for (BaseProjectile* proj : player->GetProjectileList())
@@ -28,8 +32,8 @@ void TimeStop::Update(float dt)
                 proj->stopped = true;
             }
         }
-
     }
+    
     else
     {
         for (BaseProjectile* proj : player->GetProjectileList())
@@ -107,7 +111,8 @@ void TimeStop::Draw()
         AEGfxSetColorToAdd(0.f, 0.f, 255.f, 0.f);
         AEGfxSetTransform(zoneTransform.GetMatrix().m);
         AEGfxMeshDraw(meshManager->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
-        sprite->Render(spriteTransform);
+
+        sprite->Render(spriteTransform,0.75f);
     }
 
     //resource bar for timestop

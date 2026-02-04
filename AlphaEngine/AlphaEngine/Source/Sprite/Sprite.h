@@ -94,7 +94,7 @@ public:
 	@param	f32 animTime - duration of entire animation
 	@return void
 	*/
-	void PlayAnimation(std::string animName, s32 count, f32 animTime);
+	void PlayAnimation(std::string animName, s32 count = -1, f32 animTime = 1.0f);
 
 	/*!
 	@brief	Set a default animation to fall back on if current anim ends

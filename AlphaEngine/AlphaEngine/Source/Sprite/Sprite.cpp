@@ -5,6 +5,7 @@
 			used for the Sprite class
 *//*_______________________________________________________________________*/
 
+#include <iostream>
 #include "Sprite.h"
 #include "../System/MeshBuilder.h"
 #include "../System/CSVManager.h"
@@ -173,6 +174,10 @@ void Sprite::PlayAnimation(std::string animName, s32 count, f32 animTime)
 
 		//Set animation duration per frame
 		animationDurationPerFrame = currentAnimation->GetAnimTime() / currentAnimation->GetFramesSize();
+		
+		animationTimer = 0.0f;
+
+		std::cout << "Playing new anim " << animName << std::endl;
 	}
 }
 

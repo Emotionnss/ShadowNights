@@ -129,15 +129,15 @@ void Sprite::Update()
 	}
 }
 
-void Sprite::Render(Transform2D& transform)
+void Sprite::Render(Transform2D& transform, float alpha, float r, float g, float b)
 {
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToAdd(r, g, b, 0.0f);
 
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(1.0f);
+	AEGfxSetTransparency(alpha);
 
 	AEGfxTextureSet(tex, currentUVWidth, currentUVHeight);
 	AEGfxSetTransform(transform.GetMatrix().m);

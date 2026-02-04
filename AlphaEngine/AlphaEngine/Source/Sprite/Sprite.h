@@ -76,7 +76,7 @@ public:
 	@param	Transform2D& transform - transform matrix of the object
 	@return void
 	*/
-	void Render(Transform2D& transform);
+	void Render(Transform2D& transform, float alpha = 1.0f, float r = 0.0f, float g = 0.0f, float b = 0.0f);
 
 	/*!
 	@brief	Add animation to the sprites animation map

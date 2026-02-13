@@ -281,7 +281,7 @@ public:
 	@param	AEVec2 maxLimits - maximum x and y value to constrain path to
 	@return bool - true if sucessful, false otherwise
 	*/
-	bool GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits);
+	bool GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits, Node& node);
 
 	/*!
 	@brief	Builds a path by iterating through all nodes connected to each other
@@ -289,7 +289,7 @@ public:
 	@param	Node* node - target node to reach
 	@return std::vector<AEVec2>& - reference to vector storing coordinates of the path
 	*/
-	std::vector<AEVec2>& BuildPath(std::vector<AEVec2>& path, Node* node);
+	std::vector<AEVec2>& BuildPath(std::vector<AEVec2>& path, Node& node);
 
 	/*!
 	@brief	Calculate heuristic (h) value for A* pathfinding
@@ -327,8 +327,8 @@ public:
 
 	/*!
 	@brief	Render a line that shows the path that was calculated
-	@param	std::vector<AEVec2> const& path - read only reference to the path
+	@param	std::vector<AEVec2>& path - reference to the path
 	@return void
 	*/
-	void RenderPathDebug(std::vector<AEVec2> const& path);
+	void RenderPathDebug(std::vector<AEVec2>& path);
 };

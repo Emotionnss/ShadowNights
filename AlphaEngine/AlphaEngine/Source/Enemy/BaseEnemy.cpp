@@ -135,6 +135,13 @@ void BaseEnemy::Update(float deltaTime)
         float dy = playerPos.y - myPos.y;
         float dist = sqrt(dx * dx + dy * dy);
 
+        Node node;
+        if (map->GeneratePath(transform.GetPosition(), player->transform.GetPosition(), { 0, 0 }, { 100, 100 }, node))
+        {
+            path = map->BuildPath(path, node);
+            map->RenderPathDebug(path);
+        }
+
         // ------------------------------------------
         // 4. STATE MACHINE (Attack vs Patrol)
         // ------------------------------------------

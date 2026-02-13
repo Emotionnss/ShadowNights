@@ -361,22 +361,28 @@ void Map::CleanAStarLists()
 
 	for (Node* node : openVector)
 	{
-		delete node;
-		node = nullptr;
+		if (node != nullptr)
+		{
+			delete node;
+			node = nullptr;
+		}
 	}
 
 	openVector.clear();
 
 	for (Node* node : closedList)
 	{
-		delete node;
-		node = nullptr;
+		if (node != nullptr)
+		{
+			delete node;
+			node = nullptr;
+		}
 	}
 
 	closedList.clear();
 }
 
-bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits)
+bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits, Node& node)
 {
 	CleanAStarLists();
 
@@ -394,6 +400,7 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 		//End finding of path if current node is reached
 		if (currentNode->position.x == targetPos.x && currentNode->position.y == targetPos.y)
 		{
+			node = *currentNode;
 			return true;
 		}
 
@@ -424,6 +431,7 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 			if (!proceed)
 			{
 				delete node;
+				node = nullptr;
 				continue;
 			}
 
@@ -434,7 +442,7 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 			std::vector<Node*>::iterator it = std::find(openVector.begin(), openVector.end(), node);
 
 			//If not in open list, add it
-			if (it != openVector.end())
+			if (it == openVector.end())
 			{
 				openList.push(node);
 				openVector.push_back(node);
@@ -443,6 +451,7 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 			else if (tempGValue >= node->g)
 			{
 				delete node;
+				node = nullptr;
 				continue;
 			}
 
@@ -457,9 +466,11 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 	return false;
 }
 
-std::vector<AEVec2>& Map::BuildPath(std::vector<AEVec2>& path, Node* node)
+std::vector<AEVec2>& Map::BuildPath(std::vector<AEVec2>& path, Node& node)
 {
-	Node* currentNode = node;
+	path.clear();
+
+	Node* currentNode = &node;
 
 	//Generate path by backtracking from target node to start node
 	while (currentNode != nullptr)
@@ -528,11 +539,11 @@ bool Map::CheckTile(TILE_TYPE type)
 	return (type >= FLOOR && type <= RIGHT_PLATFORM);
 }
 
-void Map::RenderPathDebug(std::vector<AEVec2> const& path)
+void Map::RenderPathDebug(std::vector<AEVec2>& path)
 {
 	AEGfxVertexList* lineMesh = meshManager->GetMesh(LINE);
 
-	for (AEVec2 currentPos : path)
+	for (int i = 0; i < path.size() - 1; ++i)
 	{
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
@@ -542,12 +553,14 @@ void Map::RenderPathDebug(std::vector<AEVec2> const& path)
 
 		//Set line rotation
 		//Get angle in radians from currentPos to the nextPos
+		float angle = atan2f(path[i + 1].y, path[i + 1].x) - atan2f(path[i].y, path[i].x);
 
 		//Set line length
 		//Get magnitude from one edge of the square to the other based on the rotation
+		float magnitude = AEVec2Distance(&path[i + 1], &path[i]);
 
 		//Create transform
-		Transform2D transform{ currentPos, {1.0f, 1.0f}, 250 };
+		Transform2D transform{ path[i], {1.0f, 1.0f}, angle};
 
 		AEGfxSetTransform(transform.GetMatrix().m);
 		AEGfxMeshDraw(lineMesh, AE_GFX_MDM_TRIANGLES);

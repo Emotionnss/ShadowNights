@@ -55,4 +55,6 @@ private:
 
     //stopped in timestop zone
     bool stopped = false;
+
+    std::vector<AEVec2> path;
 };

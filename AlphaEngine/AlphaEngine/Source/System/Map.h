@@ -93,11 +93,8 @@ private:
 	//2D array to store map info
 	Tile** map;
 
-	//Priority queue to sort openList based on the lowest f value
-	std::priority_queue<Node*> openList;
-	
 	//Vector to allow checking of node in openList (since its very hard to iterate through queue)
-	std::vector<Node*> openVector;
+	std::vector<Node*> openList;
 
 	//Stores nodes that have already been checked
 	std::vector<Node*> closedList;

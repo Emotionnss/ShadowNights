@@ -9,6 +9,7 @@
 #include "CSVManager.h"
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 
 const char* Map::TILE_ASSETS_FILE_PATH = "Assets/Tiles/";
 
@@ -111,12 +112,13 @@ Tile& Map::GetTile(f32 xPos, f32 yPos) const
 {
 	AEVec2 tilePos = GetTilePos(xPos, yPos);
 
-	return map[static_cast<s32>(tilePos.x)][static_cast<s32>(tilePos.y)];
+	return GetTileFromTilePos(tilePos.x, tilePos.y);
 }
 
 Tile& Map::GetTileFromTilePos(f32 xPos, f32 yPos) const
 {
-	return map[static_cast<s32>(xPos)][static_cast<s32>(yPos)];
+	Tile tile = map[NUM_ROW - static_cast<s32>(yPos)][static_cast<s32>(xPos)];
+	return map[NUM_ROW - static_cast<s32>(yPos)][static_cast<s32>(xPos)];
 }
 
 AEVec2 Map::GetTilePos(f32 xPos, f32 yPos) const
@@ -124,7 +126,7 @@ AEVec2 Map::GetTilePos(f32 xPos, f32 yPos) const
 	s32 rowPos = 0, columnPos = 0;
 
 	rowPos = static_cast<s32>(floor(xPos / TILE_WIDTH));
-	columnPos = NUM_ROW - static_cast<s32>(floor(yPos / TILE_HEIGHT));
+	columnPos = static_cast<s32>(floor(yPos / TILE_HEIGHT));
 
 	/*if (rowPos >= NUM_ROW)
 	{
@@ -151,14 +153,12 @@ AEVec2 Map::GetTilePos(f32 xPos, f32 yPos) const
 
 AEVec2 Map::GetTileWorldPos(AEVec2 tilePos) const
 {
-	Tile tile = map[static_cast<s32>(tilePos.x)][static_cast<s32>(tilePos.y)];
-
-	return tile.transform.GetPosition();
+	return GetTileFromTilePos(tilePos.x, tilePos.y).transform.GetPosition();
 }
 
 void Map::SetTile(TILE_TYPE tile, f32 rowPos, f32 columnPos)
 {
-	map[static_cast<s32>(rowPos)][static_cast<s32>(columnPos)].tileType = tile;
+	map[static_cast<s32>(columnPos)][static_cast<s32>(rowPos)].tileType = tile;
 }
 
 Tile** Map::GetMap() const
@@ -351,15 +351,15 @@ void Map::SetSpawnpoint(AEVec2 spawnpoint)
 
 void Map::CleanAStarLists()
 {
-	while (!openList.empty())
+	/*while (!openList.empty())
 	{
 		Node* node = openList.top();
 		delete node;
 		node = nullptr;
 		openList.pop();
-	}
+	}*/
 
-	for (Node* node : openVector)
+	for (Node* node : openList)
 	{
 		if (node != nullptr)
 		{
@@ -368,7 +368,7 @@ void Map::CleanAStarLists()
 		}
 	}
 
-	openVector.clear();
+	openList.clear();
 
 	for (Node* node : closedList)
 	{
@@ -389,12 +389,22 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 	Node* currentNode{};
 	AEVec2 currentPos{};
 
-	openList.push(new Node(startPos));
+	//Get closest tile coords to node
+	Tile tile = GetTile(startPos.x, startPos.y);
+
+	openList.push_back(new Node(tile.transform.GetPosition()));
 
 	while (!openList.empty())
 	{
+		//Sort open list for lowest f value
+		std::sort(openList.begin(), openList.end(), 
+			[](Node* const& lhs, Node* const& rhs)
+			{
+				return lhs->f < rhs->f;
+			});
+
 		//Get node with lowest f value on openList
-		currentNode = openList.top();
+		currentNode = openList[0];
 		currentPos = currentNode->position;
 
 		//End finding of path if current node is reached
@@ -405,8 +415,8 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 		}
 
 		//Remove the current node from openList
-		openList.pop();
-
+		openList.erase(openList.begin());
+		
 		//Push back current node to closed list
 		closedList.push_back(currentNode);
 
@@ -439,13 +449,13 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 			double tempGValue = currentNode->g + 1.0;
 
 			//Loop through open list to see if node is already inside
-			std::vector<Node*>::iterator it = std::find(openVector.begin(), openVector.end(), node);
+			std::vector<Node*>::iterator it = std::find(openList.begin(), openList.end(), node);
 
 			//If not in open list, add it
-			if (it == openVector.end())
+			if (it == openList.end())
 			{
-				openList.push(node);
-				openVector.push_back(node);
+				openList.push_back(node);
+				//openVector.push_back(node);
 			}
 			//If tentative g value is not better, skip to next node
 			else if (tempGValue >= node->g)
@@ -500,14 +510,14 @@ std::vector<Node*> Map::GetSurroundingNodes(AEVec2 nodePos, AEVec2 minLimits, AE
 
 	//Get surrounding tile indexes
 	AEVec2 positions[8] = {
-		(tilePos.x, tilePos.y + 1),
-		(tilePos.x + 1, tilePos.y + 1),
-		(tilePos.x + 1, tilePos.y),
-		(tilePos.x + 1, tilePos.y - 1),
-		(tilePos.x, tilePos.y - 1),
-		(tilePos.x - 1, tilePos.y - 1),
-		(tilePos.x - 1, tilePos.y),
-		(tilePos.x - 1, tilePos.y + 1)
+		{tilePos.x, tilePos.y + 1},
+		{tilePos.x + 1, tilePos.y + 1},
+		{tilePos.x + 1, tilePos.y},
+		{tilePos.x + 1, tilePos.y - 1},
+		{tilePos.x, tilePos.y - 1},
+		{tilePos.x - 1, tilePos.y - 1},
+		{tilePos.x - 1, tilePos.y},
+		{tilePos.x - 1, tilePos.y + 1}
 	};
 
 	//Loop through the positions
@@ -526,7 +536,7 @@ std::vector<Node*> Map::GetSurroundingNodes(AEVec2 nodePos, AEVec2 minLimits, AE
 
 bool Map::CheckTile(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits)
 {
-	if (tilePos.x < minLimits.x || tilePos.x >= maxLimits.x || tilePos.y < minLimits.y || tilePos.y >= maxLimits.y || (map[static_cast<s32>(tilePos.x)][static_cast<s32>(tilePos.y)].tileType >= FLOOR) && (map[static_cast<s32>(tilePos.x)][static_cast<s32>(tilePos.y)].tileType <= LEFT_PLATFORM))
+	if (tilePos.x < minLimits.x || tilePos.x >= maxLimits.x || tilePos.y < minLimits.y || tilePos.y >= maxLimits.y || tilePos.x < 0 || tilePos.x >= NUM_COLUMN || tilePos.y < 0 || tilePos.y >= NUM_ROW || (map[NUM_ROW - static_cast<s32>(tilePos.y)][static_cast<s32>(tilePos.x)].tileType >= FLOOR) && (map[NUM_ROW - static_cast<s32>(tilePos.y)][static_cast<s32>(tilePos.x)].tileType <= LEFT_PLATFORM))
 	{
 		return false;
 	}

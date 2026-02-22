@@ -10,6 +10,7 @@ AbilityHandler::AbilityHandler()
 AbilityHandler::~AbilityHandler()
 {
 	timeStop->Free();
+	delete timeStop;
 }
 
 void AbilityHandler::AbilityUpdate(float deltaTime)

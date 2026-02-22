@@ -8,6 +8,7 @@
 #include "../utils.h"
 
 #include "../Projectiles/BaseProjectile.h"
+#include "../Projectiles/SwordProjectile.h"
 
 #include <memory>
 #include <iostream>

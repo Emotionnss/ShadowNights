@@ -2,16 +2,19 @@
 #include <iostream>
 #include "../System/MeshManager.h"
 
-BaseProjectile::BaseProjectile(AEVec2 pos, AEVec2 dir)
+BaseProjectile::BaseProjectile(AEVec2 pos, AEVec2 dir, bool skipTextureLoad)
 	: direction{ dir }
 	, speed{ 500.f }
 	, size{ 25.f }
+	, projTex{ nullptr }
 {
 	transform.SetScale(size, size);
 	transform.SetPosition(pos.x, pos.y);
 
-	projTex = AEGfxTextureLoad("Assets/Weapons/knife.png");
+	if (!skipTextureLoad)
+		projTex = AEGfxTextureLoad("Assets/Weapons/knife.png");
 }
+
 
 BaseProjectile::~BaseProjectile()
 {
@@ -31,7 +34,6 @@ void BaseProjectile::Update(float deltaTime)
 		position.x += speed * direction.x * deltaTime;
 		position.y += speed * direction.y * deltaTime;
 
-		float angle = transform.GetRotation();
 		transform.SetRotation(atan2f(direction.y, direction.x) + (PI * 1.25f));
 		transform.SetPosition(position.x, position.y);
 	}
@@ -54,7 +56,10 @@ void BaseProjectile::Draw(AEGfxVertexList* mesh)
 
 void BaseProjectile::Exit()
 {
-	AEGfxTextureUnload(projTex);
+	if (projTex)
+	{
+		AEGfxTextureUnload(projTex);
+	}
 }
 
 float BaseProjectile::GetLifespan()
@@ -65,4 +70,9 @@ float BaseProjectile::GetLifespan()
 void BaseProjectile::SetLifespan(float time)
 {
 	currLifespan = time;
+}
+
+AEVec2 BaseProjectile::GetDirection()
+{
+	return direction;
 }

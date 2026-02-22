@@ -75,8 +75,20 @@ void Player::HandleInput()
 		AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
 
 		AEVec2 playerDir = ScreenToWorldPos(mousePos);
+		AEVec2Normalize(&playerDir, &playerDir);
 
 		projectileList.push_back(new BaseProjectile(GetTransform().GetPosition(), playerDir));
+	}
+	else if (AEInputCheckTriggered(AEVK_RBUTTON))
+	{
+		s32 xDir, yDir;
+		AEInputGetCursorPosition(&xDir, &yDir);
+		AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
+
+		AEVec2 playerDir = ScreenToWorldPos(mousePos);
+		AEVec2Normalize(&playerDir, &playerDir);
+
+		projectileList.push_back(new SwordProjectile(GetTransform().GetPosition(), playerDir));
 	}
 }
 

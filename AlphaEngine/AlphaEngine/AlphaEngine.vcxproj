@@ -34,6 +34,7 @@
     <ClCompile Include="Source\Scene\TestScene2.cpp" />
     <ClCompile Include="Source\Abilities\TimeStop.cpp" />
     <ClCompile Include="Source\Abilities\TimeSlow.cpp" />
+    <ClCompile Include="Source\Projectiles\SwordProjectile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Projectiles\EnemyProjectile.h" />
@@ -59,6 +60,7 @@
     <ClInclude Include="Source\Scene\TestScene2.h" />
     <ClInclude Include="Source\Abilities\TimeStop.h" />
     <ClInclude Include="Source\Abilities\TimeSlow.h" />
+    <ClInclude Include="Source\Projectiles\SwordProjectile.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

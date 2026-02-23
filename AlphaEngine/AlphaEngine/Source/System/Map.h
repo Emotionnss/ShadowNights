@@ -15,7 +15,7 @@
 #include "../System/MeshManager.h"
 #include "../Player/Transform2D.h"
 
-enum TILE_TYPE
+enum class TILE_TYPE
 {
 	NONE = 0,
 	BACKGROUND,
@@ -69,6 +69,10 @@ struct Node
 	double g;
 	double h;
 };
+
+//Node overloads
+bool operator==(Node const& lhs, Node const& rhs);
+bool operator!=(Node const& lhs, Node const& rhs);
 
 struct Tile
 {
@@ -328,4 +332,10 @@ public:
 	@return void
 	*/
 	void RenderPathDebug(std::vector<AEVec2>& path);
+
+	/*!
+	@brief	Render all tiles that have been checked by A*
+	@return void
+	*/
+	void RenderCheckedTilesDebug(float r = 1.0f, float g = 0.0f, float b = 0.0f);
 };

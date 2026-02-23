@@ -139,7 +139,6 @@ void BaseEnemy::Update(float deltaTime)
         if (map->GeneratePath(transform.GetPosition(), player->transform.GetPosition(), { 0, 0 }, { 100, 100 }, node))
         {
             path = map->BuildPath(path, node);
-            map->RenderPathDebug(path);
         }
 
         // ------------------------------------------
@@ -287,6 +286,9 @@ void BaseEnemy::Draw()
     {
         p->Draw();
     }
+
+    Map::GetInstance()->RenderPathDebug(path);
+    //Map::GetInstance()->RenderCheckedTilesDebug();
 }
 
 void BaseEnemy::PlayAnim(std::string name)

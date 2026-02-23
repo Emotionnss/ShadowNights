@@ -135,6 +135,12 @@ void BaseEnemy::Update(float deltaTime)
         float dy = playerPos.y - myPos.y;
         float dist = sqrt(dx * dx + dy * dy);
 
+        Node node;
+        if (map->GeneratePath(transform.GetPosition(), player->transform.GetPosition(), { 0, 0 }, { 100, 100 }, node))
+        {
+            path = map->BuildPath(path, node);
+        }
+
         // ------------------------------------------
         // 4. STATE MACHINE (Attack vs Patrol)
         // ------------------------------------------
@@ -280,6 +286,9 @@ void BaseEnemy::Draw()
     {
         p->Draw();
     }
+
+    Map::GetInstance()->RenderPathDebug(path);
+    //Map::GetInstance()->RenderCheckedTilesDebug();
 }
 
 void BaseEnemy::PlayAnim(std::string name)

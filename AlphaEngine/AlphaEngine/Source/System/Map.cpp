@@ -9,8 +9,19 @@
 #include "CSVManager.h"
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 
 const char* Map::TILE_ASSETS_FILE_PATH = "Assets/Tiles/";
+
+bool operator==(Node const& lhs, Node const& rhs)
+{
+	return lhs.position.x == rhs.position.x && lhs.position.y == rhs.position.y;
+}
+
+bool operator!=(Node const& lhs, Node const& rhs)
+{
+	return !(lhs == rhs);
+}
 
 Map::Map()
 {
@@ -32,46 +43,46 @@ std::string Map::GetImageFilePath(TILE_TYPE tileType)
 
 	switch (tileType)
 	{
-	case BACKGROUND:
+	case TILE_TYPE::BACKGROUND:
 		filePath += "Background.png";
 		break;
-	case FLOOR:
+	case TILE_TYPE::FLOOR:
 		filePath += "Floor.png";
 		break;
-	case CEILING:
+	case TILE_TYPE::CEILING:
 		filePath += "Ceiling.png";
 		break;
-	case LEFT_WALL:
+	case TILE_TYPE::LEFT_WALL:
 		filePath += "Left_Wall.png";
 		break;
-	case RIGHT_WALL:
+	case TILE_TYPE::RIGHT_WALL:
 		filePath += "Right_Wall.png";
 		break;
-	case NW_CORNER:
+	case TILE_TYPE::NW_CORNER:
 		filePath += "NW_Corner.png";
 		break;
-	case NE_CORNER:
+	case TILE_TYPE::NE_CORNER:
 		filePath += "NE_Corner.png";
 		break;
-	case SW_CORNER:
+	case TILE_TYPE::SW_CORNER:
 		filePath += "SW_Corner.png";
 		break;
-	case SE_CORNER:
+	case TILE_TYPE::SE_CORNER:
 		filePath += "SE_Corner.png";
 		break;
-	case LEFT_PLATFORM:
+	case TILE_TYPE::LEFT_PLATFORM:
 		filePath += "Left_Platform.png";
 		break;
-	case PLATFORM:
+	case TILE_TYPE::PLATFORM:
 		filePath += "Platform.png";
 		break;
-	case RIGHT_PLATFORM:
+	case TILE_TYPE::RIGHT_PLATFORM:
 		filePath += "Right_Platform.png";
 		break;
-	case LEFT_STAIR:
+	case TILE_TYPE::LEFT_STAIR:
 		filePath += "Left_Stair.png";
 		break;
-	case RIGHT_STAIR:
+	case TILE_TYPE::RIGHT_STAIR:
 		filePath += "Right_Stair.png";
 		break;
 	default:
@@ -84,20 +95,20 @@ std::string Map::GetImageFilePath(TILE_TYPE tileType)
 void Map::LoadMapTileImages()
 {
 	tileTypesVector = {
-		BACKGROUND,
-		FLOOR,
-		CEILING,
-		LEFT_WALL,
-		RIGHT_WALL,
-		NW_CORNER,
-		NE_CORNER,
-		SW_CORNER,
-		SE_CORNER,
-		LEFT_PLATFORM,
-		PLATFORM,
-		RIGHT_PLATFORM,
-		LEFT_STAIR,
-		RIGHT_STAIR
+		TILE_TYPE::BACKGROUND,
+		TILE_TYPE::FLOOR,
+		TILE_TYPE::CEILING,
+		TILE_TYPE::LEFT_WALL,
+		TILE_TYPE::RIGHT_WALL,
+		TILE_TYPE::NW_CORNER,
+		TILE_TYPE::NE_CORNER,
+		TILE_TYPE::SW_CORNER,
+		TILE_TYPE::SE_CORNER,
+		TILE_TYPE::LEFT_PLATFORM,
+		TILE_TYPE::PLATFORM,
+		TILE_TYPE::RIGHT_PLATFORM,
+		TILE_TYPE::LEFT_STAIR,
+		TILE_TYPE::RIGHT_STAIR
 	};
 
 	for (s32 i = 0; i < tileTypesVector.size(); i++)
@@ -111,12 +122,13 @@ Tile& Map::GetTile(f32 xPos, f32 yPos) const
 {
 	AEVec2 tilePos = GetTilePos(xPos, yPos);
 
-	return map[static_cast<s32>(tilePos.x)][static_cast<s32>(tilePos.y)];
+	return GetTileFromTilePos(tilePos.x, tilePos.y);
 }
 
 Tile& Map::GetTileFromTilePos(f32 xPos, f32 yPos) const
 {
-	return map[static_cast<s32>(xPos)][static_cast<s32>(yPos)];
+	Tile tile = map[static_cast<s32>(yPos)][static_cast<s32>(xPos)];
+	return map[static_cast<s32>(yPos)][static_cast<s32>(xPos)];
 }
 
 AEVec2 Map::GetTilePos(f32 xPos, f32 yPos) const
@@ -124,7 +136,7 @@ AEVec2 Map::GetTilePos(f32 xPos, f32 yPos) const
 	s32 rowPos = 0, columnPos = 0;
 
 	rowPos = static_cast<s32>(floor(xPos / TILE_WIDTH));
-	columnPos = NUM_ROW - static_cast<s32>(floor(yPos / TILE_HEIGHT));
+	columnPos = static_cast<s32>(floor(yPos / TILE_HEIGHT));
 
 	/*if (rowPos >= NUM_ROW)
 	{
@@ -151,14 +163,12 @@ AEVec2 Map::GetTilePos(f32 xPos, f32 yPos) const
 
 AEVec2 Map::GetTileWorldPos(AEVec2 tilePos) const
 {
-	Tile tile = map[static_cast<s32>(tilePos.x)][static_cast<s32>(tilePos.y)];
-
-	return tile.transform.GetPosition();
+	return GetTileFromTilePos(tilePos.x, tilePos.y).transform.GetPosition();
 }
 
 void Map::SetTile(TILE_TYPE tile, f32 rowPos, f32 columnPos)
 {
-	map[static_cast<s32>(rowPos)][static_cast<s32>(columnPos)].tileType = tile;
+	map[static_cast<s32>(columnPos)][static_cast<s32>(rowPos)].tileType = tile;
 }
 
 Tile** Map::GetMap() const
@@ -205,15 +215,16 @@ bool Map::LoadMap(std::string fileName)
 	ResetMap();
 
 	//Nested for loop to store the tile data read from file
-	for (s32 i = 0; i < NUM_ROW; i++)
+	for (s32 i = 0; i < NUM_ROW; ++i)
+	//for (s32 i = NUM_ROW - 1; i >= 0; --i)
 	{
-		for (s32 j = 0; j < NUM_COLUMN; j++)
+		for (s32 j = 0; j < NUM_COLUMN; ++j)
 		{
 			//Save the data s32o the map array from the mapData recieved from reading the csv file.
 			//mapData row and column must be reversed for it to show properly
 
-			map[i][j].tileType = static_cast<TILE_TYPE>(mapData[i][j]);
-			AEVec2 vec = { (TILE_WIDTH * 0.5f) + TILE_WIDTH * j, (TILE_HEIGHT * 0.5f) + TILE_HEIGHT * (NUM_ROW - i) };
+			map[i][j].tileType = static_cast<TILE_TYPE>(mapData[NUM_ROW - 1 - i][j]);
+			AEVec2 vec = { (TILE_WIDTH * 0.5f) + TILE_WIDTH * j, (TILE_HEIGHT * 0.5f) + TILE_HEIGHT * i };
 			map[i][j].transform.SetPosition(vec);
 			map[i][j].transform.SetScale(TILE_WIDTH, TILE_HEIGHT);
 
@@ -245,7 +256,7 @@ bool Map::SaveMap(std::string fileName)
 
 		for (s32 j = 0; j < NUM_ROW; j++)
 		{
-			columnData.push_back(map[j][i].tileType);
+			columnData.push_back(static_cast<s32>(map[j][i].tileType));
 		}
 
 		mapData.push_back(columnData);
@@ -272,13 +283,13 @@ void Map::RenderMap()
 	AEGfxSetTransparency(1.0f);
 
 	//Render the map
-	for (s32 i = 0; i < NUM_ROW; i++)
+	for (s32 i = 0; i < NUM_ROW; ++i)
 	{
-		for (s32 j = 0; j < NUM_COLUMN; j++)
+		for (s32 j = 0; j < NUM_COLUMN; ++j)
 		{
 			TILE_TYPE type = map[i][j].tileType;
 
-			if (type != NONE)
+			if (type != TILE_TYPE::NONE)
 			{
 				AEGfxTextureSet(imageMap[map[i][j].tileType], 0, 0);
 				AEGfxSetTransform(map[i][j].transform.GetMatrix().m);
@@ -286,6 +297,8 @@ void Map::RenderMap()
 			}
 		}
 	}
+
+	//RenderCheckedTilesDebug();
 }
 
 void Map::ResetMap()
@@ -299,7 +312,7 @@ void Map::ResetMap()
 
 		for (s32 j = 0; j < NUM_COLUMN; j++)
 		{
-			map[i][j].tileType = NONE;
+			map[i][j].tileType = TILE_TYPE::NONE;
 		}
 	}
 }
@@ -351,55 +364,75 @@ void Map::SetSpawnpoint(AEVec2 spawnpoint)
 
 void Map::CleanAStarLists()
 {
-	while (!openList.empty())
+	/*while (!openList.empty())
 	{
 		Node* node = openList.top();
 		delete node;
 		node = nullptr;
 		openList.pop();
-	}
+	}*/
 
-	for (Node* node : openVector)
+	for (Node* node : openList)
 	{
-		delete node;
-		node = nullptr;
+		if (node != nullptr)
+		{
+			delete node;
+			node = nullptr;
+		}
 	}
 
-	openVector.clear();
+	openList.clear();
 
 	for (Node* node : closedList)
 	{
-		delete node;
-		node = nullptr;
+		if (node != nullptr)
+		{
+			delete node;
+			node = nullptr;
+		}
 	}
 
 	closedList.clear();
 }
 
-bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits)
+bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits, Node& node)
 {
 	CleanAStarLists();
 
 	Node* currentNode{};
 	AEVec2 currentPos{};
 
-	openList.push(new Node(startPos));
+	//Get closest tile coords to node
+	Tile tile = GetTile(startPos.x, startPos.y);
+
+	//Get tile that contains targetPos
+	Tile targetTile = GetTile(targetPos.x, targetPos.y);
+
+	openList.push_back(new Node(tile.transform.GetPosition()));
 
 	while (!openList.empty())
 	{
+		//Sort open list for lowest f value
+		std::sort(openList.begin(), openList.end(), 
+			[](Node* const& lhs, Node* const& rhs)
+			{
+				return lhs->f < rhs->f;
+			});
+
 		//Get node with lowest f value on openList
-		currentNode = openList.top();
+		currentNode = openList[0];
 		currentPos = currentNode->position;
 
 		//End finding of path if current node is reached
-		if (currentNode->position.x == targetPos.x && currentNode->position.y == targetPos.y)
+		if (currentNode->position == targetTile.transform.GetPosition())
 		{
+			node = *currentNode;
 			return true;
 		}
 
 		//Remove the current node from openList
-		openList.pop();
-
+		openList.erase(openList.begin());
+		
 		//Push back current node to closed list
 		closedList.push_back(currentNode);
 
@@ -413,10 +446,10 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 			//Check if current node has already been evaluated
 			for (Node* closedNode : closedList)
 			{
-				if (node->position.x == closedNode->position.x && node->position.y == closedNode->position.y)
+				if (node->position == closedNode->position)
 				{
 					proceed = false;
-					continue;
+					break;
 				}
 			}
 
@@ -424,6 +457,7 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 			if (!proceed)
 			{
 				delete node;
+				node = nullptr;
 				continue;
 			}
 
@@ -431,18 +465,28 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 			double tempGValue = currentNode->g + 1.0;
 
 			//Loop through open list to see if node is already inside
-			std::vector<Node*>::iterator it = std::find(openVector.begin(), openVector.end(), node);
+			proceed = true;
 
-			//If not in open list, add it
-			if (it != openVector.end())
+			for (Node* openNode : openList)
 			{
-				openList.push(node);
-				openVector.push_back(node);
+				if (node->position == openNode->position)
+				{
+					proceed = false;
+					break;
+				}
 			}
+
+			if (proceed)
+			{
+				//If not in open list, add it
+				openList.push_back(node);
+			}
+
 			//If tentative g value is not better, skip to next node
 			else if (tempGValue >= node->g)
 			{
 				delete node;
+				node = nullptr;
 				continue;
 			}
 
@@ -457,9 +501,11 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 	return false;
 }
 
-std::vector<AEVec2>& Map::BuildPath(std::vector<AEVec2>& path, Node* node)
+std::vector<AEVec2>& Map::BuildPath(std::vector<AEVec2>& path, Node& node)
 {
-	Node* currentNode = node;
+	path.clear();
+
+	Node* currentNode = &node;
 
 	//Generate path by backtracking from target node to start node
 	while (currentNode != nullptr)
@@ -489,14 +535,14 @@ std::vector<Node*> Map::GetSurroundingNodes(AEVec2 nodePos, AEVec2 minLimits, AE
 
 	//Get surrounding tile indexes
 	AEVec2 positions[8] = {
-		(tilePos.x, tilePos.y + 1),
-		(tilePos.x + 1, tilePos.y + 1),
-		(tilePos.x + 1, tilePos.y),
-		(tilePos.x + 1, tilePos.y - 1),
-		(tilePos.x, tilePos.y - 1),
-		(tilePos.x - 1, tilePos.y - 1),
-		(tilePos.x - 1, tilePos.y),
-		(tilePos.x - 1, tilePos.y + 1)
+		{tilePos.x, tilePos.y + 1},
+		{tilePos.x + 1, tilePos.y + 1},
+		{tilePos.x + 1, tilePos.y},
+		{tilePos.x + 1, tilePos.y - 1},
+		{tilePos.x, tilePos.y - 1},
+		{tilePos.x - 1, tilePos.y - 1},
+		{tilePos.x - 1, tilePos.y},
+		{tilePos.x - 1, tilePos.y + 1}
 	};
 
 	//Loop through the positions
@@ -515,7 +561,7 @@ std::vector<Node*> Map::GetSurroundingNodes(AEVec2 nodePos, AEVec2 minLimits, AE
 
 bool Map::CheckTile(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits)
 {
-	if (tilePos.x < minLimits.x || tilePos.x >= maxLimits.x || tilePos.y < minLimits.y || tilePos.y >= maxLimits.y || (map[static_cast<s32>(tilePos.x)][static_cast<s32>(tilePos.y)].tileType >= FLOOR) && (map[static_cast<s32>(tilePos.x)][static_cast<s32>(tilePos.y)].tileType <= LEFT_PLATFORM))
+	if (tilePos.x < minLimits.x || tilePos.x >= maxLimits.x || tilePos.y < minLimits.y || tilePos.y >= maxLimits.y || tilePos.x < 0 || tilePos.x >= NUM_COLUMN || tilePos.y < 0 || tilePos.y >= NUM_ROW || CheckTile(map[static_cast<s32>(tilePos.y)][static_cast<s32>(tilePos.x)].tileType))
 	{
 		return false;
 	}
@@ -525,32 +571,54 @@ bool Map::CheckTile(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits)
 
 bool Map::CheckTile(TILE_TYPE type)
 {
-	return (type >= FLOOR && type <= RIGHT_PLATFORM);
+	return (type >= TILE_TYPE::FLOOR && type <= TILE_TYPE::RIGHT_PLATFORM);
 }
 
-void Map::RenderPathDebug(std::vector<AEVec2> const& path)
+void Map::RenderPathDebug(std::vector<AEVec2>& path)
 {
-	AEGfxVertexList* lineMesh = meshManager->GetMesh(LINE);
+	AEGfxVertexList* squareMesh = meshManager->GetMesh(SQUARE);
 
-	for (AEVec2 currentPos : path)
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+
+	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.5f);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.5f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
+	for (int i = 0; i < path.size() - 1; ++i)
 	{
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-
-		AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.5f);
-		AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.5f);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-
 		//Set line rotation
 		//Get angle in radians from currentPos to the nextPos
+		float angle = atan2f(path[i + 1].y - path[i].y, path[i + 1].x - path[i].x);
 
 		//Set line length
 		//Get magnitude from one edge of the square to the other based on the rotation
+		float magnitude = AEVec2Distance(&path[i + 1], &path[i]);
 
 		//Create transform
-		Transform2D transform{ currentPos, {1.0f, 1.0f}, 250 };
+		Transform2D transform{ path[i], {50.0f, 10.0f}, angle};
 
 		AEGfxSetTransform(transform.GetMatrix().m);
-		AEGfxMeshDraw(lineMesh, AE_GFX_MDM_TRIANGLES);
+		AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
+	}
+}
+
+void Map::RenderCheckedTilesDebug(float r, float g, float b)
+{
+	AEGfxVertexList* squareMesh = meshManager->GetMesh(SQUARE);
+
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+
+	AEGfxSetColorToAdd(r, g, b, 0.5f);
+	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.5f);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
+	for (Node* node : closedList)
+	{
+		//Create transform
+		Transform2D transform{ node->position, {TILE_WIDTH * 0.9f, TILE_HEIGHT * 0.9f}, 0.0f };
+
+		AEGfxSetTransform(transform.GetMatrix().m);
+		AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
 	}
 }
 

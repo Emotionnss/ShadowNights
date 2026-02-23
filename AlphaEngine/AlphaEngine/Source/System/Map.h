@@ -15,7 +15,7 @@
 #include "../System/MeshManager.h"
 #include "../Player/Transform2D.h"
 
-enum TILE_TYPE
+enum class TILE_TYPE
 {
 	NONE = 0,
 	BACKGROUND,
@@ -70,6 +70,10 @@ struct Node
 	double h;
 };
 
+//Node overloads
+bool operator==(Node const& lhs, Node const& rhs);
+bool operator!=(Node const& lhs, Node const& rhs);
+
 struct Tile
 {
 	Transform2D transform;
@@ -93,11 +97,8 @@ private:
 	//2D array to store map info
 	Tile** map;
 
-	//Priority queue to sort openList based on the lowest f value
-	std::priority_queue<Node*> openList;
-	
 	//Vector to allow checking of node in openList (since its very hard to iterate through queue)
-	std::vector<Node*> openVector;
+	std::vector<Node*> openList;
 
 	//Stores nodes that have already been checked
 	std::vector<Node*> closedList;
@@ -281,7 +282,7 @@ public:
 	@param	AEVec2 maxLimits - maximum x and y value to constrain path to
 	@return bool - true if sucessful, false otherwise
 	*/
-	bool GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits);
+	bool GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVec2 maxLimits, Node& node);
 
 	/*!
 	@brief	Builds a path by iterating through all nodes connected to each other
@@ -289,7 +290,7 @@ public:
 	@param	Node* node - target node to reach
 	@return std::vector<AEVec2>& - reference to vector storing coordinates of the path
 	*/
-	std::vector<AEVec2>& BuildPath(std::vector<AEVec2>& path, Node* node);
+	std::vector<AEVec2>& BuildPath(std::vector<AEVec2>& path, Node& node);
 
 	/*!
 	@brief	Calculate heuristic (h) value for A* pathfinding
@@ -327,8 +328,14 @@ public:
 
 	/*!
 	@brief	Render a line that shows the path that was calculated
-	@param	std::vector<AEVec2> const& path - read only reference to the path
+	@param	std::vector<AEVec2>& path - reference to the path
 	@return void
 	*/
-	void RenderPathDebug(std::vector<AEVec2> const& path);
+	void RenderPathDebug(std::vector<AEVec2>& path);
+
+	/*!
+	@brief	Render all tiles that have been checked by A*
+	@return void
+	*/
+	void RenderCheckedTilesDebug(float r = 1.0f, float g = 0.0f, float b = 0.0f);
 };

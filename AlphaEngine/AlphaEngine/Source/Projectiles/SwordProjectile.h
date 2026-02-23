@@ -3,8 +3,6 @@
 
 class SwordProjectile : public BaseProjectile
 {
-private:
-
 public:
 	SwordProjectile(AEVec2 pos, AEVec2 dir);
 	~SwordProjectile();

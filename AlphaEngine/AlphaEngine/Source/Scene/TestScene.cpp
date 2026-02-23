@@ -102,7 +102,8 @@ void TestScene::Update() {
 
         // --- Collision Check ---
         AEVec2 projPos = pProj->transform.GetPosition();
-        AEVec2 projHalf = { 12.5f, 12.5f };
+        AEVec2 projHalf = pProj->transform.GetScale();
+        AEVec2Scale(&projHalf, &projHalf, 0.5f);
 
         AEVec2 enemyPos = myEnemy->transform.GetPosition();
         AEVec2 enemyHalf = { fabs(myEnemy->transform.GetScale().x) / 2.0f, myEnemy->transform.GetScale().y / 2.0f };
@@ -116,7 +117,13 @@ void TestScene::Update() {
                 myEnemy->TakeDamage();
 
                 // Destroy Projectile
-                pProj->SetLifespan(-1.0f);
+                // if its a sword projectile, do not immediately destroy after killing enemy
+                SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
+                if (!swordProj)
+                {
+                    pProj->SetLifespan(-1.0f);
+                }
+
             }
         }
 
@@ -146,7 +153,7 @@ void TestScene::Draw() {
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
     abilityHandler->Draw();
-    player->Draw(meshManager->GetMesh(SQUARE));
+    player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 
     if (myEnemy) {
         myEnemy->Draw();

@@ -580,7 +580,7 @@ void Map::RenderPathDebug(std::vector<AEVec2>& path)
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-	AEGfxSetColorToAdd(1.0f, 0.0f, 0.0f, 0.5f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.5f);
 	AEGfxSetColorToMultiply(0.0f, 0.0f, 0.0f, 0.5f);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 

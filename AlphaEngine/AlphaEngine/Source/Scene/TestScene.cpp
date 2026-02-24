@@ -3,7 +3,8 @@
 #include <iostream>
 #include "../System/Scenemanager.h"
 #include "TestScene2.h"
-#include "../utils.h" 
+#include "../utils.h"
+#include "../Enemy/ShadowEnemy.h"
 
 void TestScene::Load() {
     AEGfxReset();
@@ -25,7 +26,7 @@ void TestScene::Init() {
 
     for (int e = 0; e < numberOfEnemies; e++)
     {
-        BaseEnemy* newEnemy = new BaseEnemy();
+        BaseEnemy* newEnemy = new ShadowEnemy();
         float spawnX = startX + (e * spacing);
 
         newEnemy->Init(spawnX, 300.0f, 85.0f, 60.0f, "shadow1");

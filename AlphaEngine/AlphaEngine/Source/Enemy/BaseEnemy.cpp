@@ -196,7 +196,7 @@ void BaseEnemy::Update(float deltaTime)
                     AEVec2 myTile = map->GetTilePos(myPos.x, myPos.y);
                     AEVec2 playerTile = map->GetTilePos(playerPos.x, playerPos.y);
 
-                    // 1. Generate the path PURELY for the visual debug lines
+                    // Generate the path PURELY for the visual debug lines
                     if (myTile.x >= 0 && myTile.x < map->GetNumCol() &&
                         myTile.y >= 0 && myTile.y < map->GetNumRow() &&
                         playerTile.x >= 0 && playerTile.x < map->GetNumCol() &&
@@ -211,7 +211,7 @@ void BaseEnemy::Update(float deltaTime)
                         }
                     }
 
-                    // 2. MOVEMENT: Completely ignore the grid
+                    // MOVEMENT: Completely ignore the grid
                     float targetX = playerPos.x;
 
                     // prevent jitter

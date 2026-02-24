@@ -18,7 +18,7 @@ void TestScene::Init() {
     player->GetTransform().SetPosition(300.0f, 900.0f);
     abilityHandler = new AbilityHandler();
 
-    // --- SPAWN MULTIPLE ENEMIES ---
+	// ENEMY LIST SPAWN (black man)
     int numberOfEnemies = 3;
     float startX = 600.0f;
     float spacing = 300.0f;
@@ -33,7 +33,6 @@ void TestScene::Init() {
         enemyList.push_back(newEnemy);
     }
 
-    // NOTE: Removed the buggy collision check that was sitting in here!
 }
 
 void TestScene::Update() {
@@ -43,14 +42,12 @@ void TestScene::Update() {
     player->Update(dt);
     if (abilityHandler) abilityHandler->AbilityUpdate(dt);
 
-    // UPDATE ALL ENEMIES
+    // UPDATE ALL ENEMIES (IMPT)
     for (BaseEnemy* enemy : enemyList) {
         enemy->Update(dt);
     }
 
-    // ---------------------------------------------------
-    // SAFE ENEMY PROJECTILE COLLISION 
-    // ---------------------------------------------------
+    // N***A enemy projectile
     for (BaseEnemy* enemy : enemyList)
     {
         std::vector<EnemyProjectile*>& enemyProjs = enemy->GetProjectiles();
@@ -81,9 +78,7 @@ void TestScene::Update() {
         }
     }
 
-    // ---------------------------------------------------
-    // SAFE PLAYER PROJECTILE COLLISION
-    // ---------------------------------------------------
+    // SWORD PEEPEEPOOPOO
     std::vector<BaseProjectile*>& projs = player->projectileList;
 
     for (auto it = projs.begin(); it != projs.end(); )
@@ -94,8 +89,7 @@ void TestScene::Update() {
         AEVec2 projHalf = pProj->transform.GetScale();
         AEVec2Scale(&projHalf, &projHalf, 0.5f);
 
-        bool destroyProjectile = false; // Flag to safely delete
-
+        bool destroyProjectile = false;
         for (int j = 0; j < enemyList.size(); j++)
         {
             BaseEnemy* enemy = enemyList[j];
@@ -109,18 +103,17 @@ void TestScene::Update() {
                 {
                     enemy->TakeDamage();
 
-                    // Check if it's a sword
                     SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
                     if (!swordProj)
                     {
-                        destroyProjectile = true; // Mark for deletion
-                        break; // Stop checking other enemies, bullet is gone!
+                        destroyProjectile = true; 
+                        break;
                     }
                 }
             }
         }
 
-        // Safely erase the projectile ONLY AFTER the loops are completely done with it
+        // erase the projectile after the loops are completely done with it
         if (destroyProjectile || pProj->GetLifespan() <= 0.f)
         {
             delete pProj;
@@ -132,9 +125,7 @@ void TestScene::Update() {
         }
     }
 
-    // ---------------------------------------------------
-    // SAFE ENEMY DELETION
-    // ---------------------------------------------------
+    // enemy die alr or nut punde
     for (auto it = enemyList.begin(); it != enemyList.end(); )
     {
         if ((*it)->IsReadyToDelete())
@@ -159,7 +150,6 @@ void TestScene::Draw() {
     if (abilityHandler) abilityHandler->Draw();
     player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 
-    // DRAW ALL ENEMIES
     for (BaseEnemy* enemy : enemyList) {
         enemy->Draw();
     }
@@ -179,7 +169,7 @@ void TestScene::Free() {
     player->DestroyInstance();
     if (abilityHandler) delete abilityHandler;
 
-    // CLEANUP ALL ENEMIES
+    // CLEANUP KUKUBIRD CCB KNN OBAMA RASENGAN
     for (BaseEnemy* enemy : enemyList) {
         delete enemy;
     }

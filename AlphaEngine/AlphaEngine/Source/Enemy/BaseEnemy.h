@@ -44,7 +44,7 @@ private:
     bool isDying = false;
     float deathTimer = 0.0f;
 
-    // [NEW] Projectile Logic
+    // Projectile Logic
     std::vector<EnemyProjectile*> enemyProjectiles;
     bool hasFired = false; // Flag to ensure we shoot only once per attack
     void Shoot();          // Internal helper to spawn projectile
@@ -55,6 +55,10 @@ private:
 
     //stopped in timestop zone
     bool stopped = false;
+
+    bool isAggroed = false;
+    bool isSurprised = false;
+    float surpriseTimer = 0.0f;
 
     std::vector<AEVec2> path;
 };

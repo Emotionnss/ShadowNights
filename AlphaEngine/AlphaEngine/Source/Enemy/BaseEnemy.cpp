@@ -20,7 +20,6 @@ BaseEnemy::~BaseEnemy()
         sprite = nullptr;
     }
 
-    // [NEW] Clean up all active projectiles when enemy dies
     for (EnemyProjectile* p : enemyProjectiles) {
         delete p;
     }
@@ -35,18 +34,20 @@ void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     if (sprite) delete sprite;
     sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));
 
-    // Reset Defaults
     moveSpeed = 100.0f;
     velocity = { moveSpeed, 0.0f };
     isGrounded = false;
 
     isAttacking = false;
     attackTimer = 0.0f;
-    hasFired = false; // Reset firing flag
+    hasFired = false;
 
-    // Reset Death State
     isDying = false;
     deathTimer = 0.0f;
+
+    isAggroed = false;
+    isSurprised = false;
+    surpriseTimer = 0.0f;
 
     currentAnimState = "";
     PlayAnim("walkright");
@@ -57,8 +58,8 @@ void BaseEnemy::TakeDamage()
     if (!isDying)
     {
         isDying = true;
-        velocity = { 0.0f, 0.0f }; // Freeze!
-        deathTimer = 1.0f;         // Duration of death anim
+        velocity = { 0.0f, 0.0f };
+        deathTimer = 1.0f;
         PlayAnim("shadowdeath");
     }
 }
@@ -73,14 +74,9 @@ bool BaseEnemy::isStopped()
     return stopped;
 }
 
-// [NEW] Shoot Function
 void BaseEnemy::Shoot()
 {
-    // Determine direction based on visual scale (Face Right vs Left)
     float dir = transform.GetScale().x;
-
-    // Spawn projectile at Enemy's current position
-    // Note: You might want to offset Y slightly so it comes from the "hand" not the feet
     AEVec2 spawnPos = transform.GetPosition();
     spawnPos.y += 10.0f;
 
@@ -93,34 +89,30 @@ void BaseEnemy::Update(float deltaTime)
     if (!stopped)
     {
         // ------------------------------------------
-        // 1. UPDATE PROJECTILES (Always do this!)
+        // 1. UPDATE PROJECTILES
         // ------------------------------------------
-        for (int i = 0; i < enemyProjectiles.size(); i++)
+        for (auto it = enemyProjectiles.begin(); it != enemyProjectiles.end(); )
         {
-            enemyProjectiles[i]->Update(deltaTime);
+            (*it)->Update(deltaTime);
 
-            // Remove if expired
-            if (enemyProjectiles[i]->IsDead())
+            if ((*it)->IsDead())
             {
-                delete enemyProjectiles[i];
-                enemyProjectiles.erase(enemyProjectiles.begin() + i);
-                i--;
+                delete* it;
+                it = enemyProjectiles.erase(it);
+            }
+            else
+            {
+                ++it;
             }
         }
 
-        // ------------------------------------------
-        // 2. DEATH STATE (Highest Priority)
-        // ------------------------------------------
         if (isDying)
         {
             deathTimer -= deltaTime;
             if (sprite) sprite->Update();
-            return; // Stop here
+            return;
         }
 
-        // ------------------------------------------
-        // 3. CONFIG & DATA
-        // ------------------------------------------
         const float gravity = -1400.f;
         float colliderWidth = 40.0f;
         float colliderHeight = 60.0f;
@@ -135,51 +127,118 @@ void BaseEnemy::Update(float deltaTime)
         float dy = playerPos.y - myPos.y;
         float dist = sqrt(dx * dx + dy * dy);
 
-        Node node;
-        if (map->GeneratePath(transform.GetPosition(), player->transform.GetPosition(), { 0, 0 }, { 100, 100 }, node))
-        {
-            path = map->BuildPath(path, node);
-        }
+        float attackRadius = 150.0f;
+        float aggroRadius = 450.0f;
 
-        // ------------------------------------------
-        // 4. STATE MACHINE (Attack vs Patrol)
-        // ------------------------------------------
         float visualWidth = fabs(transform.GetScale().x);
         float visualHeight = transform.GetScale().y;
 
+        // ------------------------------------------
+        // 2. STATE MACHINE
+        // ------------------------------------------
         if (isAttacking)
         {
             velocity.x = 0.0f;
             attackTimer -= deltaTime;
 
-            // Face the player
             if (dx > 0) transform.SetScale(visualWidth, visualHeight);
             else        transform.SetScale(-visualWidth, visualHeight);
 
-            // [NEW] SHOOT LOGIC
             if (!hasFired)
             {
                 Shoot();
-                hasFired = true; // Lock: Only shoot once per attack cycle
+                hasFired = true;
             }
 
             if (attackTimer <= 0.0f)
             {
                 isAttacking = false;
-                hasFired = false; // Reset for next time
+                hasFired = false;
                 PlayAnim("walkright");
+            }
+        }
+        else if (isSurprised)
+        {
+            velocity.x = 0.0f;
+            surpriseTimer -= deltaTime;
+
+            if (dx > 0) transform.SetScale(visualWidth, visualHeight);
+            else        transform.SetScale(-visualWidth, visualHeight);
+
+            PlayAnim("aggro");
+
+            if (surpriseTimer <= 0.0f)
+            {
+                isSurprised = false;
             }
         }
         else
         {
-            if (dist < detectionRadius)
+            if (dist < attackRadius)
             {
                 isAttacking = true;
-                attackTimer = 1.0f; // Attack lasts 1 second
+                attackTimer = 1.0f;
                 PlayAnim("attack1");
+            }
+            else if (dist < aggroRadius)
+            {
+                if (!isAggroed)
+                {
+                    isAggroed = true;
+                    isSurprised = true;
+                    surpriseTimer = 0.5f;
+                }
+                else
+                {
+                    // --- CHASE STATE ---
+                    path.clear();
+
+                    AEVec2 myTile = map->GetTilePos(myPos.x, myPos.y);
+                    AEVec2 playerTile = map->GetTilePos(playerPos.x, playerPos.y);
+
+                    // 1. Generate the path PURELY for the visual debug lines
+                    if (myTile.x >= 0 && myTile.x < map->GetNumCol() &&
+                        myTile.y >= 0 && myTile.y < map->GetNumRow() &&
+                        playerTile.x >= 0 && playerTile.x < map->GetNumCol() &&
+                        playerTile.y >= 0 && playerTile.y < map->GetNumRow())
+                    {
+                        AEVec2 maxBounds = { (float)map->GetNumCol() - 1.0f, (float)map->GetNumRow() - 1.0f };
+                        Node node;
+
+                        if (map->GeneratePath(myPos, playerPos, { 0, 0 }, maxBounds, node))
+                        {
+                            path = map->BuildPath(path, node);
+                        }
+                    }
+
+                    // 2. MOVEMENT: Completely ignore the grid
+                    float targetX = playerPos.x;
+
+                    // prevent jitter
+                    if (targetX > myPos.x + 5.0f)
+                    {
+                        velocity.x = fabs(moveSpeed);
+                        transform.SetScale(visualWidth, visualHeight);
+                    }
+                    else if (targetX < myPos.x - 5.0f)
+                    {
+                        velocity.x = -fabs(moveSpeed);
+                        transform.SetScale(-visualWidth, visualHeight);
+                    }
+                    else
+                    {
+                        velocity.x = 0.0f;
+                    }
+
+                    PlayAnim("walkright");
+                }
             }
             else
             {
+                // --- PATROL STATE ---
+                isAggroed = false;
+                path.clear();
+
                 velocity.x = moveSpeed;
                 PlayAnim("walkright");
 
@@ -189,7 +248,7 @@ void BaseEnemy::Update(float deltaTime)
         }
 
         // ------------------------------------------
-        // 5. PHYSICS & COLLISION
+        // 3. PHYSICS & COLLISION
         // ------------------------------------------
         velocity.y += gravity * deltaTime;
 
@@ -199,7 +258,6 @@ void BaseEnemy::Update(float deltaTime)
 
         AEVec2 halfSize{ colliderWidth / 2.f, colliderHeight / 2.f };
 
-        // Standard Map Collision Logic
         float left = position.x - halfSize.x;
         float right = position.x + halfSize.x;
         float bottom = position.y - halfSize.y;
@@ -259,7 +317,7 @@ void BaseEnemy::Update(float deltaTime)
             }
         }
 
-        if (hitWall && !isAttacking)
+        if (hitWall && !isAggroed)
         {
             moveSpeed *= -1.0f;
         }
@@ -281,14 +339,15 @@ void BaseEnemy::Draw()
 {
     if (sprite) sprite->Render(transform);
 
-    // [NEW] Draw Projectiles
     for (EnemyProjectile* p : enemyProjectiles)
     {
         p->Draw();
     }
 
-    Map::GetInstance()->RenderPathDebug(path);
-    //Map::GetInstance()->RenderCheckedTilesDebug();
+    if (!path.empty())
+    {
+        Map::GetInstance()->RenderPathDebug(path);
+    }
 }
 
 void BaseEnemy::PlayAnim(std::string name)

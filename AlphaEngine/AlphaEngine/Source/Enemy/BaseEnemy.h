@@ -2,6 +2,8 @@
 #include "../Player/GameObject.h"
 #include "../Sprite/Sprite.h"
 #include "../Projectiles/EnemyProjectile.h"
+#include "../System/SettingsManager.h"
+#include "../System/Map.h"
 #include <vector>
 #include <string>
 
@@ -40,4 +42,10 @@ protected: // Changed to PROTECTED so ShadowEnemy can access these!
     // Animation Helper
     std::string currentAnimState = "";
     void PlayAnim(std::string name);
+
+    SettingsManager* settingsManager = nullptr;
+    Map* map = nullptr;
+
+    // Pathfinding lines
+    std::vector<AEVec2> path;
 };

@@ -1,11 +1,33 @@
 #include "SettingsManager.h"
 
-bool SettingsManager::GetDebug() const
+void SettingsManager::CheckSettingsInputs()
 {
-	return debug;
+	if (AEInputCheckTriggered(AEVK_F3))
+	{
+		pathDebug = !pathDebug;
+	}
+	if (AEInputCheckTriggered(AEVK_F4))
+	{
+		tilesDebug = !tilesDebug;
+	}
 }
 
-void SettingsManager::SetDebug(bool d)
+bool SettingsManager::GetPathDebug() const
 {
-	debug = d;
+	return pathDebug;
+}
+
+void SettingsManager::SetPathDebug(bool d)
+{
+	pathDebug = d;
+}
+
+bool SettingsManager::GetTilesDebug() const
+{
+	return tilesDebug;
+}
+
+void SettingsManager::SetTilesDebug(bool d)
+{
+	tilesDebug = d;
 }

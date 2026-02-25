@@ -6,6 +6,9 @@ BaseEnemy::BaseEnemy()
     isStatic = false;
     velocity = { 0.0f, 0.0f };
     sprite = nullptr;
+
+    settingsManager = SettingsManager::GetInstance();
+    map = Map::GetInstance();
 }
 
 BaseEnemy::~BaseEnemy()
@@ -19,6 +22,9 @@ BaseEnemy::~BaseEnemy()
         delete p;
     }
     enemyProjectiles.clear();
+
+    settingsManager = nullptr;
+    map = nullptr;
 }
 
 void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
@@ -104,6 +110,20 @@ void BaseEnemy::Draw()
     for (EnemyProjectile* p : enemyProjectiles)
     {
         p->Draw();
+    }
+
+    // debug lines
+    if (!path.empty())
+    {
+        if (settingsManager->GetTilesDebug())
+        {
+            map->RenderCheckedTilesDebug();
+        }
+
+        if (settingsManager->GetPathDebug())
+        {
+            map->RenderPathDebug(path);
+        }
     }
 }
 

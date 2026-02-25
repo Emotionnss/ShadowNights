@@ -4,6 +4,7 @@
 #include "System/Map.h"
 #include "Scene/TestScene.h"
 #include "Scene/MainMenu.h"
+#include "System/SettingsManager.h"
 #include <iostream>
 
 bool gGameRunning = true;
@@ -21,6 +22,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     }
    // _CrtSetBreakAlloc(8067);
     
+    SettingsManager* sManager = SettingsManager::GetInstance();
 
     // 2. Set Scene
     SceneManager::ChangeScene(new MainMenu());
@@ -33,6 +35,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         // check if forcing the application to quit
         if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
             gGameRunning = false;
+
+        //Check inputs for settings
+        sManager->CheckSettingsInputs();
 
         SceneManager::Update();
 
@@ -48,6 +53,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     MeshManager::DestroyInstance();
     Map::DestroyInstance();
     Button::FreeResources();
+    SettingsManager::DestroyInstance();
+    sManager = nullptr;
     AESysExit();
 
     return 1;

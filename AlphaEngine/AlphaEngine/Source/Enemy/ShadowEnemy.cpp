@@ -252,10 +252,4 @@ void ShadowEnemy::Update(float deltaTime)
 void ShadowEnemy::Draw()
 {
     BaseEnemy::Draw();
-
-    // debug lines
-    if (!path.empty())
-    {
-        Map::GetInstance()->RenderPathDebug(path);
-    }
 }

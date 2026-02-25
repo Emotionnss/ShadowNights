@@ -21,8 +21,5 @@ private:
     bool isAggroed = false;
     bool isSurprised = false;
     float surpriseTimer = 0.0f;
-
-    // Pathfinding lines
-    std::vector<AEVec2> path;
 };
 

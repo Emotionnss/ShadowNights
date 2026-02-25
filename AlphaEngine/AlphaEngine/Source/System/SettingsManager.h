@@ -1,3 +1,6 @@
+#pragma once
+
+#include "AEEngine.h"
 #include "SingletonTemplate.h"
 
 class SettingsManager : public SingletonTemplate<SettingsManager>
@@ -5,10 +8,15 @@ class SettingsManager : public SingletonTemplate<SettingsManager>
 	friend class SingletonTemplate<SettingsManager>;
 
 private:
-	bool debug = false;
+	bool pathDebug = false;
+	bool tilesDebug = false;
 
 public:
 
-	bool GetDebug() const;
-	void SetDebug(bool d);
+	void CheckSettingsInputs();
+
+	bool GetPathDebug() const;
+	void SetPathDebug(bool d);
+	bool GetTilesDebug() const;
+	void SetTilesDebug(bool d);
 };

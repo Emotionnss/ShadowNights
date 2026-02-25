@@ -9,50 +9,35 @@ class BaseEnemy : public GameObject
 {
 public:
     BaseEnemy();
-    ~BaseEnemy();
+    virtual ~BaseEnemy(); // Must be virtual so children delete properly!
 
-    void Init(float x, float y, float w, float h, std::string spriteName);
-    void Update(float deltaTime) override;
-    void Draw() override;
+    virtual void Init(float x, float y, float w, float h, std::string spriteName);
+    virtual void Update(float deltaTime);
+    virtual void Draw();
 
-    // Call this when hit by player projectile
-    void TakeDamage();
-
-    // Check if death animation is done so TestScene can delete me
+    virtual void TakeDamage();
     bool IsReadyToDelete();
-
-    // Accessor for TestScene to check collisions
     std::vector<EnemyProjectile*>& GetProjectiles() { return enemyProjectiles; }
-
     bool isStopped();
-private:
+
+protected: // Changed to PROTECTED so ShadowEnemy can access these!
     Sprite* sprite = nullptr;
 
     // Physics
     float gravity = -1400.0f;
     bool isGrounded = false;
-
-    // Movement
     float moveSpeed = 100.0f;
-
-    // Attack Logic
-    bool isAttacking = false;
-    float attackTimer = 0.0f;
-    float detectionRadius = 150.0f;
+    bool stopped = false;
 
     // Death Logic
     bool isDying = false;
     float deathTimer = 0.0f;
 
-    // [NEW] Projectile Logic
+    // Projectile Logic
     std::vector<EnemyProjectile*> enemyProjectiles;
-    bool hasFired = false; // Flag to ensure we shoot only once per attack
-    void Shoot();          // Internal helper to spawn projectile
+    void Shoot();
 
     // Animation Helper
     std::string currentAnimState = "";
     void PlayAnim(std::string name);
-
-    //stopped in timestop zone
-    bool stopped = false;
 };

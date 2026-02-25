@@ -23,5 +23,5 @@ private:
     MeshManager* meshManager = nullptr;
     Map* map = nullptr;
 
-    BaseEnemy* myEnemy = nullptr;
+    std::vector<BaseEnemy*> enemyList;
 };

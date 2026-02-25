@@ -1,0 +1,28 @@
+#pragma once
+#include "BaseEnemy.h"
+
+class ShadowEnemy : public BaseEnemy
+{
+public:
+    ShadowEnemy();
+    ~ShadowEnemy() override;
+
+    void Init(float x, float y, float w, float h, std::string spriteName) override;
+    void Update(float deltaTime) override;
+    void Draw() override;
+
+private:
+    // Attack Logic
+    bool isAttacking = false;
+    float attackTimer = 0.0f;
+    bool hasFired = false;
+
+    // Aggro Logic
+    bool isAggroed = false;
+    bool isSurprised = false;
+    float surpriseTimer = 0.0f;
+
+    // Pathfinding lines
+    std::vector<AEVec2> path;
+};
+

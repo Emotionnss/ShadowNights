@@ -3,7 +3,8 @@
 #include <iostream>
 #include "../System/Scenemanager.h"
 #include "TestScene2.h"
-#include "../utils.h" 
+#include "../utils.h"
+#include "../Enemy/ShadowEnemy.h"
 
 void TestScene::Load() {
     AEGfxReset();
@@ -12,38 +13,27 @@ void TestScene::Load() {
     player = Player::GetInstance();
 
     map->LoadMap("Level1");
-
-    myEnemy = new BaseEnemy();
 }
 
 void TestScene::Init() {
     player->GetTransform().SetPosition(300.0f, 900.0f);
     abilityHandler = new AbilityHandler();
 
-    if (myEnemy) {
-        myEnemy->Init(900.0f, 300.0f, 85.0f, 60.0f, "shadow1");
-        myEnemy->SetVelocity(0.0f, 0.0f);
-        std::vector<EnemyProjectile*>& enemyProjs = myEnemy->GetProjectiles();
-        for (int i = 0; i < enemyProjs.size(); i++)
-        {
-            AEVec2 projPos = enemyProjs[i]->GetTransform().GetPosition();
-            AEVec2 projHalf = { 20.0f, 20.0f };
+	// ENEMY LIST SPAWN (black man)
+    int numberOfEnemies = 3;
+    float startX = 600.0f;
+    float spacing = 300.0f;
 
-            AEVec2 playerPos = player->GetTransform().GetPosition();
-            AEVec2 playerHalf = { 35.0f, 35.0f };
+    for (int e = 0; e < numberOfEnemies; e++)
+    {
+        BaseEnemy* newEnemy = new ShadowEnemy();
+        float spawnX = startX + (e * spacing);
 
-            if (AABBOverlap(projPos, projHalf, playerPos, playerHalf))
-            {
-                // Deal Damage
-                player->TakeDamage(10);
-
-                // Destroy Bullet
-                delete enemyProjs[i];
-                enemyProjs.erase(enemyProjs.begin() + i);
-                i--;
-            }
-        }
+        newEnemy->Init(spawnX, 300.0f, 85.0f, 60.0f, "shadow1");
+        newEnemy->SetVelocity(0.0f, 0.0f);
+        enemyList.push_back(newEnemy);
     }
+
 }
 
 void TestScene::Update() {
@@ -51,99 +41,105 @@ void TestScene::Update() {
 
     player->HandleInput();
     player->Update(dt);
-    abilityHandler->AbilityUpdate(dt);
+    if (abilityHandler) abilityHandler->AbilityUpdate(dt);
 
-    if (myEnemy) {
-        myEnemy->Update(dt);
+    // UPDATE ALL ENEMIES (IMPT)
+    for (BaseEnemy* enemy : enemyList) {
+        enemy->Update(dt);
     }
 
-    //CHECK IF ENEMY PROJECTILES HIT PLAYER
-    if (myEnemy)
+    // N***A enemy projectile
+    for (BaseEnemy* enemy : enemyList)
     {
-        std::vector<EnemyProjectile*>& enemyProjs = myEnemy->GetProjectiles();
+        std::vector<EnemyProjectile*>& enemyProjs = enemy->GetProjectiles();
 
-        for (int i = 0; i < enemyProjs.size(); i++)
+        for (auto it = enemyProjs.begin(); it != enemyProjs.end(); )
         {
-            EnemyProjectile* proj = enemyProjs[i];
+            EnemyProjectile* proj = *it;
 
-            // 1. Get Hitbox Info
-            AEVec2 projPos = proj->GetTransform().GetPosition();
-            AEVec2 projHalf = { 20.0f, 20.0f }; // 40x40 size (Half is 20)
+            AEVec2 projPos = proj->transform.GetPosition();
+            AEVec2 projHalf = { 20.0f, 20.0f };
 
             AEVec2 playerPos = player->GetTransform().GetPosition();
-            AEVec2 playerHalf = { 35.0f, 35.0f }; // 70x70 size (Half is 35)
+            AEVec2 playerHalf = { 35.0f, 35.0f };
 
-            // 2. Check Overlap
             if (AABBOverlap(projPos, projHalf, playerPos, playerHalf))
             {
                 std::cout << "OUCH! Player Hit!" << std::endl;
-
-                // Deal Damage to Player
                 player->TakeDamage(10);
 
-                // Destroy the Projectile immediately
+                // Destroy the Projectile safely
                 delete proj;
-                enemyProjs.erase(enemyProjs.begin() + i);
-                i--; // Adjust index since we removed an item
+                it = enemyProjs.erase(it);
+            }
+            else
+            {
+                ++it;
             }
         }
     }
 
-    // --- PROJECTILE LOGIC ---
+    // SWORD PEEPEEPOOPOO
     std::vector<BaseProjectile*>& projs = player->projectileList;
 
-    for (int i = 0; i < projs.size(); i++)
+    for (auto it = projs.begin(); it != projs.end(); )
     {
-        // Safety Check
-        if (myEnemy == nullptr) break;
+        BaseProjectile* pProj = *it;
 
-        BaseProjectile* pProj = projs[i];
-        pProj->Update(dt);
-
-        // --- Collision Check ---
         AEVec2 projPos = pProj->transform.GetPosition();
         AEVec2 projHalf = pProj->transform.GetScale();
         AEVec2Scale(&projHalf, &projHalf, 0.5f);
 
-        AEVec2 enemyPos = myEnemy->transform.GetPosition();
-        AEVec2 enemyHalf = { fabs(myEnemy->transform.GetScale().x) / 2.0f, myEnemy->transform.GetScale().y / 2.0f };
-
-        //Check Overlap -> Trigger Damage
-        if (AABBOverlap(projPos, projHalf, enemyPos, enemyHalf))
+        bool destroyProjectile = false;
+        for (int j = 0; j < enemyList.size(); j++)
         {
-            // Don't hit him again if he's already dying
-            if (!myEnemy->IsReadyToDelete())
+            BaseEnemy* enemy = enemyList[j];
+
+            AEVec2 enemyPos = enemy->transform.GetPosition();
+            AEVec2 enemyHalf = { fabs(enemy->transform.GetScale().x) / 2.0f, enemy->transform.GetScale().y / 2.0f };
+
+            if (AABBOverlap(projPos, projHalf, enemyPos, enemyHalf))
             {
-                myEnemy->TakeDamage();
-
-                // Destroy Projectile
-                // if its a sword projectile, do not immediately destroy after killing enemy
-                SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
-                if (!swordProj)
+                if (!enemy->IsReadyToDelete())
                 {
-                    pProj->SetLifespan(-1.0f);
-                }
+                    enemy->TakeDamage();
 
+                    SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
+                    if (!swordProj)
+                    {
+                        destroyProjectile = true; 
+                        break;
+                    }
+                }
             }
         }
 
-        // Cleanup Projectiles
-        if (pProj->GetLifespan() <= 0.f)
+        // erase the projectile after the loops are completely done with it
+        if (destroyProjectile || pProj->GetLifespan() <= 0.f)
         {
             delete pProj;
-            projs.erase(projs.begin() + i);
-            i--;
+            it = projs.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
 
-    // Delete enemy only when animation is done
-    if (myEnemy && myEnemy->IsReadyToDelete())
+    // enemy die alr or nut punde
+    for (auto it = enemyList.begin(); it != enemyList.end(); )
     {
-        delete myEnemy;
-        myEnemy = nullptr;
-        std::cout << "Enemy Died and Removed!" << std::endl;
+        if ((*it)->IsReadyToDelete())
+        {
+            delete* it;
+            it = enemyList.erase(it);
+            std::cout << "Enemy Died and Removed!" << std::endl;
+        }
+        else
+        {
+            ++it;
+        }
     }
-
 }
 
 void TestScene::Draw() {
@@ -152,11 +148,11 @@ void TestScene::Draw() {
 
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-    abilityHandler->Draw();
+    if (abilityHandler) abilityHandler->Draw();
     player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 
-    if (myEnemy) {
-        myEnemy->Draw();
+    for (BaseEnemy* enemy : enemyList) {
+        enemy->Draw();
     }
 
     AEMtx33 scaleMtx, transMtx, finalMtx;
@@ -172,12 +168,13 @@ void TestScene::Draw() {
 
 void TestScene::Free() {
     player->DestroyInstance();
-    delete abilityHandler;
+    if (abilityHandler) delete abilityHandler;
 
-    if (myEnemy) {
-        delete myEnemy;
-        myEnemy = nullptr;
+    // CLEANUP KUKUBIRD CCB KNN OBAMA RASENGAN
+    for (BaseEnemy* enemy : enemyList) {
+        delete enemy;
     }
+    enemyList.clear();
 }
 
 void TestScene::Unload()
@@ -185,5 +182,5 @@ void TestScene::Unload()
     player = nullptr;
     abilityHandler = nullptr;
     meshManager = nullptr;
-    myEnemy = nullptr;
+    enemyList.clear();
 }

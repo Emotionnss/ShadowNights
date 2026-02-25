@@ -15,18 +15,17 @@
 TimeStop::TimeStop()
     :meshManager{ MeshManager::GetInstance() }, player{ Player::GetInstance() }, active{ false }, spriteName{ "timestop" }
 {
-    sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));
+    zoneSprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));
 }
 
 void TimeStop::Update(float dt)
 {
     if (active)
     {
-        resource -= 30 * dt;
         zoneScale += 1500 * dt;
         for (BaseProjectile* proj : player->GetProjectileList())
         {
-            if (AreCirclesIntersecting(proj->transform.GetPosition().x, proj->transform.GetPosition().y, proj->size,
+            if (AreCirclesIntersecting(proj->transform.GetPosition().x, proj->transform.GetPosition().y, 0.1f ,
                 zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))
             {
                 proj->stopped = true;
@@ -38,31 +37,20 @@ void TimeStop::Update(float dt)
     {
         for (BaseProjectile* proj : player->GetProjectileList())
         {
-            if (AreCirclesIntersecting(proj->transform.GetPosition().x, proj->transform.GetPosition().y, proj->size,
-                zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))
-            {
-                proj->stopped = false;
-            }
+
+            proj->stopped = false;
+            
         }
-        resource += 100 * dt;
+
         zoneScale = originalScale;
 
     }
     zoneScale = AEClamp(zoneScale, originalScale, maxScale);
     SetZoneScale();
-    f32 camX{}, camY{};
-    AEGfxGetCamPosition(&camX, &camY);
-    resource = AEClamp(resource, 0, maxResource);
-    resourceBarTfm.SetScale(20, (resource / maxResource * 100.f));
-    resourceBarTfm.SetPosition(camX + 450.f, camY - 200.f);
-    if (resource <= 0)
-    {
-        active = false;
-    }
-    sprite->Update();
+    zoneSprite->Update();
 }
 
-void TimeStop::ToggleTime(AEVec2 position)
+bool TimeStop::ToggleTime(AEVec2 position)
 {
     if (active == true)
     {
@@ -74,14 +62,15 @@ void TimeStop::ToggleTime(AEVec2 position)
         active = true;
         SetZonePos(position);
     }
+    return active;
 }
 
-bool TimeStop::TimeStopped()
+bool TimeStop::TimeStopped() const
 {
     return active;
 }
 
-f32 TimeStop::GetScale()
+f32 TimeStop::GetScale() const
 {
     return zoneScale;
 }
@@ -112,26 +101,17 @@ void TimeStop::Draw()
         AEGfxSetTransform(zoneTransform.GetMatrix().m);
         AEGfxMeshDraw(meshManager->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
 
-        sprite->Render(spriteTransform,0.75f);
+        zoneSprite->Render(spriteTransform,0.75f);
     }
-
-    //resource bar for timestop
-    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-    AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-    AEGfxSetTransparency(1.f);
-    AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-    AEGfxSetColorToAdd(1.f, 1.f, 255.f, 0.f);
-    AEGfxSetTransform(resourceBarTfm.GetMatrix().m);
-    AEGfxMeshDraw(meshManager->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
 }
 
 void TimeStop::Free()
 {
     meshManager = nullptr;
     player = nullptr;
-    if (sprite)
+    if (zoneSprite)
     {
-        delete sprite;
-        sprite = nullptr;
+        delete zoneSprite;
+        zoneSprite = nullptr;
     }
 }

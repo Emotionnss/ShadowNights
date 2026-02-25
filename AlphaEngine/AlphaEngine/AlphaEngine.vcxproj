@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Enemy\ShadowEnemy.cpp" />
     <ClCompile Include="Source\Projectiles\EnemyProjectile.cpp" />
     <ClCompile Include="Source\Enemy\BaseEnemy.cpp" />
     <ClCompile Include="Source\Abilities\AbilityHandler.cpp" />
@@ -29,6 +30,7 @@
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\System\CSVManager.cpp" />
     <ClCompile Include="Source\System\Map.cpp" />
+    <ClCompile Include="Source\System\SettingsManager.cpp" />
     <ClCompile Include="Source\utils.cpp" />
     <ClCompile Include="Source\Scene\TestScene.cpp" />
     <ClCompile Include="Source\Scene\TestScene2.cpp" />
@@ -37,6 +39,7 @@
     <ClCompile Include="Source\Projectiles\SwordProjectile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Enemy\ShadowEnemy.h" />
     <ClInclude Include="Source\Projectiles\EnemyProjectile.h" />
     <ClInclude Include="Source\Enemy\BaseEnemy.h" />
     <ClInclude Include="Source\Abilities\AbilityHandler.h" />
@@ -54,6 +57,7 @@
     <ClInclude Include="Source\System\Scenemanager.h" />
     <ClInclude Include="Source\System\CSVManager.h" />
     <ClInclude Include="Source\System\Map.h" />
+    <ClInclude Include="Source\System\SettingsManager.h" />
     <ClInclude Include="Source\System\SingletonTemplate.h" />
     <ClInclude Include="Source\utils.h" />
     <ClInclude Include="Source\Scene\TestScene.h" />

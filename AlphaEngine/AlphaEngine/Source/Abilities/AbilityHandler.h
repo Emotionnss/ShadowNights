@@ -2,12 +2,21 @@
 #include "../Player/Player.h"
 #include "TimeStop.h"
 #include "TimeSlow.h"
+#include "../System/MeshManager.h"
 class AbilityHandler
 {
 private:
 	//TimeSlow timeSlow{};
 	TimeStop *timeStop = new TimeStop();
 	Player* player = nullptr;
+	f32 maxResource{ 100.f };//the max amt of resource available to the player
+	f32 resource{ 100.f };//the resource used for stopping time
+	Transform2D resourceBarTfm{};//transform for the resource bar 
+
+	MeshManager* meshManager = nullptr;//mesh manager
+	AEVec2 camPos;
+	bool timeStopped{};
+	bool timeSlowed{};
 public:
 	AbilityHandler();
 	~AbilityHandler();

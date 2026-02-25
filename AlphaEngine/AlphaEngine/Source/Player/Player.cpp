@@ -150,7 +150,7 @@ void Player::ComputeCollision(AEVec2& position)
 			float py = (halfSize.y + tileHalf.y) - fabsf(dy);
 			if (py <= 0) continue;
 
-			if (tile.tileType == FLOOR)
+			if (tile.tileType == TILE_TYPE::FLOOR)
 			{
 				float prevBottom = oldPosition.y - halfSize.y;
 				float tileTop = tilePos.y + tileHalf.y;

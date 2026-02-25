@@ -24,7 +24,7 @@ public:
     void Slowed(bool active);
     bool isStopped() const;
     void isStopped(bool active);
-protected: // Changed to PROTECTED so ShadowEnemy can access these!
+protected:
     Sprite* sprite = nullptr;
 
     // Physics
@@ -50,6 +50,8 @@ protected: // Changed to PROTECTED so ShadowEnemy can access these!
 
     SettingsManager* settingsManager = nullptr;
     Map* map = nullptr;
+
+    std::string deathAnimName = "shadowdeath";
 
     // Pathfinding lines
     std::vector<AEVec2> path;

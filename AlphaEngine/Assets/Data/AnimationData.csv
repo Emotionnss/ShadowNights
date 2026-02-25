@@ -6,3 +6,10 @@ shadow1,shadowdeath,14,10
 shadowspritesheettest,walk,10,5
 timestop,spawn,0,11
 shadoworb,orb1,0,6
+batenemy,batidle,1,4
+batenemy,batattack,2,9
+batenemy,batmove,3,8
+batenemy,batdeath,0,11
+archerenemy,archeridle,1,8
+archerenemy,archerattack,2,14
+archerenemy,archerdeath,0,10

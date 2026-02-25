@@ -51,7 +51,7 @@ void BaseEnemy::TakeDamage()
         isDying = true;
         velocity = { 0.0f, 0.0f };
         deathTimer = 1.0f;
-        PlayAnim("shadowdeath");
+        PlayAnim(deathAnimName); // Use the variable instead of the hardcoded string!
     }
 }
 
@@ -96,6 +96,9 @@ void BaseEnemy::Shoot()
     spawnPos.y += 10.0f;
 
     EnemyProjectile* newProj = new EnemyProjectile(spawnPos, dir);
+
+    newProj->slowed = this->slowed;
+
     enemyProjectiles.push_back(newProj);
 }
 
@@ -103,7 +106,6 @@ void BaseEnemy::Update(float deltaTime)
 {
     if (!stopped)
     {
-        // UPDATE PROJECTILES
         for (auto it = enemyProjectiles.begin(); it != enemyProjectiles.end(); )
         {
             (*it)->Speed(slowed ? (*it)->OriginalSpeed() / 20.f : (*it)->OriginalSpeed());
@@ -139,7 +141,7 @@ void BaseEnemy::Draw()
     }
 
     // debug lines
-    if (!path.empty())
+    if (path.size() > 1)
     {
         if (settingsManager->GetTilesDebug())
         {

@@ -5,6 +5,8 @@
 #include "TestScene2.h"
 #include "../utils.h"
 #include "../Enemy/ShadowEnemy.h"
+#include "../Enemy/BatEnemy.h"
+
 
 void TestScene::Load() {
     AEGfxReset();
@@ -19,7 +21,7 @@ void TestScene::Init() {
     player->GetTransform().SetPosition(300.0f, 900.0f);
     abilityHandler = new AbilityHandler();
 
-	// ENEMY LIST SPAWN (black man)
+    // ENEMY LIST SPAWN
     int numberOfEnemies = 3;
     float startX = 600.0f;
     float spacing = 300.0f;
@@ -27,11 +29,15 @@ void TestScene::Init() {
     for (int e = 0; e < numberOfEnemies; e++)
     {
         BaseEnemy* newEnemy = new ShadowEnemy();
+        BaseEnemy* myBat = new BatEnemy();
         float spawnX = startX + (e * spacing);
 
         newEnemy->Init(spawnX, 300.0f, 85.0f, 60.0f, "shadow1");
         newEnemy->SetVelocity(0.0f, 0.0f);
         enemyList.push_back(newEnemy);
+
+        myBat->Init(spawnX, 300.0f, 85.0f, 60.0f, "batenemy");
+        enemyList.push_back(myBat);
     }
 
 }
@@ -73,7 +79,6 @@ void TestScene::Update() {
                 std::cout << "OUCH! Player Hit!" << std::endl;
                 player->TakeDamage(10);
 
-                // Destroy the Projectile safely
                 delete proj;
                 it = enemyProjs.erase(it);
             }

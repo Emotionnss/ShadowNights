@@ -75,7 +75,7 @@ void BaseProjectile::SetLifespan(float time)
 
 void BaseProjectile::SetSpeed(float speed)
 {
-	this->speed = speed;
+		this->speed = speed;
 }
 
 AEVec2 BaseProjectile::GetDirection()

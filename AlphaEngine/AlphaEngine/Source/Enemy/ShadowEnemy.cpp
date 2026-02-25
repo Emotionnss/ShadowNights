@@ -98,7 +98,7 @@ void ShadowEnemy::Update(float deltaTime)
         if (dist < attackRadius)
         {
             isAttacking = true;
-            attackTimer = slowed ? originalTimer * 2.f : originalTimer;
+            attackTimer = slowed ? originalTimer * 2.0f : originalTimer;
             //attackTimer = 1.0f;
             PlayAnim("attack1");
         }

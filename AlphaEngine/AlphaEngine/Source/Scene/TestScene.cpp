@@ -41,7 +41,7 @@ void TestScene::Update() {
 
     player->HandleInput();
     player->Update(dt);
-    if (abilityHandler) abilityHandler->AbilityUpdate(dt);
+    if (abilityHandler) abilityHandler->AbilityUpdate(enemyList,dt);
 
     // UPDATE ALL ENEMIES (IMPT)
     for (BaseEnemy* enemy : enemyList) {

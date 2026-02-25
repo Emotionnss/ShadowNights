@@ -23,14 +23,14 @@ private:
 public:
 
 	TimeStop();//time stop constructor
-	void Update(float deltaTime);//update
+	~TimeStop();//destructor
+	void Update(std::vector<BaseEnemy*> enemyList,float deltaTime);//update
 	bool ToggleTime(AEVec2 position);//toggle the ability off & on 
 
 	bool TimeStopped() const; //returns if the ablity is active
 	f32 GetScale() const;//returns the scale of the ability
-	void SetZonePos(AEVec2 position);//
-	void SetZoneScale();
-	void Draw();
-	void Free();
+	void SetZonePos(AEVec2 position);//the position of zone
+	void SetZoneScale();//the scaling of zone
+	void Draw();//renderings
 };
 

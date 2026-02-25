@@ -15,6 +15,7 @@ private:
     // Attack Logic
     bool isAttacking = false;
     float attackTimer = 0.0f;
+    float originalTimer = 1.0f;
     bool hasFired = false;
 
     // Aggro Logic

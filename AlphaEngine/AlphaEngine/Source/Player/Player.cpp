@@ -124,6 +124,24 @@ void Player::ComputeCollision(AEVec2& position)
 			AEVec2 tilePos = tile.transform.GetPosition();
 			AEVec2 tileHalf{ map->GetTileSize() * 0.5f, map->GetTileSize() * 0.5f };
 
+			//tile.transform.SetRotation
+
+			
+			/*
+			if (tile.tileType == 111 || tile.tileType == 112)
+			{
+				tile.transform.SetRotation(45);
+				std::cout << tile.transform.GetRotation() << std::endl;
+			}
+
+			if (tile.tileType == PLATFORM || tile.tileType == LEFT_PLATFORM || tile.tileType == RIGHT_PLATFORM)
+			{
+				AEVec2Set(&tilePos, tile.transform.GetPosition().x,
+					tile.transform.GetPosition().y + map->GetTileSize() * 0.5f);
+				tileHalf.y = 0.f;
+			}
+			*/
+
 			float dx = position.x - tilePos.x;
 			float px = (halfSize.x + tileHalf.x) - fabsf(dx);
 			if (px <= 0) continue;

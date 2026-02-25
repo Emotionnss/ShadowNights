@@ -23,6 +23,10 @@ void GameObject::Update(float deltaTime)
 	velocity.y += acceleration.y * deltaTime;
 
 	AEVec2 pos = transform.GetPosition();
+
+	velocity.x *= 0.99f;
+	velocity.y *= 0.99f;
+
 	pos.x += velocity.x * deltaTime;
 	pos.y += velocity.y * deltaTime;
 

@@ -30,8 +30,10 @@ public:
 	void DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matrix);
 
 	void TakeDamage(float damage);
-
 	void TakeDamage(int value) { currentHP -= value; }
+
+	void SetCollidedTile(const Tile variable);
+	Tile GetCollidedTile();
 
 	std::vector<BaseProjectile*> GetProjectileList() { return projectileList; }
 
@@ -55,5 +57,5 @@ private:
 
 	Map* map;
 
-	
+	Tile collidedTile;
 };

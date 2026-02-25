@@ -48,6 +48,11 @@ void TestScene::Update() {
         enemy->Update(dt);
     }
 
+    if (player->GetCollidedTile().tileType == TILE_TYPE::BACKGROUND && enemyList.size() == 0)
+    {
+        SceneManager::ChangeScene(new TestScene2());
+    }
+
     // N***A enemy projectile
     for (BaseEnemy* enemy : enemyList)
     {

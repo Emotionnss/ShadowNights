@@ -3,6 +3,7 @@
 Player::Player()
 	: input{ 0.f, 0.f }
 	, map{ Map::GetInstance() } // Might convert to function for cleaner execution
+	, collidedTile{ }
 	, speed{ 4000.f }
 	, maxHP{ 100.f }
 	, currentHP{ maxHP }
@@ -42,6 +43,16 @@ Player::~Player()
 		delete sprite;
 		sprite = nullptr;
 	}
+}
+
+void Player::SetCollidedTile(const Tile variable)
+{
+	collidedTile = variable;
+}
+
+Tile Player::GetCollidedTile()
+{
+	return collidedTile;
 }
 
 void Player::HandleInput()
@@ -124,24 +135,6 @@ void Player::ComputeCollision(AEVec2& position)
 			AEVec2 tilePos = tile.transform.GetPosition();
 			AEVec2 tileHalf{ map->GetTileSize() * 0.5f, map->GetTileSize() * 0.5f };
 
-			//tile.transform.SetRotation
-
-			
-			/*
-			if (tile.tileType == 111 || tile.tileType == 112)
-			{
-				tile.transform.SetRotation(45);
-				std::cout << tile.transform.GetRotation() << std::endl;
-			}
-
-			if (tile.tileType == PLATFORM || tile.tileType == LEFT_PLATFORM || tile.tileType == RIGHT_PLATFORM)
-			{
-				AEVec2Set(&tilePos, tile.transform.GetPosition().x,
-					tile.transform.GetPosition().y + map->GetTileSize() * 0.5f);
-				tileHalf.y = 0.f;
-			}
-			*/
-
 			float dx = position.x - tilePos.x;
 			float px = (halfSize.x + tileHalf.x) - fabsf(dx);
 			if (px <= 0) continue;
@@ -149,6 +142,8 @@ void Player::ComputeCollision(AEVec2& position)
 			float dy = position.y - tilePos.y;
 			float py = (halfSize.y + tileHalf.y) - fabsf(dy);
 			if (py <= 0) continue;
+
+			SetCollidedTile(tile);
 
 			if (tile.tileType == TILE_TYPE::FLOOR)
 			{
@@ -162,6 +157,11 @@ void Player::ComputeCollision(AEVec2& position)
 					isGrounded = true;
 				}
 
+				continue;
+			}
+
+			if (tile.tileType == TILE_TYPE::BACKGROUND)
+			{
 				continue;
 			}
 
@@ -188,7 +188,6 @@ void Player::ComputeCollision(AEVec2& position)
 
 void Player::Update(float deltaTime)
 {
-
 	HandleInput();
 
 	AEVec2 currentForces{ 0.f, gravity };

@@ -32,7 +32,7 @@ void ShadowEnemy::Update(float deltaTime)
 {
     // BaseEnemy handles Projectiles and Death animations
     BaseEnemy::Update(deltaTime);
-
+    
     // If we are stopped or dying dont run AI or movement
     if (stopped || isDying) return;
 
@@ -98,7 +98,8 @@ void ShadowEnemy::Update(float deltaTime)
         if (dist < attackRadius)
         {
             isAttacking = true;
-            attackTimer = 1.0f;
+            attackTimer = slowed ? originalTimer * 2.f : originalTimer;
+            //attackTimer = 1.0f;
             PlayAnim("attack1");
         }
         else if (dist < aggroRadius)
@@ -252,10 +253,4 @@ void ShadowEnemy::Update(float deltaTime)
 void ShadowEnemy::Draw()
 {
     BaseEnemy::Draw();
-
-    // debug lines
-    if (!path.empty())
-    {
-        Map::GetInstance()->RenderPathDebug(path);
-    }
 }

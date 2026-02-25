@@ -12,10 +12,9 @@ public:
         // 1. Setup Position
         transform.SetPosition(startPos.x, startPos.y);
         transform.SetScale(40.0f, 40.0f); // Size of projectile visuals
-
+        dirX = directionX;
         // 2. Setup Movement (Speed = 400)
-        float speed = 400.0f;
-        velocity.x = (directionX > 0) ? speed : -speed;
+        velocity.x = (dirX > 0) ? speed : -speed;
         velocity.y = 0.0f;
 
         // 3. Setup Sprite & Animation
@@ -35,6 +34,7 @@ public:
 
     void Update(float dt) override
     {
+        velocity.x = (dirX > 0) ? speed : -speed;
         // Move Object
         AEVec2 pos = transform.GetPosition();
         pos.x += velocity.x * dt;
@@ -54,6 +54,21 @@ public:
 
     bool IsDead() { return lifespan <= 0.0f; }
 
+    void Speed(float newSpeed)
+    {
+        this->speed = newSpeed;
+    }
+    float Speed() const
+    {
+        return this->speed;
+    }
+    float OriginalSpeed() const
+    {
+        return this->originalSpeed;
+    }
 private:
+    float dirX;
     float lifespan = 3.0f; // Disappears after 3 seconds
+    float originalSpeed = 400.f;
+    float speed = originalSpeed;
 };

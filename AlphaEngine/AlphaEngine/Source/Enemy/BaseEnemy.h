@@ -2,6 +2,8 @@
 #include "../Player/GameObject.h"
 #include "../Sprite/Sprite.h"
 #include "../Projectiles/EnemyProjectile.h"
+#include "../System/SettingsManager.h"
+#include "../System/Map.h"
 #include <vector>
 #include <string>
 
@@ -18,16 +20,21 @@ public:
     virtual void TakeDamage();
     bool IsReadyToDelete();
     std::vector<EnemyProjectile*>& GetProjectiles() { return enemyProjectiles; }
-    bool isStopped();
-
+    bool Slowed() const;
+    void Slowed(bool active);
+    bool isStopped() const;
+    void isStopped(bool active);
 protected: // Changed to PROTECTED so ShadowEnemy can access these!
     Sprite* sprite = nullptr;
 
     // Physics
     float gravity = -1400.0f;
     bool isGrounded = false;
-    float moveSpeed = 100.0f;
+    float originalSpeed = 100.f;
+    float moveSpeed = originalSpeed;
+
     bool stopped = false;
+    bool slowed = false;
 
     // Death Logic
     bool isDying = false;
@@ -40,4 +47,10 @@ protected: // Changed to PROTECTED so ShadowEnemy can access these!
     // Animation Helper
     std::string currentAnimState = "";
     void PlayAnim(std::string name);
+
+    SettingsManager* settingsManager = nullptr;
+    Map* map = nullptr;
+
+    // Pathfinding lines
+    std::vector<AEVec2> path;
 };

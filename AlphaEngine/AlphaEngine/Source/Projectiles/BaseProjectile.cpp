@@ -4,7 +4,8 @@
 
 BaseProjectile::BaseProjectile(AEVec2 pos, AEVec2 dir, bool skipTextureLoad)
 	: direction{ dir }
-	, speed{ 500.f }
+	, oriSpeed{500.f}
+	, speed{ oriSpeed}
 	, size{ 25.f }
 	, projTex{ nullptr }
 {
@@ -70,6 +71,11 @@ float BaseProjectile::GetLifespan()
 void BaseProjectile::SetLifespan(float time)
 {
 	currLifespan = time;
+}
+
+void BaseProjectile::SetSpeed(float speed)
+{
+	this->speed = speed;
 }
 
 AEVec2 BaseProjectile::GetDirection()

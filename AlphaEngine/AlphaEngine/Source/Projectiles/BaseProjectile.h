@@ -9,12 +9,13 @@ private:
 	float currLifespan = timeLeft;
 
 public:
-	float speed = 1.f, size = 1.f;
+	float oriSpeed, speed, size;
 	Transform2D transform;
 	AEGfxTexture* projTex;
 
 
 	bool stopped{};
+	bool slowed{};
 	BaseProjectile(AEVec2 pos, AEVec2 dir, bool skipTextureLoad = false);
 	~BaseProjectile();
 
@@ -25,6 +26,7 @@ public:
 	float GetLifespan();
 	void SetLifespan(float time);
 
+	void SetSpeed(float speed);
 	AEVec2 GetDirection();
 };
 

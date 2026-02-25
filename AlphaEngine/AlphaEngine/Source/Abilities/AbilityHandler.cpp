@@ -5,47 +5,53 @@
 AbilityHandler::AbilityHandler()
 	:player{Player::GetInstance()},meshManager{MeshManager::GetInstance()}
 {
-	player = Player::GetInstance();
-	
+	AEGfxGetCamPosition(&camPos.x, &camPos.y);
 }
 
 AbilityHandler::~AbilityHandler()
 {
-	timeStop->Free();
 	delete timeStop;
+
+	delete timeSlow;
 }
 
-void AbilityHandler::AbilityUpdate(float dt)
+void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 {
-	timeStop->Update(dt);
+	AEGfxGetCamPosition(&camPos.x, &camPos.y);
+	timeStop->Update(enemyList,dt);
+	timeSlow->Update(enemyList,dt);
+
 	if (AEInputCheckTriggered(AEVK_F))
 	{
 		timeStopped = timeStop->ToggleTime(player->GetTransform().GetPosition());
 	}
 	if (AEInputCheckTriggered(AEVK_Q))
 	{
-		
+		timeSlowed = timeSlow->ToggleSlow();
 	}
 
 	if (timeStopped)
 	{
-		resource -= 30 * dt;
+		resource -= 15 * dt;
+	}
+	if (timeSlowed)
+	{
+		resource -= 15 * dt;
 	}
 
 	if (resource <= 0)
 	{
-		timeStopped = timeStop->ToggleTime(player->GetTransform().GetPosition());
+		timeStopped = timeStopped?timeStop->ToggleTime(player->GetTransform().GetPosition()):false;
+		timeSlowed = timeSlowed?timeSlow->ToggleSlow():false;
 	}
 
-	if (!timeStopped)
+	if (!timeStopped && !timeSlowed)
 	{
 		resource += 100 * dt;
 	}
+	
 	resource = AEClamp(resource, 0, maxResource);
 	resourceBarTfm.SetScale(20, (resource / maxResource * 100.f));
-	
-
-	AEGfxGetCamPosition(&camPos.x, &camPos.y);
 	resourceBarTfm.SetPosition(camPos.x + 450.f, camPos.y - 200.f);
 }
 

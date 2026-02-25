@@ -15,14 +15,12 @@ private:
     // Attack Logic
     bool isAttacking = false;
     float attackTimer = 0.0f;
+    float originalTimer = 1.0f;
     bool hasFired = false;
 
     // Aggro Logic
     bool isAggroed = false;
     bool isSurprised = false;
     float surpriseTimer = 0.0f;
-
-    // Pathfinding lines
-    std::vector<AEVec2> path;
 };
 

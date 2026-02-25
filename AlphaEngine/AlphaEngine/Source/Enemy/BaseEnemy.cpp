@@ -6,6 +6,9 @@ BaseEnemy::BaseEnemy()
     isStatic = false;
     velocity = { 0.0f, 0.0f };
     sprite = nullptr;
+
+    settingsManager = SettingsManager::GetInstance();
+    map = Map::GetInstance();
 }
 
 BaseEnemy::~BaseEnemy()
@@ -19,6 +22,9 @@ BaseEnemy::~BaseEnemy()
         delete p;
     }
     enemyProjectiles.clear();
+
+    settingsManager = nullptr;
+    map = nullptr;
 }
 
 void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
@@ -29,7 +35,8 @@ void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     if (sprite) delete sprite;
     sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));
 
-    moveSpeed = 100.0f;
+    originalSpeed = 100.f;
+    moveSpeed = originalSpeed;
     velocity = { moveSpeed, 0.0f };
     isGrounded = false;
     isDying = false;
@@ -53,9 +60,33 @@ bool BaseEnemy::IsReadyToDelete()
     return isDying && (deathTimer <= 0.0f);
 }
 
-bool BaseEnemy::isStopped()
+bool BaseEnemy::Slowed() const
+{
+    return slowed;
+}
+
+void BaseEnemy::Slowed(bool active)
+{
+    slowed = active;
+    switch (slowed)
+    {
+    case true:
+        moveSpeed = originalSpeed / 2.f;
+        break;
+    case false:
+        moveSpeed = originalSpeed;
+        break;
+    }
+}
+
+bool BaseEnemy::isStopped() const
 {
     return stopped;
+}
+
+void BaseEnemy::isStopped(bool active)
+{
+    stopped = active;
 }
 
 void BaseEnemy::Shoot()
@@ -75,6 +106,7 @@ void BaseEnemy::Update(float deltaTime)
         // UPDATE PROJECTILES
         for (auto it = enemyProjectiles.begin(); it != enemyProjectiles.end(); )
         {
+            (*it)->Speed(slowed ? (*it)->OriginalSpeed() / 20.f : (*it)->OriginalSpeed());
             (*it)->Update(deltaTime);
 
             if ((*it)->IsDead())
@@ -104,6 +136,20 @@ void BaseEnemy::Draw()
     for (EnemyProjectile* p : enemyProjectiles)
     {
         p->Draw();
+    }
+
+    // debug lines
+    if (!path.empty())
+    {
+        if (settingsManager->GetTilesDebug())
+        {
+            map->RenderCheckedTilesDebug();
+        }
+
+        if (settingsManager->GetPathDebug())
+        {
+            map->RenderPathDebug(path);
+        }
     }
 }
 

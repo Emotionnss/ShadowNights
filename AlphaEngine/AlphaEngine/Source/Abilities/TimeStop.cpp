@@ -3,22 +3,24 @@
 #include "../utils.h"
 #include "../System/CSVManager.h"
 
-//void TimeStop::Init()
-//{
-//	meshManager = MeshManager::GetInstance();
-//    player = Player::GetInstance();
-//    active = false;
-//    sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "timestop"));
-//    //sprite->PlayAnimation("spawn", 1, 1.f);
-//    
-//}
 TimeStop::TimeStop()
     :meshManager{ MeshManager::GetInstance() }, player{ Player::GetInstance() }, active{ false }, spriteName{ "timestop" }
 {
     zoneSprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));
 }
 
-void TimeStop::Update(float dt)
+TimeStop::~TimeStop()
+{
+    meshManager = nullptr;
+    player = nullptr;
+    if (zoneSprite)
+    {
+        delete zoneSprite;
+        zoneSprite = nullptr;
+    }
+}
+
+void TimeStop::Update(std::vector<BaseEnemy*> enemyList,float dt)
 {
     if (active)
     {
@@ -31,6 +33,14 @@ void TimeStop::Update(float dt)
                 proj->stopped = true;
             }
         }
+        for (BaseEnemy* enemy : enemyList)
+        {
+            if (AreCirclesIntersecting(enemy->transform.GetPosition().x, enemy->transform.GetPosition().y, 0.1f,
+                zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))
+            {
+                enemy->isStopped(true);
+            }
+        }
     }
     
     else
@@ -41,7 +51,12 @@ void TimeStop::Update(float dt)
             proj->stopped = false;
             
         }
+        for (BaseEnemy* enemy : enemyList)
+        {
 
+            enemy->isStopped(false);
+            
+        }
         zoneScale = originalScale;
 
     }
@@ -102,16 +117,5 @@ void TimeStop::Draw()
         AEGfxMeshDraw(meshManager->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
 
         zoneSprite->Render(spriteTransform,0.75f);
-    }
-}
-
-void TimeStop::Free()
-{
-    meshManager = nullptr;
-    player = nullptr;
-    if (zoneSprite)
-    {
-        delete zoneSprite;
-        zoneSprite = nullptr;
     }
 }

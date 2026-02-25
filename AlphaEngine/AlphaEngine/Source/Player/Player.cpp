@@ -288,19 +288,26 @@ void Player::Draw(AEGfxVertexList* mesh)
 	for (const auto& p : projectileList)
 		p->Draw(mesh);
 
-	/*
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(0.0f);
-	AEGfxSetTransform(transform.GetMatrix().m);
-	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-	*/
+	if (SettingsManager().GetInstance()->GetPlayerColDebug())
+	{
+		AEGfxVertexList* squareMesh = MeshManager::GetInstance()->GetMesh(SQUARE);
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+
+		AEGfxSetColorToAdd(0.25f, 0.75f, 0.25f, 1.f);
+		AEGfxSetColorToMultiply(0.0f, 0.5f, 0.0f, 1.f);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
+		//Create transform
+		Transform2D tileTransform{ GetCollidedTile().transform };
+
+		tileTransform.SetScale(tileTransform.GetScale().x + 10.f, tileTransform.GetScale().y + 10.f);
+
+		AEGfxSetTransform(tileTransform.GetMatrix().m);
+		AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
+	}
 
 	DrawHealthBar(mesh, currentHP, healthbar);
 
 	// Draw player sprite/transform via GameObject::Draw
 	GameObject::Draw();
-
 }

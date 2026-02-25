@@ -10,6 +10,20 @@ void SettingsManager::CheckSettingsInputs()
 	{
 		tilesDebug = !tilesDebug;
 	}
+	if (AEInputCheckTriggered(AEVK_F5))
+	{
+		playerCollisionDebug = !playerCollisionDebug;
+	}
+}
+
+bool SettingsManager::GetPlayerColDebug() const
+{
+	return playerCollisionDebug;
+}
+
+void SettingsManager::SetPlayerColDebug(bool d)
+{
+	playerCollisionDebug = d;
 }
 
 bool SettingsManager::GetPathDebug() const

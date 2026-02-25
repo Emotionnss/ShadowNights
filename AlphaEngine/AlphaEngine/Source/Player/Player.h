@@ -6,6 +6,7 @@
 #include "../System/Map.h"
 #include "../System/CSVManager.h"
 #include "../utils.h"
+#include "../System/SettingsManager.h"
 
 #include "../Projectiles/BaseProjectile.h"
 #include "../Projectiles/SwordProjectile.h"

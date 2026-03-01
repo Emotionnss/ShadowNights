@@ -96,6 +96,9 @@
     <ClCompile Include="Source\Enemy\BatEnemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Abilities\TemporalAnchor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Enemy\ArcherEnemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -180,6 +183,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Enemy\BatEnemy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Abilities\TemporalAnchor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Enemy\ArcherEnemy.h">

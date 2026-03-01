@@ -3,16 +3,20 @@
 #include "../Projectiles/BaseProjectile.h"
 #include "../utils.h"
 AbilityHandler::AbilityHandler()
-	:player{Player::GetInstance()},meshManager{MeshManager::GetInstance()}
+	:player{ Player::GetInstance() },
+	meshManager{ MeshManager::GetInstance() },
+	stopCost{ 15 },
+	slowCost{ 15 }
 {
 	AEGfxGetCamPosition(&camPos.x, &camPos.y);
 }
 
 AbilityHandler::~AbilityHandler()
 {
+	player = nullptr;
 	delete timeStop;
-
 	delete timeSlow;
+	delete tempAnch;
 }
 
 void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
@@ -20,8 +24,8 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 	AEGfxGetCamPosition(&camPos.x, &camPos.y);
 	timeStop->Update(enemyList,dt);
 	timeSlow->Update(enemyList,dt);
-
-	if (AEInputCheckTriggered(AEVK_F))
+	tempAnch->Update(dt);
+	if (AEInputCheckTriggered(AEVK_E))
 	{
 		timeStopped = timeStop->ToggleTime(player->GetTransform().GetPosition());
 	}
@@ -29,7 +33,10 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 	{
 		timeSlowed = timeSlow->ToggleSlow();
 	}
-
+	if (AEInputCheckTriggered(AEVK_F))
+	{
+		anchored = tempAnch->Anchor(player->GetTransform().GetPosition());
+	}
 	if (timeStopped)
 	{
 		resource -= 15 * dt;
@@ -59,8 +66,9 @@ void AbilityHandler::Draw()
 {
 
 	timeStop->Draw();
-
-	//resource bar for timestop
+	timeSlow->Draw();
+	tempAnch->Draw();
+	//resource bar for the abilties
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.f);

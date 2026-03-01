@@ -60,12 +60,13 @@ void EnemyProjectile::Update(float deltaTime)
                     SetDirection({ newDirX / newMag, newDirY / newMag });
                 }
             }
-            float currentSpeed = slowed ? (oriSpeed * 0.5f) : oriSpeed;
-            speed = currentSpeed;
+            //float currentSpeed = slowed ? (oriSpeed * 0.5f) : oriSpeed;
+            //speed = currentSpeed;
+            speed = slowed ? (oriSpeed * 0.5f) : oriSpeed;
 
             AEVec2 position = transform.GetPosition();
-            position.x += currentSpeed * GetDirection().x * deltaTime;
-            position.y += currentSpeed * GetDirection().y * deltaTime;
+            position.x += speed * GetDirection().x * deltaTime;
+            position.y += speed * GetDirection().y * deltaTime;
 
             transform.SetRotation(atan2f(GetDirection().y, GetDirection().x) + (3.14159f * 1.25f));
             transform.SetPosition(position.x, position.y);

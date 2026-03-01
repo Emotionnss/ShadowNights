@@ -42,6 +42,8 @@ void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     isDying = false;
     deathTimer = 0.0f;
     currentAnimState = "";
+    origAnimSpeed = 1.f;
+    animSpeed = origAnimSpeed;
 }
 
 void BaseEnemy::TakeDamage()
@@ -50,8 +52,8 @@ void BaseEnemy::TakeDamage()
     {
         isDying = true;
         velocity = { 0.0f, 0.0f };
-        deathTimer = 1.0f;
-        PlayAnim(deathAnimName);
+        //deathTimer = 1.0f;
+        PlayAnim(deathAnimName); // Use the variable instead of the hardcoded string!
     }
 }
 
@@ -71,10 +73,16 @@ void BaseEnemy::Slowed(bool active)
     switch (slowed)
     {
     case true:
-        moveSpeed = originalSpeed / 2.f;
+        if(!isDying)
+            deathTimer = oriDeathTimer * 10.f;
+        animSpeed = animSpeed * 10.f;
+        moveSpeed = originalSpeed / 10.f;
         break;
     case false:
+        if (!isDying)
+            deathTimer = oriDeathTimer;
         moveSpeed = originalSpeed;
+        animSpeed = origAnimSpeed;
         break;
     }
 }
@@ -159,6 +167,6 @@ void BaseEnemy::PlayAnim(std::string name)
     if (currentAnimState != name)
     {
         currentAnimState = name;
-        if (sprite) sprite->PlayAnimation(name, -1, 1.0f);
+        if (sprite) sprite->PlayAnimation(name, -1, animSpeed);
     }
 }

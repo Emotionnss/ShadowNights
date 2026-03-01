@@ -28,7 +28,7 @@ void BaseProjectile::Update(float deltaTime)
 	{
 		currLifespan -= 1.f * deltaTime;
 	}
-
+	speed = slowed ? oriSpeed / 2.f : oriSpeed;
 	if (!stopped)
 	{
 		AEVec2 position = transform.GetPosition();

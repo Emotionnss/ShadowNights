@@ -40,6 +40,7 @@
     <ClCompile Include="Source\Abilities\TimeStop.cpp" />
     <ClCompile Include="Source\Abilities\TimeSlow.cpp" />
     <ClCompile Include="Source\Projectiles\SwordProjectile.cpp" />
+    <ClCompile Include="Source\Abilities\TemporalAnchor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Enemy\ArcherEnemy.h" />
@@ -71,6 +72,7 @@
     <ClInclude Include="Source\Abilities\TimeStop.h" />
     <ClInclude Include="Source\Abilities\TimeSlow.h" />
     <ClInclude Include="Source\Projectiles\SwordProjectile.h" />
+    <ClInclude Include="Source\Abilities\TemporalAnchor.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

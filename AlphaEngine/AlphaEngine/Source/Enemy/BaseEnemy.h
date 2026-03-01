@@ -40,6 +40,7 @@ protected:
     // Death Logic
     bool isDying = false;
     float deathTimer = 0.0f;
+    f32 oriDeathTimer = 1.f;
 
     // Projectile Logic
     std::vector<EnemyProjectile*> enemyProjectiles;
@@ -48,6 +49,9 @@ protected:
     // Animation Helper
     std::string currentAnimState = "";
     void PlayAnim(std::string name);
+
+    f32 origAnimSpeed{ 1.f };
+    f32 animSpeed{ origAnimSpeed };
 
     SettingsManager* settingsManager = nullptr;
     Map* map = nullptr;

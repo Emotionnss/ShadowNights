@@ -13,3 +13,6 @@ batenemy,batdeath,0,11
 archerenemy,archeridle,1,8
 archerenemy,archerattack,2,14
 archerenemy,archerdeath,0,10
+boss,spawn,1,4
+boss,idle,2,6
+boss,death,0,7

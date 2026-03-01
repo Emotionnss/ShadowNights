@@ -51,7 +51,7 @@ void BaseEnemy::TakeDamage()
         isDying = true;
         velocity = { 0.0f, 0.0f };
         deathTimer = 1.0f;
-        PlayAnim(deathAnimName); // Use the variable instead of the hardcoded string!
+        PlayAnim(deathAnimName);
     }
 }
 
@@ -91,14 +91,13 @@ void BaseEnemy::isStopped(bool active)
 
 void BaseEnemy::Shoot()
 {
-    float dir = transform.GetScale().x;
+    float dirX = (transform.GetScale().x > 0) ? 1.0f : -1.0f;
     AEVec2 spawnPos = transform.GetPosition();
     spawnPos.y += 10.0f;
 
-    EnemyProjectile* newProj = new EnemyProjectile(spawnPos, dir);
+    EnemyProjectile* newProj = new EnemyProjectile(spawnPos, { dirX, 0.0f });
 
     newProj->slowed = this->slowed;
-
     enemyProjectiles.push_back(newProj);
 }
 

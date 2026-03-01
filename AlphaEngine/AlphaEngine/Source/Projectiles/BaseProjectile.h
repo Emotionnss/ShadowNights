@@ -26,6 +26,7 @@ public:
 
     float GetLifespan();
     void SetLifespan(float time);
+    void SetDirection(AEVec2 newDir);
 
     void SetSpeed(float speed);
     AEVec2 GetDirection();

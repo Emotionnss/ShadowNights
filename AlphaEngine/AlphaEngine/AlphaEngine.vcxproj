@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Enemy\ArcherEnemy.cpp" />
     <ClCompile Include="Source\Enemy\BatEnemy.cpp" />
     <ClCompile Include="Source\Enemy\BossEnemy.cpp" />
     <ClCompile Include="Source\Enemy\ShadowEnemy.cpp" />
@@ -41,6 +42,7 @@
     <ClCompile Include="Source\Projectiles\SwordProjectile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Enemy\ArcherEnemy.h" />
     <ClInclude Include="Source\Enemy\BatEnemy.h" />
     <ClInclude Include="Source\Enemy\BossEnemy.h" />
     <ClInclude Include="Source\Enemy\ShadowEnemy.h" />

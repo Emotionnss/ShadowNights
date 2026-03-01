@@ -6,7 +6,7 @@ class EnemyProjectile : public BaseProjectile
 {
 public:
 
-    EnemyProjectile(AEVec2 pos, float directionX);
+    EnemyProjectile(AEVec2 pos, AEVec2 dir);
     ~EnemyProjectile();
 
     void Update(float deltaTime) override;
@@ -17,6 +17,7 @@ public:
     void Speed(float newSpeed);
     float Speed() const;
     float OriginalSpeed() const;
+    bool isHoming = false;
 
 private:
     Sprite* sprite = nullptr;

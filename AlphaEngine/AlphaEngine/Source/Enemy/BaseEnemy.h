@@ -11,7 +11,7 @@ class BaseEnemy : public GameObject
 {
 public:
     BaseEnemy();
-    virtual ~BaseEnemy(); // Must be virtual so children delete properly!
+    virtual ~BaseEnemy();
 
     virtual void Init(float x, float y, float w, float h, std::string spriteName);
     virtual void Update(float deltaTime);
@@ -24,6 +24,7 @@ public:
     void Slowed(bool active);
     bool isStopped() const;
     void isStopped(bool active);
+    
 protected:
     Sprite* sprite = nullptr;
 
@@ -42,7 +43,7 @@ protected:
 
     // Projectile Logic
     std::vector<EnemyProjectile*> enemyProjectiles;
-    void Shoot();
+    virtual void Shoot();
 
     // Animation Helper
     std::string currentAnimState = "";

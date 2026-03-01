@@ -1,9 +1,10 @@
 #include "EnemyProjectile.h"
 #include "../System/CSVManager.h"
-#include <cmath> // Needed for atan2f
+#include <cmath>
+#include "../Player/Player.h"
 
-EnemyProjectile::EnemyProjectile(AEVec2 pos, float directionX)
-    : BaseProjectile(pos, { (directionX > 0) ? 1.0f : -1.0f, 0.0f }, true)
+EnemyProjectile::EnemyProjectile(AEVec2 pos, AEVec2 dir)
+    : BaseProjectile(pos, dir, true)
 {
     oriSpeed = 400.0f;
     speed = oriSpeed;
@@ -34,6 +35,31 @@ void EnemyProjectile::Update(float deltaTime)
         {
             SetLifespan(GetLifespan() - 1.f * deltaTime);
 
+            if (isHoming)
+            {
+                Player* player = Player::GetInstance();
+                AEVec2 playerPos = player->GetTransform().GetPosition();
+                AEVec2 myPos = transform.GetPosition();
+
+                float dx = playerPos.x - myPos.x;
+                float dy = playerPos.y - myPos.y;
+                float dist = sqrt(dx * dx + dy * dy);
+
+                if (dist > 0.0f)
+                {
+                    float perfectX = dx / dist;
+                    float perfectY = dy / dist;
+
+                    float turnSpeed = 3.0f;
+                    AEVec2 currentDir = GetDirection();
+
+                    float newDirX = currentDir.x + (perfectX - currentDir.x) * turnSpeed * deltaTime;
+                    float newDirY = currentDir.y + (perfectY - currentDir.y) * turnSpeed * deltaTime;
+
+                    float newMag = sqrt(newDirX * newDirX + newDirY * newDirY);
+                    SetDirection({ newDirX / newMag, newDirY / newMag });
+                }
+            }
             float currentSpeed = slowed ? (oriSpeed * 0.5f) : oriSpeed;
             speed = currentSpeed;
 

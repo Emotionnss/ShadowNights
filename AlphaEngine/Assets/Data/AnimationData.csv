@@ -10,9 +10,9 @@ batenemy,batidle,1,4
 batenemy,batattack,2,9
 batenemy,batmove,3,8
 batenemy,batdeath,0,11
-archerenemy,archeridle,1,8
-archerenemy,archerattack,2,14
-archerenemy,archerdeath,0,10
+sniperenemy,archeridle,1,8
+sniperenemy,archerattack,2,14
+sniperenemy,archerdeath,0,10
 boss,spawn,1,4
 boss,idle,2,6
 boss,death,0,7

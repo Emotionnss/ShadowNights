@@ -3,6 +3,7 @@
 #include "../Player/Player.h"
 #include <cmath>
 #include <algorithm>
+#include <cstdlib>
 
 BatEnemy::BatEnemy() : BaseEnemy()
 {
@@ -76,6 +77,13 @@ void BatEnemy::Update(float deltaTime)
 
             if (velocity.x > 0) transform.SetScale(-visualWidth, visualHeight);
             else                transform.SetScale(visualWidth, visualHeight);
+
+            shootTimer -= deltaTime;
+            if (shootTimer <= 0.0f)
+            {
+                Shoot();               
+                shootTimer = 2.0f;
+            }
         }
     }
 
@@ -144,6 +152,33 @@ void BatEnemy::Update(float deltaTime)
 
     transform.SetPosition(position.x, position.y);
     if (sprite) sprite->Update();
+}
+
+void BatEnemy::Shoot()
+{
+    Player* player = Player::GetInstance();
+    AEVec2 myPos = transform.GetPosition();
+    AEVec2 playerPos = player->GetTransform().GetPosition();
+
+    float dx = playerPos.x - myPos.x;
+    float dy = playerPos.y - myPos.y;
+    float baseAngle = atan2f(dy, dx);
+
+    float randomOffset = ((rand() % 100) / 100.0f - 0.5f) * 0.2f;
+
+    baseAngle += randomOffset;
+
+    float spread = 0.25f;
+
+    for (int i = -1; i <= 1; i++)
+    {
+        float currentAngle = baseAngle + (i * spread);
+        AEVec2 bulletDir = { cosf(currentAngle), sinf(currentAngle) };
+
+        EnemyProjectile* newProj = new EnemyProjectile(myPos, bulletDir);
+        newProj->slowed = this->slowed;
+        enemyProjectiles.push_back(newProj);
+    }
 }
 
 void BatEnemy::Draw()

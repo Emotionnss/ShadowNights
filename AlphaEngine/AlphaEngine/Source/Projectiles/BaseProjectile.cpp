@@ -82,3 +82,8 @@ AEVec2 BaseProjectile::GetDirection()
 {
 	return direction;
 }
+
+void BaseProjectile::SetDirection(AEVec2 newDir)
+{
+	direction = newDir;
+}

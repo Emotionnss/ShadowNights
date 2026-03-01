@@ -142,6 +142,7 @@ bool BossEnemy::UpdateMoving(float deltaTime)
 
     transform.SetPosition(position.x, position.y);
 
+    //Check for whether boss reached near position
     if (position.x > targetPos.x - 5.0f && position.x < targetPos.x + 5.0f && position.y > targetPos.y - 5.0f && position.y < targetPos.y + 5.0f)
     {
         return true;

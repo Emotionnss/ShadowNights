@@ -2,6 +2,10 @@
 #include "TimeStop.h"
 #include "TimeSlow.h"
 #include "TemporalAnchor.h"
+
+#include "BossLaser.h"
+
+
 #include "../System/MeshManager.h"
 class AbilityHandler
 {
@@ -10,6 +14,8 @@ private:
 	TimeStop* timeStop = new TimeStop();
 	TimeSlow* timeSlow = new TimeSlow();
 	TemporalAnchor* tempAnch = new TemporalAnchor();
+
+	BossLaser* bossLaser = new BossLaser();
 
 	Player* player = nullptr;
 	f32 slowCost{}, stopCost, temporalCost;
@@ -22,6 +28,8 @@ private:
 	bool timeStopped{};
 	bool timeSlowed{};
 	bool anchored{};
+
+	bool lasered{};
 public:
 	AbilityHandler();
 	~AbilityHandler();

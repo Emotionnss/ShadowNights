@@ -102,14 +102,17 @@
     <ClCompile Include="Source\Enemy\BossEnemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Utils\Slider.cpp">
+    <ClCompile Include="Source\Abilities\BossLaser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Utils\utils.cpp">
+    <ClCompile Include="Source\Abilities\BossExplosive.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Source\System\CSVManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -197,10 +200,10 @@
     <ClInclude Include="Source\Enemy\BossEnemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Utils\Slider.h">
+    <ClInclude Include="Source\Abilities\BossLaser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Utils\utils.h">
+    <ClInclude Include="Source\Abilities\BossExplosive.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

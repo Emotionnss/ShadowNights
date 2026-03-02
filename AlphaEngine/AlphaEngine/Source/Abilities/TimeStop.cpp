@@ -75,12 +75,12 @@ bool TimeStop::ToggleTime(AEVec2 position)//toggle the ability
     if (active == true)//if its active
     {
         active = false;//deactivate it
-        zoneSprite->PlayAnimation("spawn", 1, 1.f);
     }
     else if (active == false)//if not active
     {
         active = true;//activate
         SetZonePos(position);//set the position of the zone
+        zoneSprite->PlayAnimation("spawn", 1, 1.f);
     }
     return active;//return its activity
 }

@@ -5,7 +5,7 @@
 #include "GameObject.h"
 #include "../System/Map.h"
 #include "../System/CSVManager.h"
-#include "../utils.h"
+#include "../Utils/utils.h"
 #include "../System/SettingsManager.h"
 
 #include "../Projectiles/BaseProjectile.h"

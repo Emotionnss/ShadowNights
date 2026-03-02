@@ -44,6 +44,21 @@ public:
 	}
 
 	/**
+	 @brief Get the current instance of the singleton, creates it if it
+			doesn't exist
+	 @param void
+	 @return templated pointer to the instance
+	 */
+	template <typename T2> static T* GetInstance(T2 param)
+	{
+		//Sets a new instance if it does not exist
+		if (instance == nullptr)
+			instance = new T(param);
+
+		return instance;
+	}
+
+	/**
 	 @brief Destroy the instance if it exists, and resets it to nullptr
 	 @param void
 	 @return void

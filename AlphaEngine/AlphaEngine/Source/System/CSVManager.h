@@ -9,12 +9,6 @@
 #include <string>
 #include <vector>
 
-enum CSV_DATA_TYPE
-{
-	SPRITESHEET_DATA,
-	TOTAL_DATA
-};
-
 class CSVManager
 {
 private:
@@ -39,7 +33,14 @@ public:
 	 @param std::string headerName - header name to check against
 	 @return std::vector<std::string> - spritesheet data
 	 */
-	static std::vector<std::string> ReadInfo(CSV_DATA_TYPE dataType, std::string headerName);
+	static std::vector<std::string> ReadInfo(std::string headerName);
+
+	/**
+	 @brief Read information from a CSV file
+	 @param std::string headerName - header name to check against
+	 @return std::vector<std::string> - spritesheet data
+	 */
+	static std::vector<std::string> ReadSettingsInfo();
 	
 	/**
 	 @brief Read animation information from a CSV file

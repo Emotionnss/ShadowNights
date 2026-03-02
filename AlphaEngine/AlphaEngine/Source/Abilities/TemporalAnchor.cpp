@@ -11,7 +11,7 @@ TemporalAnchor::TemporalAnchor() :
 {
 	zoneTfm.SetScale(1000, 1000);
 	anchorTfm.SetScale(100, 100);
-	anchorSprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "timestop"));//create new sprite for the anchor
+	anchorSprite = new Sprite(CSVManager::ReadInfo("timestop"));//create new sprite for the anchor
 }
 
 TemporalAnchor::~TemporalAnchor()

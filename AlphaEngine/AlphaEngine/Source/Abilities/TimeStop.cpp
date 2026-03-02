@@ -9,7 +9,7 @@ TimeStop::TimeStop()//constructor
     active{ false }, //active boolean
     spriteName{ "timestop" }//spritename in sprite excelsheet
 {
-    zoneSprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));//create new sprite for the timestop zone
+    zoneSprite = new Sprite(CSVManager::ReadInfo(spriteName));//create new sprite for the timestop zone
     zoneSprite->PlayAnimation("spawn", 1, 1.f);
 }
 

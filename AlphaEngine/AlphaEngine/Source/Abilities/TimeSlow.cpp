@@ -8,7 +8,7 @@ TimeSlow::TimeSlow()
 	despawningTime{3.f},
 	despawningTimer{despawningTime}
 {
-	timeSlowSprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, timeSlow));
+	timeSlowSprite = new Sprite(CSVManager::ReadInfo(timeSlow));
 
 	timeSlowTransform.SetScale(player->GetTransform().GetScale().x,player->GetTransform().GetScale().y);
 	

@@ -33,7 +33,7 @@ void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     transform.SetScale(w, h);
 
     if (sprite) delete sprite;
-    sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));
+    sprite = new Sprite(CSVManager::ReadInfo(spriteName));
 
     originalSpeed = 100.f;
     moveSpeed = originalSpeed;

@@ -1,5 +1,21 @@
 #include "SettingsManager.h"
 
+
+SettingsManager::SettingsManager() :
+	TILE_WIDTH{ 0.f },
+	TILE_HEIGHT{ 0.f }
+{
+}
+
+SettingsManager::SettingsManager(std::vector<std::string> settingsInfo) :
+	TILE_WIDTH{std::stof(settingsInfo[0])},
+	TILE_HEIGHT{std::stof(settingsInfo[1])},
+	bgmVolume{std::stoi(settingsInfo[2])},
+	sfxVolume{std::stoi(settingsInfo[3])}
+{
+
+}
+
 void SettingsManager::CheckSettingsInputs()
 {
 	if (AEInputCheckTriggered(AEVK_F3))

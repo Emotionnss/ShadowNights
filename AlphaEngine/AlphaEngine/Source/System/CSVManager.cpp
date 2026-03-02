@@ -147,22 +147,13 @@ std::vector<std::vector<int>> CSVManager::ReadMap(std::string fileName)
 	return rowValues;
 }
 
-std::vector<std::string> CSVManager::ReadInfo(CSV_DATA_TYPE dataType, std::string headerName)
+std::vector<std::string> CSVManager::ReadInfo(std::string headerName)
 {
 	//Get info in string
 	std::vector<std::string> info;
 
-	std::string filePath;
-
-	switch (dataType)
-	{
-	case SPRITESHEET_DATA:
-		filePath = "Assets/Data/SpriteData.csv";
-		break;
-	}
-
 	//Creates an output filestream and opens the file
-	std::ifstream file{ filePath, std::ios::in };
+	std::ifstream file{ "Assets/Data/SpriteData.csv", std::ios::in };
 
 	// Make sure the file is open
 	try
@@ -194,6 +185,37 @@ std::vector<std::string> CSVManager::ReadInfo(CSV_DATA_TYPE dataType, std::strin
 		}
 	}
 
+	return info;
+}
+
+std::vector<std::string> CSVManager::ReadSettingsInfo()
+{
+	//Get info in string
+	std::vector<std::string> info;
+
+	//Creates an output filestream and opens the file
+	std::ifstream file{ "Assets/Data/SettingsData.csv", std::ios::in };
+
+	// Make sure the file is open
+	try
+	{
+		if (!file.is_open())
+		{
+			throw std::runtime_error("Could not open file");
+		}
+	}
+	catch (std::runtime_error e)
+	{
+		//std::cout << "Runtime error: " << e.what();
+		return info;
+	}
+
+	std::string line;
+
+	//Gets line by line until end of file
+	getline(file, line);
+
+	info = Tokenise(line, ',');
 	return info;
 }
 

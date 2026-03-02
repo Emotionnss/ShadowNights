@@ -20,7 +20,7 @@ Player::Player()
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
 	AEVec2Set(&cameraOffset, 200.f, -50.f);
 
-	sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "ame"));
+	sprite = new Sprite(CSVManager::ReadInfo("ame"));
 	sprite->SetDefaultAnimation("bounce");
 	sprite->PlayDefaultAnimation(-1, 1.f);
 
@@ -69,7 +69,7 @@ void Player::HandleInput()
 		Player::input.x -= 1.f;
 	}
 
-	if (AEInputCheckTriggered(AEVK_SPACE) && isGrounded)
+	if (AEInputCheckTriggered(AEVK_SPACE) && isGrounded && velocity.y >= 0.f)
 	{
 		SetVelocity(GetVelocity().x, 1000.f);
 		isGrounded = false;
@@ -288,7 +288,7 @@ void Player::Draw(AEGfxVertexList* mesh)
 	for (const auto& p : projectileList)
 		p->Draw(mesh);
 
-	if (SettingsManager().GetInstance()->GetPlayerColDebug())
+	if (SettingsManager::GetInstance()->GetPlayerColDebug())
 	{
 		AEGfxVertexList* squareMesh = MeshManager::GetInstance()->GetMesh(SQUARE);
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);

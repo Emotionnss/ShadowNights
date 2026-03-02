@@ -9,7 +9,7 @@ BossLaser::BossLaser()
 	active{ false },
     spriteName{ "bosslaser" }
 {
-    laserSprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));
+    laserSprite = new Sprite(CSVManager::ReadInfo(spriteName));
     laserSprite->PlayAnimation("spawn", 1, 1.f);
 
     transform.SetScale(500, 500);

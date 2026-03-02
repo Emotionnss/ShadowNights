@@ -17,6 +17,8 @@ AbilityHandler::~AbilityHandler()
 	delete timeStop;
 	delete timeSlow;
 	delete tempAnch;
+
+	delete bossLaser;
 }
 
 void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
@@ -25,6 +27,10 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 	timeStop->Update(enemyList,dt);
 	timeSlow->Update(enemyList,dt);
 	tempAnch->Update(dt);
+
+	bossLaser->Update(dt);
+
+
 	if (AEInputCheckTriggered(AEVK_E))
 	{
 		timeStopped = timeStop->ToggleTime(player->GetTransform().GetPosition());
@@ -37,6 +43,14 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 	{
 		anchored = tempAnch->Anchor(player->GetTransform().GetPosition());
 	}
+
+	if (AEInputCheckTriggered(AEVK_T))
+	{
+		lasered = bossLaser->Triggered(player->GetTransform().GetPosition());
+	}
+
+
+
 	if (timeStopped)
 	{
 		resource -= 15 * dt;
@@ -68,6 +82,9 @@ void AbilityHandler::Draw()
 	timeStop->Draw();
 	timeSlow->Draw();
 	tempAnch->Draw();
+
+	bossLaser->Draw();
+
 	//resource bar for the abilties
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);

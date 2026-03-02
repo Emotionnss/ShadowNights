@@ -11,8 +11,8 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <queue>
 #include "../System/MeshManager.h"
+#include "../System/SettingsManager.h"
 #include "../Player/Transform2D.h"
 
 enum class TILE_TYPE
@@ -86,13 +86,13 @@ class Map : public SingletonTemplate<Map>
 
 private:
 	static const char* TILE_ASSETS_FILE_PATH;
-	const f32 TILE_WIDTH = 100.f;
-	const f32 TILE_HEIGHT = 100.f;
 	bool firstLoad = false;
 	s32 NUM_COLUMN;
 	s32 NUM_ROW;
 
 	MeshManager* meshManager;
+
+	SettingsManager* settingsManager;
 
 	//2D array to store map info
 	Tile** map;

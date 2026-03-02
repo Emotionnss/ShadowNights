@@ -16,7 +16,6 @@ void ShadowEnemy::Init(float x, float y, float w, float h, std::string spriteNam
 {
     BaseEnemy::Init(x, y, w, h, spriteName);
 
-    //variables
     isAttacking = false;
     attackTimer = 0.0f;
     hasFired = false;
@@ -30,10 +29,8 @@ void ShadowEnemy::Init(float x, float y, float w, float h, std::string spriteNam
 
 void ShadowEnemy::Update(float deltaTime)
 {
-    // BaseEnemy handles Projectiles and Death animations
     BaseEnemy::Update(deltaTime);
     
-    // If we are stopped or dying dont run AI or movement
     if (stopped || isDying) return;
 
     // SHADOW ENEMY AI & COLLISION
@@ -67,7 +64,7 @@ void ShadowEnemy::Update(float deltaTime)
 
         if (!hasFired)
         {
-            Shoot(); // Uses BaseEnemy Shoot function
+            Shoot();
             hasFired = true;
         }
 
@@ -98,7 +95,7 @@ void ShadowEnemy::Update(float deltaTime)
         if (dist < attackRadius)
         {
             isAttacking = true;
-            attackTimer = slowed ? originalTimer * 2.f : originalTimer;
+            attackTimer = slowed ? originalTimer * 2.0f : originalTimer;
             //attackTimer = 1.0f;
             PlayAnim("attack1");
         }

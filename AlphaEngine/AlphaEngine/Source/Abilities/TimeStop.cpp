@@ -3,13 +3,17 @@
 #include "../utils.h"
 #include "../System/CSVManager.h"
 
-TimeStop::TimeStop()
-    :meshManager{ MeshManager::GetInstance() }, player{ Player::GetInstance() }, active{ false }, spriteName{ "timestop" }
+TimeStop::TimeStop()//constructor
+    :meshManager{ MeshManager::GetInstance() }, //mesh manager
+    player{ Player::GetInstance() }, //player instance
+    active{ false }, //active boolean
+    spriteName{ "timestop" }//spritename in sprite excelsheet
 {
-    zoneSprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, spriteName));
+    zoneSprite = new Sprite(CSVManager::ReadInfo(spriteName));//create new sprite for the timestop zone
+    zoneSprite->PlayAnimation("spawn", 1, 1.f);
 }
 
-TimeStop::~TimeStop()
+TimeStop::~TimeStop()//destructor
 {
     meshManager = nullptr;
     player = nullptr;
@@ -22,88 +26,82 @@ TimeStop::~TimeStop()
 
 void TimeStop::Update(std::vector<BaseEnemy*> enemyList,float dt)
 {
-    if (active)
+    if (active)//if time stopped
     {
-        zoneScale += 1500 * dt;
-        for (BaseProjectile* proj : player->GetProjectileList())
+        zoneScale += 1500 * dt;//rapidly increase zone
+        for (BaseProjectile* proj : player->GetProjectileList())//for every projectile the player throws
         {
             if (AreCirclesIntersecting(proj->transform.GetPosition().x, proj->transform.GetPosition().y, 0.1f ,
-                zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))
+                zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))//if its in the timestop zone
             {
-                proj->stopped = true;
+                proj->stopped = true;//stop moving the projectile
             }
         }
-        for (BaseEnemy* enemy : enemyList)
+        for (BaseEnemy* enemy : enemyList)//same for the enemies
         {
             if (AreCirclesIntersecting(enemy->transform.GetPosition().x, enemy->transform.GetPosition().y, 0.1f,
                 zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))
             {
-                enemy->isStopped(true);
+                enemy->isStopped(true);//stop the enemies
             }
         }
     }
     
-    else
+    else//else if not timestopped
     {
-        for (BaseProjectile* proj : player->GetProjectileList())
+        for (BaseProjectile* proj : player->GetProjectileList())//every player thrown projectile
         {
 
-            proj->stopped = false;
+            proj->stopped = false;//not stopped
             
         }
-        for (BaseEnemy* enemy : enemyList)
+        for (BaseEnemy* enemy : enemyList)//every enemy thrown projectile
         {
 
-            enemy->isStopped(false);
+            enemy->isStopped(false);//not stopped
             
         }
-        zoneScale = originalScale;
+        zoneScale = originalScale;//revert the zonescale back to the original
 
     }
-    zoneScale = AEClamp(zoneScale, originalScale, maxScale);
-    SetZoneScale();
-    zoneSprite->Update();
+    zoneScale = AEClamp(zoneScale, originalScale, maxScale);//clamp the zone size
+    zoneTransform.SetScale(zoneScale, zoneScale);//update the scale of the zone
+    spriteTransform.SetScale(zoneScale * 2.f, zoneScale * 2.f);//update of the scale of the sprite
+    zoneSprite->Update();//let sprite update as well
 }
 
-bool TimeStop::ToggleTime(AEVec2 position)
+bool TimeStop::ToggleTime(AEVec2 position)//toggle the ability
 {
-    if (active == true)
+    if (active == true)//if its active
     {
-        active = false;
+        active = false;//deactivate it
+        zoneSprite->PlayAnimation("spawn", 1, 1.f);
+    }
+    else if (active == false)//if not active
+    {
+        active = true;//activate
+        SetZonePos(position);//set the position of the zone
+    }
+    return active;//return its activity
+}
 
-    }
-    else if (active == false)
-    {
-        active = true;
-        SetZonePos(position);
-    }
+bool TimeStop::TimeStopped() const//getter
+{
     return active;
 }
 
-bool TimeStop::TimeStopped() const
-{
-    return active;
-}
-
-f32 TimeStop::GetScale() const
+f32 TimeStop::GetScale() const//getter
 {
     return zoneScale;
 }
 
-void TimeStop::SetZonePos(AEVec2 position)
+void TimeStop::SetZonePos(AEVec2 position)//setter for the zones position
 {
     zoneTransform.SetPosition(position);
     spriteTransform.SetPosition(position);
 }
 
-void TimeStop::SetZoneScale()
-{
-    zoneTransform.SetScale(zoneScale, zoneScale);
-    spriteTransform.SetScale(zoneScale*2.f, zoneScale*2.f);
-
-}
-
-void TimeStop::Draw()
+void TimeStop::Draw()//Rendering the sprites
 {
     //zone for timestop
     AEGfxSetRenderMode(AE_GFX_RM_COLOR); 

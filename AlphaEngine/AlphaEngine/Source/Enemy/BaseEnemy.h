@@ -11,7 +11,7 @@ class BaseEnemy : public GameObject
 {
 public:
     BaseEnemy();
-    virtual ~BaseEnemy(); // Must be virtual so children delete properly!
+    virtual ~BaseEnemy();
 
     virtual void Init(float x, float y, float w, float h, std::string spriteName);
     virtual void Update(float deltaTime);
@@ -24,7 +24,8 @@ public:
     void Slowed(bool active);
     bool isStopped() const;
     void isStopped(bool active);
-protected: // Changed to PROTECTED so ShadowEnemy can access these!
+    
+protected:
     Sprite* sprite = nullptr;
 
     // Physics
@@ -39,17 +40,23 @@ protected: // Changed to PROTECTED so ShadowEnemy can access these!
     // Death Logic
     bool isDying = false;
     float deathTimer = 0.0f;
+    f32 oriDeathTimer = 1.f;
 
     // Projectile Logic
     std::vector<EnemyProjectile*> enemyProjectiles;
-    void Shoot();
+    virtual void Shoot();
 
     // Animation Helper
     std::string currentAnimState = "";
     void PlayAnim(std::string name);
 
+    f32 origAnimSpeed{ 1.f };
+    f32 animSpeed{ origAnimSpeed };
+
     SettingsManager* settingsManager = nullptr;
     Map* map = nullptr;
+
+    std::string deathAnimName = "shadowdeath";
 
     // Pathfinding lines
     std::vector<AEVec2> path;

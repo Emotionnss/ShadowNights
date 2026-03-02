@@ -30,7 +30,6 @@ public:
 	bool TimeStopped() const; //returns if the ablity is active
 	f32 GetScale() const;//returns the scale of the ability
 	void SetZonePos(AEVec2 position);//the position of zone
-	void SetZoneScale();//the scaling of zone
 	void Draw();//renderings
 };
 

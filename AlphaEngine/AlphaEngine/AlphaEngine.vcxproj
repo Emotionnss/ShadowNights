@@ -11,6 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Enemy\ArcherEnemy.cpp" />
+    <ClCompile Include="Source\Enemy\BatEnemy.cpp" />
+    <ClCompile Include="Source\Enemy\BossEnemy.cpp" />
     <ClCompile Include="Source\Enemy\ShadowEnemy.cpp" />
     <ClCompile Include="Source\Projectiles\EnemyProjectile.cpp" />
     <ClCompile Include="Source\Enemy\BaseEnemy.cpp" />
@@ -37,8 +40,12 @@
     <ClCompile Include="Source\Abilities\TimeStop.cpp" />
     <ClCompile Include="Source\Abilities\TimeSlow.cpp" />
     <ClCompile Include="Source\Projectiles\SwordProjectile.cpp" />
+    <ClCompile Include="Source\Abilities\TemporalAnchor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Enemy\ArcherEnemy.h" />
+    <ClInclude Include="Source\Enemy\BatEnemy.h" />
+    <ClInclude Include="Source\Enemy\BossEnemy.h" />
     <ClInclude Include="Source\Enemy\ShadowEnemy.h" />
     <ClInclude Include="Source\Projectiles\EnemyProjectile.h" />
     <ClInclude Include="Source\Enemy\BaseEnemy.h" />
@@ -65,6 +72,7 @@
     <ClInclude Include="Source\Abilities\TimeStop.h" />
     <ClInclude Include="Source\Abilities\TimeSlow.h" />
     <ClInclude Include="Source\Projectiles\SwordProjectile.h" />
+    <ClInclude Include="Source\Abilities\TemporalAnchor.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

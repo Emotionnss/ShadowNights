@@ -28,7 +28,7 @@ void BaseProjectile::Update(float deltaTime)
 	{
 		currLifespan -= 1.f * deltaTime;
 	}
-
+	speed = slowed ? oriSpeed / 2.f : oriSpeed;
 	if (!stopped)
 	{
 		AEVec2 position = transform.GetPosition();
@@ -75,10 +75,15 @@ void BaseProjectile::SetLifespan(float time)
 
 void BaseProjectile::SetSpeed(float speed)
 {
-	this->speed = speed;
+		this->speed = speed;
 }
 
 AEVec2 BaseProjectile::GetDirection()
 {
 	return direction;
+}
+
+void BaseProjectile::SetDirection(AEVec2 newDir)
+{
+	direction = newDir;
 }

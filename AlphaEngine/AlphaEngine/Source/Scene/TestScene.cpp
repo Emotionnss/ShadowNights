@@ -5,6 +5,9 @@
 #include "TestScene2.h"
 #include "../utils.h"
 #include "../Enemy/ShadowEnemy.h"
+#include "../Enemy/BatEnemy.h"
+#include "../Enemy/ArcherEnemy.h"
+
 
 void TestScene::Load() {
     AEGfxReset();
@@ -19,7 +22,7 @@ void TestScene::Init() {
     player->GetTransform().SetPosition(300.0f, 900.0f);
     abilityHandler = new AbilityHandler();
 
-	// ENEMY LIST SPAWN (black man)
+    // ENEMY LIST SPAWN
     int numberOfEnemies = 3;
     float startX = 600.0f;
     float spacing = 300.0f;
@@ -27,11 +30,20 @@ void TestScene::Init() {
     for (int e = 0; e < numberOfEnemies; e++)
     {
         BaseEnemy* newEnemy = new ShadowEnemy();
+        BaseEnemy* myBat = new BatEnemy();
+        BaseEnemy* myArcher = new ArcherEnemy();
+
         float spawnX = startX + (e * spacing);
 
         newEnemy->Init(spawnX, 300.0f, 85.0f, 60.0f, "shadow1");
         newEnemy->SetVelocity(0.0f, 0.0f);
         enemyList.push_back(newEnemy);
+
+        myBat->Init(spawnX, 700.0f, 85.0f, 60.0f, "batenemy");
+        enemyList.push_back(myBat);
+
+        myArcher->Init(spawnX + 150.0f, 300.0f, 85.0f, 60.0f, "sniperenemy");
+        enemyList.push_back(myArcher);
     }
 
 }
@@ -73,7 +85,6 @@ void TestScene::Update() {
                 std::cout << "OUCH! Player Hit!" << std::endl;
                 player->TakeDamage(10);
 
-                // Destroy the Projectile safely
                 delete proj;
                 it = enemyProjs.erase(it);
             }
@@ -119,7 +130,7 @@ void TestScene::Update() {
             }
         }
 
-        // erase the projectile after the loops are completely done with it
+        // erase the projectile (zav is gay)
         if (destroyProjectile || pProj->GetLifespan() <= 0.f)
         {
             delete pProj;

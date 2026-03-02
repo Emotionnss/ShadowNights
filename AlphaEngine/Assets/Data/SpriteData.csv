@@ -4,3 +4,7 @@ shadow1 - Idle_test,3,4
 shadowspritesheettest,15,12
 timestop,1,12
 shadoworb,1,6
+batenemy,4,16
+sniperenemy,3,14
+boss,3,7
+timeslow2,2,9

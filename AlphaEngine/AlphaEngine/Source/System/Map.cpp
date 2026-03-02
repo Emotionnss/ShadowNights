@@ -28,6 +28,7 @@ Map::Map()
 	LoadMapTileImages();
 
 	meshManager = MeshManager::GetInstance();
+	settingsManager = SettingsManager::GetInstance();
 }
 
 Map::~Map()
@@ -135,8 +136,8 @@ AEVec2 Map::GetTilePos(f32 xPos, f32 yPos) const
 {
 	s32 rowPos = 0, columnPos = 0;
 
-	rowPos = static_cast<s32>(floor(xPos / TILE_WIDTH));
-	columnPos = static_cast<s32>(floor(yPos / TILE_HEIGHT));
+	rowPos = static_cast<s32>(floor(xPos / settingsManager->TILE_WIDTH));
+	columnPos = static_cast<s32>(floor(yPos / settingsManager->TILE_HEIGHT));
 
 	/*if (rowPos >= NUM_ROW)
 	{
@@ -224,9 +225,9 @@ bool Map::LoadMap(std::string fileName)
 			//mapData row and column must be reversed for it to show properly
 
 			map[i][j].tileType = static_cast<TILE_TYPE>(mapData[NUM_ROW - 1 - i][j]);
-			AEVec2 vec = { (TILE_WIDTH * 0.5f) + TILE_WIDTH * j, (TILE_HEIGHT * 0.5f) + TILE_HEIGHT * i };
+			AEVec2 vec = { (settingsManager->TILE_WIDTH * 0.5f) + settingsManager->TILE_WIDTH * j, (settingsManager->TILE_HEIGHT * 0.5f) + settingsManager->TILE_HEIGHT * i };
 			map[i][j].transform.SetPosition(vec);
-			map[i][j].transform.SetScale(TILE_WIDTH, TILE_HEIGHT);
+			map[i][j].transform.SetScale(settingsManager->TILE_WIDTH, settingsManager->TILE_HEIGHT);
 
 			//std::cout << "Pos: " << vec.x << ", " << vec.y << std::endl;
 
@@ -349,7 +350,7 @@ AEVec2 Map::GetDimensions(void) const
 
 f32 Map::GetTileSize(void) const
 {
-	return TILE_WIDTH;
+	return settingsManager->TILE_WIDTH;
 }
 
 AEVec2 Map::GetSpawnpoint(void) const
@@ -615,7 +616,7 @@ void Map::RenderCheckedTilesDebug(float r, float g, float b)
 	for (Node* node : closedList)
 	{
 		//Create transform
-		Transform2D transform{ node->position, {TILE_WIDTH * 0.9f, TILE_HEIGHT * 0.9f}, 0.0f };
+		Transform2D transform{ node->position, {settingsManager->TILE_WIDTH * 0.9f, settingsManager->TILE_HEIGHT * 0.9f}, 0.0f };
 
 		AEGfxSetTransform(transform.GetMatrix().m);
 		AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);

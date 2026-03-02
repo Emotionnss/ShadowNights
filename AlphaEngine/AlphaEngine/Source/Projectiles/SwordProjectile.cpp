@@ -24,6 +24,7 @@ void SwordProjectile::Update(float deltaTime)
 {
 	if (GetLifespan() > 0.f)
 	{
+		speed = slowed ? speed * 2.f : speed;
 		if (!stopped)
 		{
 			SetLifespan(GetLifespan() - 1.f * deltaTime);

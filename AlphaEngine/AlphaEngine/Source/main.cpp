@@ -6,6 +6,8 @@
 #include "Scene/MainMenu.h"
 #include "System/SettingsManager.h"
 #include <iostream>
+#include <vector>
+#include <string>
 
 bool gGameRunning = true;
 
@@ -21,8 +23,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         return 0;
     }
    // _CrtSetBreakAlloc(8067);
-    
-    SettingsManager* sManager = SettingsManager::GetInstance();
+
+    //Init settings
+    std::vector<std::string> settingsInfo = CSVManager::ReadSettingsInfo();
+    SettingsManager* sManager = SettingsManager::GetInstance(settingsInfo);
 
     // 2. Set Scene
     SceneManager::ChangeScene(new MainMenu());

@@ -13,7 +13,7 @@ EnemyProjectile::EnemyProjectile(AEVec2 pos, AEVec2 dir)
     transform.SetPosition(pos.x, pos.y);
     SetLifespan(3.0f);
 
-    sprite = new Sprite(CSVManager::ReadInfo(SPRITESHEET_DATA, "shadoworb"));
+    sprite = new Sprite(CSVManager::ReadInfo("shadoworb"));
     sprite->PlayDefaultAnimation(-1, 1.0f);
 }
 

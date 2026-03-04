@@ -46,8 +46,22 @@ void TimeStop::Update(std::vector<BaseEnemy*> enemyList,float dt)
             }
         }
     }
-    
-    else//else if not timestopped
+
+    if (tempStop)
+    {
+        for (BaseProjectile* proj : player->GetProjectileList())//for every projectile the player throws
+        {
+            proj->stopped = true;//stop moving the projectile
+        }
+        for (BaseEnemy* enemy : enemyList)//same for the enemies
+        {
+            
+            enemy->isStopped(true);//stop the enemies
+            
+        }
+    }
+
+    else if (!tempStop && !active)//else if not timestopped
     {
         for (BaseProjectile* proj : player->GetProjectileList())//every player thrown projectile
         {
@@ -83,6 +97,11 @@ bool TimeStop::ToggleTime(AEVec2 position)//toggle the ability
         zoneSprite->PlayAnimation("spawn", 1, 1.f);
     }
     return active;//return its activity
+}
+
+void TimeStop::TempStop( bool active)
+{
+    tempStop = active;
 }
 
 bool TimeStop::TimeStopped() const//getter

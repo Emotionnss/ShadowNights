@@ -3,6 +3,7 @@
 #include <iostream>
 #include "../System/Scenemanager.h"
 #include "TestScene2.h"
+#include "BossScene.h"
 #include "../Utils/utils.h"
 #include "../Enemy/ShadowEnemy.h"
 #include "../Enemy/BatEnemy.h"
@@ -62,7 +63,7 @@ void TestScene::Update() {
 
     if (player->GetCollidedTile().tileType == TILE_TYPE::BACKGROUND && enemyList.size() == 0)
     {
-        SceneManager::ChangeScene(new TestScene2());
+        SceneManager::ChangeScene(new BossScene());
     }
 
     // N***A enemy projectile
@@ -80,7 +81,7 @@ void TestScene::Update() {
             AEVec2 playerPos = player->GetTransform().GetPosition();
             AEVec2 playerHalf = { 35.0f, 35.0f };
 
-            if (AABBOverlap(projPos, projHalf, playerPos, playerHalf))
+            if (AABBOverlap(projPos, projHalf, playerPos, playerHalf) && !abilityHandler->Reverse())
             {
                 std::cout << "OUCH! Player Hit!" << std::endl;
                 player->TakeDamage(10);
@@ -94,7 +95,17 @@ void TestScene::Update() {
             }
         }
     }
-
+    if (player->Health() <= 0)
+    {
+        if (abilityHandler->Anchored())
+        {
+            abilityHandler->TriggerAnchor();
+        }
+        else
+        {
+            player->Health(100);
+        }
+    }
     // SWORD PEEPEEPOOPOO
     std::vector<BaseProjectile*>& projs = player->projectileList;
 

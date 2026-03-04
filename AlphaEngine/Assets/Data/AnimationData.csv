@@ -19,3 +19,4 @@ boss,death,0,7
 timeslow2,spawn,0,5
 timeslow2,despawn,1,9
 bosslaser,spawn,0,6
+anchor,spawn,0,10

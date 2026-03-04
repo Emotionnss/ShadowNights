@@ -81,11 +81,6 @@ Transform2D Slider::GetTrackerTransform(void) const
 	return trackerTransform;
 }
 
-/*!
-@brief	Render the slider
-@param	CP_POSITION_MODE previousMode - the previous rendering mode
-@return void
-*//*______________________________________________________________*/
 void Slider::RenderSlider()
 {
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -98,6 +93,7 @@ void Slider::RenderSlider()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
+	//Thumb render
 	AEGfxTextureSet(thumb, 0, 0);
 	AEGfxSetTransform(thumbTransform.GetMatrix().m);
 	AEGfxMeshDraw(texSquareMesh, AE_GFX_MDM_TRIANGLES);

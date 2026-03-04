@@ -11,7 +11,8 @@ TemporalAnchor::TemporalAnchor() :
 {
 	zoneTfm.SetScale(1000, 1000);
 	anchorTfm.SetScale(100, 100);
-	anchorSprite = new Sprite(CSVManager::ReadInfo("timestop"));//create new sprite for the anchor
+	anchorSprite = new Sprite(CSVManager::ReadInfo("anchor"));//create new sprite for the anchor
+	anchorSprite->PlayAnimation("spawn", -1, 0.5f);
 }
 
 TemporalAnchor::~TemporalAnchor()
@@ -27,33 +28,55 @@ TemporalAnchor::~TemporalAnchor()
 		delete anchorSprite;
 		anchorSprite = nullptr;
 	}
+	savedPlayerPositions.clear();
 }
 
 void TemporalAnchor::Update(f32 dt)
 {
-	if (active)
+	if (active && !reversing)
 	{
 		activeTimer += -1 * dt;
+		saveTimer += -1 * dt;
+		if (saveTimer <= 0)
+		{
+			saveTimer = saveTime;
+			SavePositions(player->GetTransform().GetPosition());
+		}
 		if (!AreCirclesIntersecting(player->GetTransform().GetPosition().x, player->GetTransform().GetPosition().y, player->GetTransform().GetScale().x,
 			anchorTfm.GetPosition().x, anchorTfm.GetPosition().y, zoneTfm.GetScale().x))
 		{
-			std::cout << "out of zone" << '\n';
 			active = false;
 		}
 		else
 		{
-			std::cout << "in zone" << '\n';
-			if (activeTimer <= 0)
+			if (activeTimer <= 0 && !reversing)
 			{
 				active = false;
-				player->GetTransform().SetPosition(anchorTfm.GetPosition());
+				reversing = true;
+				iter = savedPlayerPositions.size() - 1;
 			}
 		}
 	}
-	else
+	if (reversing)
+	{
+		if (!savedPlayerPositions.empty())
+		{
+			player->GetTransform().SetPosition(savedPlayerPositions[iter]);
+			savedPlayerPositions.erase(savedPlayerPositions.begin() + iter--);
+		}
+		else
+		{
+			reversing = false;
+			//player->GetTransform().SetPosition(anchorTfm.GetPosition());
+			player->Health(savedHealth);	
+		}
+	}
+	else if (!active && !reversing)
 	{
 		activeTimer = activeTime;
+		saveTimer = saveTime;
 	}
+	anchorSprite->Update();
 }
 
 bool TemporalAnchor::Anchor(AEVec2 anchPos)
@@ -61,14 +84,24 @@ bool TemporalAnchor::Anchor(AEVec2 anchPos)
 	if (active)
 	{
 		active = false;
-		player->GetTransform().SetPosition(anchorTfm.GetPosition());
+		reversing = true;
+		iter = savedPlayerPositions.size() - 1;
+		//player->GetTransform().SetPosition(anchorTfm.GetPosition());
+
 	}
 	else
 	{
 		active = true;
+		savedHealth = player->Health();
 		anchorTfm.SetPosition(anchPos);
 		zoneTfm.SetPosition(anchPos);
+		anchorSprite->PlayAnimation("spawn",-1,0.5f);
 	}
+	return active;
+}
+
+bool TemporalAnchor::Anchor() const
+{
 	return active;
 }
 
@@ -87,4 +120,15 @@ void TemporalAnchor::Draw()
 		
 		anchorSprite->Render(anchorTfm);
 	}
+}
+
+void TemporalAnchor::SavePositions(AEVec2 playerPos)
+{
+	savedPlayerPositions.push_back(playerPos);
+	//std::cout << "saving position" << playerPos.x << " " << playerPos.y << " vector size" << savedPlayerPositions.size() << '\n';
+}
+
+bool TemporalAnchor::Reversing() const
+{
+	return reversing;
 }

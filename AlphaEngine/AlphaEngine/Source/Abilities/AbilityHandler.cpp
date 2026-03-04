@@ -6,7 +6,8 @@ AbilityHandler::AbilityHandler()
 	:player{ Player::GetInstance() },
 	meshManager{ MeshManager::GetInstance() },
 	stopCost{ 15 },
-	slowCost{ 15 }
+	slowCost{ 15 },
+	temporalCost{ 50 }
 {
 	AEGfxGetCamPosition(&camPos.x, &camPos.y);
 }
@@ -14,6 +15,7 @@ AbilityHandler::AbilityHandler()
 AbilityHandler::~AbilityHandler()
 {
 	player = nullptr;
+	meshManager = nullptr;
 	delete timeStop;
 	delete timeSlow;
 	delete tempAnch;
@@ -35,14 +37,25 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 	{
 		timeStopped = timeStop->ToggleTime(player->GetTransform().GetPosition());
 	}
+
 	if (AEInputCheckTriggered(AEVK_Q))
 	{
 		timeSlowed = timeSlow->ToggleSlow();
 	}
-	if (AEInputCheckTriggered(AEVK_F))
+
+	if (AEInputCheckTriggered(AEVK_R))
 	{
-		anchored = tempAnch->Anchor(player->GetTransform().GetPosition());
+		player->Health(100);
 	}
+
+	if (AEInputCheckTriggered(AEVK_F) && resource >= temporalCost)
+	{
+		TriggerAnchor();
+
+		resource = anchored ? resource - temporalCost : resource;
+	}
+	timeStop->TempStop(Reverse());
+	anchored = tempAnch->Anchor();
 
 	if (AEInputCheckTriggered(AEVK_T))
 	{
@@ -66,7 +79,7 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 		timeSlowed = timeSlowed?timeSlow->ToggleSlow():false;
 	}
 
-	if (!timeStopped && !timeSlowed)
+	if (!timeStopped && !timeSlowed && !anchored)
 	{
 		resource += 100 * dt;
 	}
@@ -94,3 +107,19 @@ void AbilityHandler::Draw()
 	AEGfxSetTransform(resourceBarTfm.GetMatrix().m);
 	AEGfxMeshDraw(meshManager->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
 }
+
+bool AbilityHandler::Anchored() const
+{
+	return anchored;
+}
+
+bool AbilityHandler::Reverse() const
+{
+	return tempAnch->Reversing();
+}
+
+void AbilityHandler::TriggerAnchor()
+{
+	anchored = tempAnch->Anchor(player->GetTransform().GetPosition());
+}
+

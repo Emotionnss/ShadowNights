@@ -5,12 +5,12 @@ TimeSlow::TimeSlow()
 	active{ false },
 	startDespawn{false},
 	timeSlow{ "timeslow2" },
-	despawningTime{3.f},
+	despawningTime{1.f},
 	despawningTimer{despawningTime}
 {
 	timeSlowSprite = new Sprite(CSVManager::ReadInfo(timeSlow));
 
-	timeSlowTransform.SetScale(player->GetTransform().GetScale().x,player->GetTransform().GetScale().y);
+	timeSlowTransform.SetScale(player->GetTransform().GetScale().x * 1000,player->GetTransform().GetScale().y * 1000);
 	
 }
 
@@ -58,7 +58,6 @@ void TimeSlow::Update(std::vector<BaseEnemy*> enemyList,float dt)
 		if (despawningTimer > 0)
 		{
 			despawningTimer += -1 * dt;
-			timeSlowSprite->PlayAnimation("despawn");
 		}
 		else
 		{
@@ -73,11 +72,12 @@ bool TimeSlow::ToggleSlow()
 	if (active == true)
 	{
 		startDespawn = true;
+		timeSlowSprite->PlayAnimation("despawn");
 		active = false;
 	}
 	else
 	{
-		timeSlowSprite->PlayAnimation("spawn",1,10.f);
+		timeSlowSprite->PlayAnimation("spawn",1);
 		startDespawn = false;
 		active = true;
 	}

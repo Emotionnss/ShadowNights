@@ -3,6 +3,7 @@
 #include <iostream>
 #include "../System/Scenemanager.h"
 #include "TestScene2.h"
+#include "BossScene.h"
 #include "../Utils/utils.h"
 #include "../Enemy/ShadowEnemy.h"
 #include "../Enemy/BatEnemy.h"
@@ -99,23 +100,33 @@ void TestScene::Update() {
 			AEVec2 playerPos = player->GetTransform().GetPosition();
 			AEVec2 playerHalf = { 35.0f, 35.0f };
 
-			if (AABBOverlap(projPos, projHalf, playerPos, playerHalf))
-			{
-				std::cout << "OUCH! Player Hit!" << std::endl;
-				player->TakeDamage(10);
+            if (AABBOverlap(projPos, projHalf, playerPos, playerHalf) && !abilityHandler->Reverse())
+            {
+                std::cout << "OUCH! Player Hit!" << std::endl;
+                player->TakeDamage(10);
 
-				delete proj;
-				it = enemyProjs.erase(it);
-			}
-			else
-			{
-				++it;
-			}
-		}
-	}
-
-	// SWORD PEEPEEPOOPOO
-	std::vector<BaseProjectile*>& projs = player->projectileList;
+                delete proj;
+                it = enemyProjs.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+    if (player->Health() <= 0)
+    {
+        if (abilityHandler->Anchored())
+        {
+            abilityHandler->TriggerAnchor();
+        }
+        else
+        {
+            player->Health(100);
+        }
+    }
+    // SWORD PEEPEEPOOPOO
+    std::vector<BaseProjectile*>& projs = player->projectileList;
 
 	for (auto it = projs.begin(); it != projs.end(); )
 	{

@@ -114,6 +114,12 @@
     <ClCompile Include="Source\Utils\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
+=======
+    <ClCompile Include="Source\Scene\BossScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+>>>>>>> 70c586a9b9a327a31d69ec2a6a17853148fdd0f5
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\System\CSVManager.h">
@@ -215,7 +221,11 @@
     <ClInclude Include="Source\Utils\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="Source\System\SoundManager.h">
+=======
+    <ClInclude Include="Source\Scene\BossScene.h">
+>>>>>>> 70c586a9b9a327a31d69ec2a6a17853148fdd0f5
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

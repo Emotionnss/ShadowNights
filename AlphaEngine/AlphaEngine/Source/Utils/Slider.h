@@ -93,7 +93,7 @@ public:
 
 	/*!
 	@brief	Render the slider
-	@param	CP_POSITION_MODE previousMode - the previous rendering mode
+	@param	void
 	@return void
 	*//*______________________________________________________________*/
 	void RenderSlider();

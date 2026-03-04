@@ -17,7 +17,20 @@
 
 enum class TILE_TYPE
 {
+	// 0 - 100: Background
+	// 100 - 200: Collisions
+	
 	NONE = 0,
+	LEFT_CHAIN = 1,
+	MIDDLE_CHAIN = 2,
+	RIGHT_CHAIN = 3,
+	LEFT_SKELETON = 4,
+	RIGHT_SKELETON = 5,
+	LEFTMOST_WEB = 6,
+	LEFT_WEB = 7,
+	RIGHT_WEB = 8,
+	RIGHTMOST_WEB = 9,
+	CLOSED_DOOR = 99,
 	BACKGROUND = 100,
 	FLOOR = 101,
 	CEILING = 102,
@@ -32,6 +45,7 @@ enum class TILE_TYPE
 	RIGHT_PLATFORM = 122,
 	LEFT_STAIR = 150,
 	RIGHT_STAIR = 151,
+	OPEN_DOOR = 161,
 	TOTAL
 };
 

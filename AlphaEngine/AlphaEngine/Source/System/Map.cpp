@@ -47,6 +47,36 @@ std::string Map::GetImageFilePath(TILE_TYPE tileType)
 	case TILE_TYPE::BACKGROUND:
 		filePath += "Background.png";
 		break;
+	case TILE_TYPE::LEFT_CHAIN:
+		filePath += "ChainL.png";
+		break;
+	case TILE_TYPE::MIDDLE_CHAIN:
+		filePath += "ChainM.png";
+		break;
+	case TILE_TYPE::RIGHT_CHAIN:
+		filePath += "ChainR.png";
+		break;
+	case TILE_TYPE::LEFT_SKELETON:
+		filePath += "SkeletonL.png";
+		break;
+	case TILE_TYPE::RIGHT_SKELETON:
+		filePath += "SkeletonR.png";
+		break;
+	case TILE_TYPE::LEFTMOST_WEB:
+		filePath += "SpiderwebL1.png";
+		break;
+	case TILE_TYPE::LEFT_WEB:
+		filePath += "SpiderwebL2.png";
+		break;
+	case TILE_TYPE::RIGHT_WEB:
+		filePath += "SpiderwebR1.png";
+		break;
+	case TILE_TYPE::RIGHTMOST_WEB:
+		filePath += "SpiderwebR2.png";
+		break;
+	case TILE_TYPE::CLOSED_DOOR:
+		filePath += "DoorClosedTopHalf.png";
+		break;
 	case TILE_TYPE::FLOOR:
 		filePath += "Floor.png";
 		break;
@@ -86,6 +116,9 @@ std::string Map::GetImageFilePath(TILE_TYPE tileType)
 	case TILE_TYPE::RIGHT_STAIR:
 		filePath += "Right_Stair.png";
 		break;
+	case TILE_TYPE::OPEN_DOOR:
+		filePath += "DoorOpenTopHalf.png";
+		break;
 	default:
 		break;
 	}
@@ -97,6 +130,16 @@ void Map::LoadMapTileImages()
 {
 	tileTypesVector = {
 		TILE_TYPE::BACKGROUND,
+		TILE_TYPE::LEFT_CHAIN,
+		TILE_TYPE::MIDDLE_CHAIN,
+		TILE_TYPE::RIGHT_CHAIN,
+		TILE_TYPE::LEFT_SKELETON,
+		TILE_TYPE::RIGHT_SKELETON,
+		TILE_TYPE::LEFTMOST_WEB,
+		TILE_TYPE::LEFT_WEB,
+		TILE_TYPE::RIGHT_WEB,
+		TILE_TYPE::RIGHTMOST_WEB,
+		TILE_TYPE::CLOSED_DOOR,
 		TILE_TYPE::FLOOR,
 		TILE_TYPE::CEILING,
 		TILE_TYPE::LEFT_WALL,
@@ -109,7 +152,8 @@ void Map::LoadMapTileImages()
 		TILE_TYPE::PLATFORM,
 		TILE_TYPE::RIGHT_PLATFORM,
 		TILE_TYPE::LEFT_STAIR,
-		TILE_TYPE::RIGHT_STAIR
+		TILE_TYPE::RIGHT_STAIR,
+		TILE_TYPE::OPEN_DOOR
 	};
 
 	for (s32 i = 0; i < tileTypesVector.size(); i++)
@@ -572,7 +616,7 @@ bool Map::CheckTile(AEVec2 tilePos, AEVec2 minLimits, AEVec2 maxLimits)
 
 bool Map::CheckTile(TILE_TYPE type)
 {
-	return (type >= TILE_TYPE::BACKGROUND && type <= TILE_TYPE::RIGHT_PLATFORM);
+	return (type >= TILE_TYPE::CLOSED_DOOR && type <= TILE_TYPE::OPEN_DOOR);
 }
 
 void Map::RenderPathDebug(std::vector<AEVec2>& path)

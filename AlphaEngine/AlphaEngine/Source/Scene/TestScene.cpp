@@ -10,183 +10,202 @@
 
 
 void TestScene::Load() {
-    AEGfxReset();
-    meshManager = MeshManager::GetInstance();
-    map = Map::GetInstance();
-    player = Player::GetInstance();
+	AEGfxReset();
+	meshManager = MeshManager::GetInstance();
+	map = Map::GetInstance();
+	player = Player::GetInstance();
 
-    map->LoadMap("Level1");
+	map->LoadMap("Level1");
+
+	for (s32 i = 0; i < map->GetNumRow(); ++i)
+	{
+		for (s32 j = 0; j < map->GetNumCol(); ++j)
+		{
+			if (map->GetMap()[i][j].tileType == TILE_TYPE::CLOSED_DOOR)
+			{
+				AEVec2Set(&DoorTilePosition, static_cast<f32>(i), static_cast<f32>(j));
+				std::cout << "X: " << DoorTilePosition.x << "Y: " << DoorTilePosition.y << std::endl;
+				return;
+			}
+		}
+	}
 }
 
 void TestScene::Init() {
-    player->GetTransform().SetPosition(300.0f, 900.0f);
-    abilityHandler = new AbilityHandler();
+	player->GetTransform().SetPosition(300.0f, 900.0f);
+	abilityHandler = new AbilityHandler();
 
-    // ENEMY LIST SPAWN
-    int numberOfEnemies = 3;
-    float startX = 600.0f;
-    float spacing = 300.0f;
+	// ENEMY LIST SPAWN
+	int numberOfEnemies = 3;
+	float startX = 600.0f;
+	float spacing = 300.0f;
 
-    for (int e = 0; e < numberOfEnemies; e++)
-    {
-        BaseEnemy* newEnemy = new ShadowEnemy();
-        BaseEnemy* myBat = new BatEnemy();
-        BaseEnemy* myArcher = new ArcherEnemy();
+	for (int e = 0; e < numberOfEnemies; e++)
+	{
+		BaseEnemy* newEnemy = new ShadowEnemy();
+		BaseEnemy* myBat = new BatEnemy();
+		BaseEnemy* myArcher = new ArcherEnemy();
 
-        float spawnX = startX + (e * spacing);
+		float spawnX = startX + (e * spacing);
 
-        newEnemy->Init(spawnX, 300.0f, 85.0f, 60.0f, "shadow1");
-        newEnemy->SetVelocity(0.0f, 0.0f);
-        enemyList.push_back(newEnemy);
+		newEnemy->Init(spawnX, 300.0f, 85.0f, 60.0f, "shadow1");
+		newEnemy->SetVelocity(0.0f, 0.0f);
+		enemyList.push_back(newEnemy);
 
-        myBat->Init(spawnX, 700.0f, 85.0f, 60.0f, "batenemy");
-        enemyList.push_back(myBat);
+		myBat->Init(spawnX, 700.0f, 85.0f, 60.0f, "batenemy");
+		enemyList.push_back(myBat);
 
-        myArcher->Init(spawnX + 150.0f, 300.0f, 85.0f, 60.0f, "sniperenemy");
-        enemyList.push_back(myArcher);
-    }
-
+		myArcher->Init(spawnX + 150.0f, 300.0f, 85.0f, 60.0f, "sniperenemy");
+		enemyList.push_back(myArcher);
+	}
 }
 
 void TestScene::Update() {
-    f32 dt = (f32)AEFrameRateControllerGetFrameTime();
+	f32 dt = (f32)AEFrameRateControllerGetFrameTime();
 
-    player->HandleInput();
-    player->Update(dt);
-    if (abilityHandler) abilityHandler->AbilityUpdate(enemyList,dt);
+	player->HandleInput();
+	player->Update(dt);
+	if (abilityHandler) abilityHandler->AbilityUpdate(enemyList, dt);
 
-    // UPDATE ALL ENEMIES (IMPT)
-    for (BaseEnemy* enemy : enemyList) {
-        enemy->Update(dt);
-    }
+	// UPDATE ALL ENEMIES (IMPT)
+	for (BaseEnemy* enemy : enemyList) {
+		enemy->Update(dt);
+	}
 
-    if (player->GetCollidedTile().tileType == TILE_TYPE::BACKGROUND && enemyList.size() == 0)
-    {
-        SceneManager::ChangeScene(new TestScene2());
-    }
+	// Open Door Once Enemy has been defeated
+	if (enemyList.size() == 0)
+	{
+		map->SetTile(TILE_TYPE::OPEN_DOOR, DoorTilePosition.y, DoorTilePosition.x);
+	}
 
-    // N***A enemy projectile
-    for (BaseEnemy* enemy : enemyList)
-    {
-        std::vector<EnemyProjectile*>& enemyProjs = enemy->GetProjectiles();
+	// Change scene when player collides with an open door
+	if (player->GetCollidedTile().tileType == TILE_TYPE::OPEN_DOOR)
+	{
+		SceneManager::ChangeScene(new TestScene2());
+	}
 
-        for (auto it = enemyProjs.begin(); it != enemyProjs.end(); )
-        {
-            EnemyProjectile* proj = *it;
+	// N***A enemy projectile
+	for (BaseEnemy* enemy : enemyList)
+	{
+		std::vector<EnemyProjectile*>& enemyProjs = enemy->GetProjectiles();
 
-            AEVec2 projPos = proj->transform.GetPosition();
-            AEVec2 projHalf = { 20.0f, 20.0f };
+		for (auto it = enemyProjs.begin(); it != enemyProjs.end(); )
+		{
+			EnemyProjectile* proj = *it;
 
-            AEVec2 playerPos = player->GetTransform().GetPosition();
-            AEVec2 playerHalf = { 35.0f, 35.0f };
+			AEVec2 projPos = proj->transform.GetPosition();
+			AEVec2 projHalf = { 20.0f, 20.0f };
 
-            if (AABBOverlap(projPos, projHalf, playerPos, playerHalf))
-            {
-                std::cout << "OUCH! Player Hit!" << std::endl;
-                player->TakeDamage(10);
+			AEVec2 playerPos = player->GetTransform().GetPosition();
+			AEVec2 playerHalf = { 35.0f, 35.0f };
 
-                delete proj;
-                it = enemyProjs.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-    }
+			if (AABBOverlap(projPos, projHalf, playerPos, playerHalf))
+			{
+				std::cout << "OUCH! Player Hit!" << std::endl;
+				player->TakeDamage(10);
 
-    // SWORD PEEPEEPOOPOO
-    std::vector<BaseProjectile*>& projs = player->projectileList;
+				delete proj;
+				it = enemyProjs.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
 
-    for (auto it = projs.begin(); it != projs.end(); )
-    {
-        BaseProjectile* pProj = *it;
+	// SWORD PEEPEEPOOPOO
+	std::vector<BaseProjectile*>& projs = player->projectileList;
 
-        AEVec2 projPos = pProj->transform.GetPosition();
-        AEVec2 projHalf = pProj->transform.GetScale();
-        AEVec2Scale(&projHalf, &projHalf, 0.5f);
+	for (auto it = projs.begin(); it != projs.end(); )
+	{
+		BaseProjectile* pProj = *it;
 
-        bool destroyProjectile = false;
-        for (int j = 0; j < enemyList.size(); j++)
-        {
-            BaseEnemy* enemy = enemyList[j];
+		AEVec2 projPos = pProj->transform.GetPosition();
+		AEVec2 projHalf = pProj->transform.GetScale();
+		AEVec2Scale(&projHalf, &projHalf, 0.5f);
 
-            AEVec2 enemyPos = enemy->transform.GetPosition();
-            AEVec2 enemyHalf = { fabs(enemy->transform.GetScale().x) / 2.0f, enemy->transform.GetScale().y / 2.0f };
+		bool destroyProjectile = false;
+		for (int j = 0; j < enemyList.size(); j++)
+		{
+			BaseEnemy* enemy = enemyList[j];
 
-            if (AABBOverlap(projPos, projHalf, enemyPos, enemyHalf))
-            {
-                if (!enemy->IsReadyToDelete())
-                {
-                    enemy->TakeDamage();
+			AEVec2 enemyPos = enemy->transform.GetPosition();
+			AEVec2 enemyHalf = { fabs(enemy->transform.GetScale().x) / 2.0f, enemy->transform.GetScale().y / 2.0f };
 
-                    SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
-                    if (!swordProj)
-                    {
-                        destroyProjectile = true; 
-                        break;
-                    }
-                }
-            }
-        }
+			if (AABBOverlap(projPos, projHalf, enemyPos, enemyHalf))
+			{
+				if (!enemy->IsReadyToDelete())
+				{
+					enemy->TakeDamage();
 
-        // erase the projectile (zav is gay)
-        if (destroyProjectile || pProj->GetLifespan() <= 0.f)
-        {
-            delete pProj;
-            it = projs.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
+					SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
+					if (!swordProj)
+					{
+						destroyProjectile = true;
+						break;
+					}
+				}
+			}
+		}
 
-    // enemy die alr or nut punde
-    for (auto it = enemyList.begin(); it != enemyList.end(); )
-    {
-        if ((*it)->IsReadyToDelete())
-        {
-            delete* it;
-            it = enemyList.erase(it);
-            std::cout << "Enemy Died and Removed!" << std::endl;
-        }
-        else
-        {
-            ++it;
-        }
-    }
+		// erase the projectile (zav is gay)
+		if (destroyProjectile || pProj->GetLifespan() <= 0.f)
+		{
+			delete pProj;
+			it = projs.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	// enemy die alr or nut punde
+	for (auto it = enemyList.begin(); it != enemyList.end(); )
+	{
+		if ((*it)->IsReadyToDelete())
+		{
+			delete* it;
+			it = enemyList.erase(it);
+			std::cout << "Enemy Died and Removed!" << std::endl;
+		}
+		else
+		{
+			++it;
+		}
+	}
 }
 
 void TestScene::Draw() {
-    AEGfxSetBackgroundColor(0.4f, 0.4f, 0.4f);
-    map->RenderMap();
+	AEGfxSetBackgroundColor(0.4f, 0.4f, 0.4f);
+	map->RenderMap();
 
-    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-    if (abilityHandler) abilityHandler->Draw();
-    player->Draw(meshManager->GetMesh(CORNER_SQUARE));
+	if (abilityHandler) abilityHandler->Draw();
+	player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 
-    for (BaseEnemy* enemy : enemyList) {
-        enemy->Draw();
-    }
+	for (BaseEnemy* enemy : enemyList) {
+		enemy->Draw();
+	}
 }
 
 void TestScene::Free() {
-    player->DestroyInstance();
-    if (abilityHandler) delete abilityHandler;
+	player->DestroyInstance();
+	if (abilityHandler) delete abilityHandler;
 
-    // CLEANUP KUKUBIRD CCB KNN OBAMA RASENGAN
-    for (BaseEnemy* enemy : enemyList) {
-        delete enemy;
-    }
-    enemyList.clear();
+	// CLEANUP KUKUBIRD CCB KNN OBAMA RASENGAN
+	for (BaseEnemy* enemy : enemyList) {
+		delete enemy;
+	}
+	enemyList.clear();
 }
 
 void TestScene::Unload()
 {
-    player = nullptr;
-    abilityHandler = nullptr;
-    meshManager = nullptr;
-    enemyList.clear();
+	player = nullptr;
+	abilityHandler = nullptr;
+	meshManager = nullptr;
+	enemyList.clear();
 }

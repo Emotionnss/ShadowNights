@@ -22,6 +22,7 @@ private:
     AbilityHandler* abilityHandler = nullptr;
     MeshManager* meshManager = nullptr;
     Map* map = nullptr;
+    AEVec2 DoorTilePosition;
 
     std::vector<BaseEnemy*> enemyList;
 };

@@ -14,7 +14,7 @@ private:
 	bool tilesDebug = false;
 	bool playerCollisionDebug = false;
 
-	//Temp variables for volume
+	// Volume that reads from settings excel
 	s32 bgmVolume;
 	s32 sfxVolume;
 

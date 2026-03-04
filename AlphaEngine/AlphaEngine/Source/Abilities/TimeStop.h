@@ -8,6 +8,7 @@ class TimeStop
 {
 private:
 	bool active{};//if the ability is active
+	bool tempStop{};//for if the player is reversing back to temporal anchor
 	f32 originalScale = 1.f;//the starting scale for the zone
 	f32 zoneScale = 1.f;//the current scale of the zone
 	f32 maxScale = 500.f;//the maximum size of the zie
@@ -26,6 +27,7 @@ public:
 	~TimeStop();//destructor
 	void Update(std::vector<BaseEnemy*> enemyList,float deltaTime);//update
 	bool ToggleTime(AEVec2 position);//toggle the ability off & on 
+	void TempStop(bool active);
 
 	bool TimeStopped() const; //returns if the ablity is active
 	f32 GetScale() const;//returns the scale of the ability

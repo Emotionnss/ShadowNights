@@ -33,6 +33,9 @@ public:
 	void TakeDamage(float damage);
 	void TakeDamage(int value) { currentHP -= value; }
 
+	void Health(float val);
+	f32 Health();
+
 	void SetCollidedTile(const Tile variable);
 	Tile GetCollidedTile();
 

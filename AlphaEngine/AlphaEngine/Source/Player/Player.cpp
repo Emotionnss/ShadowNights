@@ -45,6 +45,16 @@ Player::~Player()
 	}
 }
 
+void Player::Health(float val)
+{
+	currentHP = val;
+}
+
+f32 Player::Health()
+{
+	return currentHP;
+}
+
 void Player::SetCollidedTile(const Tile variable)
 {
 	collidedTile = variable;

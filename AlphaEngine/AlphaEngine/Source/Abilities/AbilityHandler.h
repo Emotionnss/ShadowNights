@@ -27,14 +27,17 @@ private:
 	AEVec2 camPos;//position of camera for resource bar
 	bool timeStopped{};
 	bool timeSlowed{};
+
 	bool anchored{};
 
 	bool lasered{};
 public:
+	void TriggerAnchor();
 	AbilityHandler();
 	~AbilityHandler();
 	void AbilityUpdate(std::vector<BaseEnemy*> enemylist,float deltaTime);
 	void Draw();
-
+	bool Anchored()const;
+	bool Reverse() const;
 };
 

@@ -84,7 +84,9 @@ bool TemporalAnchor::Anchor(AEVec2 anchPos)
 	if (active)
 	{
 		active = false;
-		player->GetTransform().SetPosition(anchorTfm.GetPosition());
+		reversing = true;
+		iter = savedPlayerPositions.size() - 1;
+		//player->GetTransform().SetPosition(anchorTfm.GetPosition());
 
 	}
 	else

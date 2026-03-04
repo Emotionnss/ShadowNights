@@ -24,6 +24,8 @@ void BossEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     isAggroed = false;
     isSurprised = false;
     surpriseTimer = 0.0f;
+
+    transform.SetScale(400, 400);
 }
 
 void BossEnemy::Update(float deltaTime)
@@ -36,9 +38,6 @@ void BossEnemy::Update(float deltaTime)
 
     //Update Enemy FSM
     EnemyFSM(deltaTime);
-
-    float colliderWidth = 40.0f;
-    float colliderHeight = 60.0f;
 
     Map* map = Map::GetInstance();
     Player* player = Player::GetInstance();

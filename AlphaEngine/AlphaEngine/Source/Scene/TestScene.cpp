@@ -3,6 +3,7 @@
 #include <iostream>
 #include "../System/Scenemanager.h"
 #include "TestScene2.h"
+#include "BossScene.h"
 #include "../Utils/utils.h"
 #include "../Enemy/ShadowEnemy.h"
 #include "../Enemy/BatEnemy.h"
@@ -62,7 +63,7 @@ void TestScene::Update() {
 
     if (player->GetCollidedTile().tileType == TILE_TYPE::BACKGROUND && enemyList.size() == 0)
     {
-        SceneManager::ChangeScene(new TestScene2());
+        SceneManager::ChangeScene(new BossScene());
     }
 
     // N***A enemy projectile

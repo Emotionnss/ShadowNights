@@ -31,13 +31,15 @@ private:
 	MeshManager* meshManager = nullptr;//mesh manager
 	AEVec2 camPos;//position of camera for resource bar
 
-	AEGfxTexture* a1Tex;
-	AEMtx33 a1Tfm{};
+	AEGfxTexture* a1Tex , *a2Tex , *a3Tex;
+	Transform2D a1Tfm{},a2Tfm,a3Tfm;
 	bool timeStopped{};
 	bool timeSlowed{};
 
 	bool anchored{};
 
+	bool lasered{};
+	f32 a1Alpha{}, a2Alpha{}, a3Alpha{};
 public:
 	void TriggerAnchor();
 	AbilityHandler();

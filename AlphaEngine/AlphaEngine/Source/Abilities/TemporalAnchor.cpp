@@ -1,6 +1,7 @@
 #include "TemporalAnchor.h"
 #include <iostream>
 #include "../Utils/utils.h"
+#include "../Sprite/Sprite.h"
 TemporalAnchor::TemporalAnchor() :
 	active{ false },
 	activeTime{ 3.f },
@@ -13,6 +14,8 @@ TemporalAnchor::TemporalAnchor() :
 	anchorTfm.SetScale(100, 100);
 	anchorSprite = new Sprite(CSVManager::ReadInfo("anchor"));//create new sprite for the anchor
 	anchorSprite->PlayAnimation("spawn", -1, 0.5f);
+	playerTex = AEGfxTextureLoad("Assets/Abilities/ame.png");
+	ghostTfm.SetScale(player->GetTransform().GetScale().x , player->GetTransform().GetScale().y);
 }
 
 TemporalAnchor::~TemporalAnchor()
@@ -28,7 +31,7 @@ TemporalAnchor::~TemporalAnchor()
 		delete anchorSprite;
 		anchorSprite = nullptr;
 	}
-	savedPlayerPositions.clear();
+	ghostVect.clear();
 }
 
 void TemporalAnchor::Update(f32 dt)
@@ -39,35 +42,39 @@ void TemporalAnchor::Update(f32 dt)
 		saveTimer += -1 * dt;
 		if (saveTimer <= 0)
 		{
+			AEVec2 UV = player->GetSprite()->GetCurrentUVCoords();
 			saveTimer = saveTime;
-			SavePositions(player->GetTransform().GetPosition());
+
+			SaveGhost(UV,player->GetTransform().GetPosition());
+			
 		}
 		if (!AreCirclesIntersecting(player->GetTransform().GetPosition().x, player->GetTransform().GetPosition().y, player->GetTransform().GetScale().x,
 			anchorTfm.GetPosition().x, anchorTfm.GetPosition().y, zoneTfm.GetScale().x))
 		{
 			active = false;
-			savedPlayerPositions.clear();
+			ghostVect.clear();
 		}
 		else
 		{
 			if (activeTimer <= 0 && !reversing)
 			{
-				active = false;
 				reversing = true;
-				iter = savedPlayerPositions.size() - 1;
+				iter = ghostVect.size() - 1;
 			}
 		}
 	}
 	if (reversing)
 	{
-		if (!savedPlayerPositions.empty())
+		if (!ghostVect.empty())
 		{
-			player->GetTransform().SetPosition(savedPlayerPositions[iter]);
-			savedPlayerPositions.erase(savedPlayerPositions.begin() + iter--);
+
+			player->GetTransform().SetPosition(ghostVect[iter].position);
+			ghostVect.erase(ghostVect.begin() + iter--);
 		}
 		else
 		{
 			reversing = false;
+			active = false;
 			//player->GetTransform().SetPosition(anchorTfm.GetPosition());
 			player->Health(savedHealth);	
 		}
@@ -86,7 +93,7 @@ bool TemporalAnchor::Anchor(AEVec2 anchPos)
 	{
 		active = false;
 		reversing = true;
-		iter = savedPlayerPositions.size() - 1;
+		iter = ghostVect.size() - 1;
 		//player->GetTransform().SetPosition(anchorTfm.GetPosition());
 
 	}
@@ -120,13 +127,28 @@ void TemporalAnchor::Draw()
 		AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
 		
 		anchorSprite->Render(anchorTfm);
+
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetTransparency(0.25f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		for (Ghosts ghost: ghostVect)
+		{
+
+			ghostTfm.SetPosition(ghost.position);
+			std::cout << "using UV" << ghost.spriteUV.x << " " << ghost.spriteUV.y << " vector size" << ghostVect.size() << '\n';
+			AEGfxTextureSet(player->GetSprite()->GetSpriteTexture(), ghost.spriteUV.x, ghost.spriteUV.y);
+			AEGfxSetTransform(ghostTfm.GetMatrix().m);
+			AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+		}
+
 	}
 }
 
-void TemporalAnchor::SavePositions(AEVec2 playerPos)
+void TemporalAnchor::SaveGhost(AEVec2 UVs,AEVec2 playerPos)
 {
-	savedPlayerPositions.push_back(playerPos);
-	//std::cout << "saving position" << playerPos.x << " " << playerPos.y << " vector size" << savedPlayerPositions.size() << '\n';
+	Ghosts ghost { UVs,playerPos };
+	ghostVect.push_back(ghost);
+	/*std::cout << "saving UV" << UVs.x << " " << UVs.y << " vector size" << ghostVect.size() << '\n';*/
 }
 
 bool TemporalAnchor::Reversing() const

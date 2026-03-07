@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../Projectiles/BaseProjectile.h"
 #include "../Utils/utils.h"
+
 AbilityHandler::AbilityHandler()
 	:player{ Player::GetInstance() },
 	meshManager{ MeshManager::GetInstance() },
@@ -10,10 +11,20 @@ AbilityHandler::AbilityHandler()
 	temporalCost{ 50 }
 {
 	AEGfxGetCamPosition(&camPos.x, &camPos.y);
+	AEMtx33	trans, rot, scale;
+	AEMtx33Scale(&scale, 100, 100);
+	AEMtx33Rot(&rot, 0);
+	AEMtx33Trans(&trans, camPos.x, camPos.y);
+
+	AEMtx33Concat(&a1Tfm, &rot, &scale);//concatenate rotation and scale together
+	AEMtx33Concat(&a1Tfm, &trans, &a1Tfm);//concatenate the transform and the translate
+	a1Tex = AEGfxTextureLoad("hourglass.png");
 }
 
 AbilityHandler::~AbilityHandler()
 {
+	if(a1Tex)
+		AEGfxTextureUnload(a1Tex);
 	player = nullptr;
 	meshManager = nullptr;
 	delete timeStop;
@@ -103,9 +114,21 @@ void AbilityHandler::Draw()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.f);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetColorToAdd(1.f, 1.f, 255.f, 0.f);
+	//AEGfxSetColorToAdd(1.f, 1.f, 255.f, 0.f);
 	AEGfxSetTransform(resourceBarTfm.GetMatrix().m);
 	AEGfxMeshDraw(meshManager->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
+
+
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
+
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1.f);
+
+	AEGfxTextureSet(a1Tex, 0, 0);
+	AEGfxSetTransform(a1Tfm.m);
+	AEGfxMeshDraw(meshManager->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 }
 
 bool AbilityHandler::Anchored() const

@@ -46,6 +46,7 @@ void TemporalAnchor::Update(f32 dt)
 			anchorTfm.GetPosition().x, anchorTfm.GetPosition().y, zoneTfm.GetScale().x))
 		{
 			active = false;
+			savedPlayerPositions.clear();
 		}
 		else
 		{

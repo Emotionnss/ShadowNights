@@ -194,12 +194,12 @@ void TestScene::Draw() {
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-	if (abilityHandler) abilityHandler->Draw();
-	player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 
 	for (BaseEnemy* enemy : enemyList) {
 		enemy->Draw();
 	}
+	if (abilityHandler) abilityHandler->Draw();
+	player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 }
 
 void TestScene::Free() {

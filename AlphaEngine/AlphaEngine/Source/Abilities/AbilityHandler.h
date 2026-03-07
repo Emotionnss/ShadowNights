@@ -7,6 +7,7 @@
 
 
 #include "../System/MeshManager.h"
+#include "../Sprite/Sprite.h"
 class AbilityHandler
 {
 private:
@@ -25,6 +26,9 @@ private:
 
 	MeshManager* meshManager = nullptr;//mesh manager
 	AEVec2 camPos;//position of camera for resource bar
+
+	AEGfxTexture* a1Tex;
+	AEMtx33 a1Tfm{};
 	bool timeStopped{};
 	bool timeSlowed{};
 

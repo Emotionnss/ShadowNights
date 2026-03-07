@@ -121,4 +121,25 @@ public:
 	@return Animation* - pointer to current animation
 	*/
 	Animation* GetCurrentAnimation() const;
+
+	/*!
+	@brief    Get the UV coords of a single frame of an animation
+	@param    u32 index - index of frame to get
+	@return AEVec2
+	*/
+	AEVec2 GetAnimationFrameUVCoords(u32 index) const;
+
+	/*!
+	@brief  Get the current UV coords of the animation that is currently playing
+	@param  void
+	@return AEVec2
+	*/
+	AEVec2 GetCurrentUVCoords() const;
+
+	/*!
+	@brief    Get the spritesheet of the sprite
+	@param    void
+	@return AEGfxTexture*
+	*/
+	AEGfxTexture* GetSpriteTexture() const;
 };

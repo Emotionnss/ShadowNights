@@ -11,14 +11,12 @@ AbilityHandler::AbilityHandler()
 	temporalCost{ 50 }
 {
 	AEGfxGetCamPosition(&camPos.x, &camPos.y);
-	AEMtx33	trans, rot, scale;
-	AEMtx33Scale(&scale, 100, 100);
-	AEMtx33Rot(&rot, 0);
-	AEMtx33Trans(&trans, camPos.x, camPos.y);
-
-	AEMtx33Concat(&a1Tfm, &rot, &scale);//concatenate rotation and scale together
-	AEMtx33Concat(&a1Tfm, &trans, &a1Tfm);//concatenate the transform and the translate
+	a1Tfm.SetScale(100, 100);
+	a2Tfm.SetScale(a1Tfm.GetScale().x, a1Tfm.GetScale().y);
+	a3Tfm.SetScale(a1Tfm.GetScale().x, a1Tfm.GetScale().y);
 	a1Tex = AEGfxTextureLoad("Assets/Abilities/hourglass.png");
+	a2Tex = AEGfxTextureLoad("Assets/Abilities/timeslow.png");
+	a3Tex = AEGfxTextureLoad("Assets/Abilities/tempAnch.png");
 }
 
 AbilityHandler::~AbilityHandler()
@@ -113,9 +111,16 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 		resource += 100 * dt;
 	}
 	
+	a1Alpha = timeStopped ? 0.5f : 1.f;
+	a2Alpha = timeSlowed ? 0.5f : 1.f;
+	a3Alpha = anchored ? 0.5f : resource < temporalCost ? 0.5f : 1.f;
+
 	resource = AEClamp(resource, 0, maxResource);
 	resourceBarTfm.SetScale(20, (resource / maxResource * 100.f));
 	resourceBarTfm.SetPosition(camPos.x + 450.f, camPos.y - 200.f);
+	a1Tfm.SetPosition(camPos.x - a1Tfm.GetScale().x, camPos.y - AEGfxGetWindowHeight() / 2.f);
+	a2Tfm.SetPosition(camPos.x, camPos.y - AEGfxGetWindowHeight() / 2.f);
+	a3Tfm.SetPosition(camPos.x + a3Tfm.GetScale().x, camPos.y - AEGfxGetWindowHeight() / 2.f);
 }
 
 void AbilityHandler::Draw()
@@ -140,17 +145,31 @@ void AbilityHandler::Draw()
 	AEGfxSetTransform(resourceBarTfm.GetMatrix().m);
 	AEGfxMeshDraw(meshManager->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
 
-
+	//for ability 1 UI
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
 
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(1.f);
+	AEGfxSetTransparency(a1Alpha);
 
 	AEGfxTextureSet(a1Tex, 0, 0);
-	AEGfxSetTransform(a1Tfm.m);
-	AEGfxMeshDraw(meshManager->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+	AEGfxSetTransform(a1Tfm.GetMatrix().m);
+	AEGfxMeshDraw(meshManager->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+
+	//for ability 2 UI
+	AEGfxSetTransparency(a2Alpha);
+
+	AEGfxTextureSet(a2Tex, 0, 0);
+	AEGfxSetTransform(a2Tfm.GetMatrix().m);
+	AEGfxMeshDraw(meshManager->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+
+	//ability 3 Ui
+	AEGfxSetTransparency(a3Alpha);
+
+	AEGfxTextureSet(a3Tex, 0, 0);
+	AEGfxSetTransform(a3Tfm.GetMatrix().m);
+	AEGfxMeshDraw(meshManager->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 }
 
 bool AbilityHandler::Anchored() const

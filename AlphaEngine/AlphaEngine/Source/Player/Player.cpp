@@ -66,6 +66,11 @@ Tile Player::GetCollidedTile()
 	return collidedTile;
 }
 
+Sprite* Player::GetSprite() const
+{
+	return this->sprite;
+}
+
 void Player::HandleInput()
 {
 	AEVec2Zero(&input);
@@ -381,7 +386,7 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
 
 	matrix.SetRotation(0);
-	matrix.SetPosition(CamPos.x, CamPos.y + 350.f);
+	matrix.SetPosition(CamPos.x - 55.f, CamPos.y + 350.f);
 	float safeValue = AEClamp(value, 0.f, maxHP);
 	matrix.SetScale(safeValue * 5.f, 55.f);
 

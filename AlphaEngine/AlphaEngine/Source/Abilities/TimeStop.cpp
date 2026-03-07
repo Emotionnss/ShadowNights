@@ -99,9 +99,9 @@ bool TimeStop::ToggleTime(AEVec2 position)//toggle the ability
     return active;//return its activity
 }
 
-void TimeStop::TempStop( bool active)
+void TimeStop::TempStop( bool activity)
 {
-    tempStop = active;
+    tempStop = activity;
 }
 
 bool TimeStop::TimeStopped() const//getter

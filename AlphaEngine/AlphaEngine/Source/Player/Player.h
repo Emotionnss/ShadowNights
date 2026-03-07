@@ -53,6 +53,7 @@ public:
 
 	std::vector<BaseProjectile*> projectileList;
 
+	Sprite* GetSprite() const;
 private:
 
 	Transform2D healthbar;

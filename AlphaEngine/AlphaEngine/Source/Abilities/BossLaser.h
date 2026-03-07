@@ -23,8 +23,8 @@ private:
 	float damageCooldown = 0.f;
 
 	// lifespan of the entire ability
-	float Baselifespan = 10.f;
-	float lifespan = Baselifespan;
+	float baseLifespan = 10.f;
+	float lifespan = baseLifespan;
 
 	// wind up for a bit of leeway
 	float startupDelayBase = 3.f;
@@ -32,6 +32,7 @@ private:
 
 public:
 	BossLaser();
+	BossLaser(float baseLifespan, float startupTime);
 	~BossLaser();
 
 	void Update(float deltaTime);

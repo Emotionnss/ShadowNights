@@ -16,6 +16,21 @@ BossLaser::BossLaser()
     transform.SetScale(250, 1000);
 }
 
+BossLaser::BossLaser(float baseLifespan, float startupTime)
+    : meshManager{ MeshManager::GetInstance() },
+    player{ Player::GetInstance() },
+    active{ false },
+    spriteName{ "bosslaser" }
+{
+    this->baseLifespan = baseLifespan;
+    this->startupDelayBase = startupTime;
+
+    laserSprite = new Sprite(CSVManager::ReadInfo(spriteName));
+    laserSprite->PlayAnimation("spawn", 1, 1.f);
+
+    transform.SetScale(250, 1000);
+}
+
 BossLaser::~BossLaser()
 {
     meshManager = nullptr;
@@ -72,7 +87,7 @@ void BossLaser::Update(float deltaTime)
     {
         active = false;
         charging = false;
-        lifespan = Baselifespan;
+        lifespan = baseLifespan;
     }
 }
 void BossLaser::Draw()
@@ -97,7 +112,7 @@ bool BossLaser::Triggered(AEVec2 pos)
     {
         active = false;//deactivate it
         charging = false;
-        lifespan = Baselifespan;
+        lifespan = baseLifespan;
     }
     else //if not active
     {

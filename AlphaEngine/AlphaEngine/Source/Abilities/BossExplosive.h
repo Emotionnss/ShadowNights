@@ -20,8 +20,11 @@ private:
 	Player* player = nullptr;
 	MeshManager* meshManager = nullptr;
 
+	int numBullets;
+
 public:
 	BossExplosive();
+	BossExplosive(int numBullets);
 	~BossExplosive();
 
 	void Update(float deltaTime);

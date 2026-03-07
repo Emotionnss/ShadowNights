@@ -31,8 +31,13 @@ AbilityHandler::~AbilityHandler()
 	delete timeSlow;
 	delete tempAnch;
 
-	delete bossLaser;
-	delete bossExplosive;
+	for (BossLaser* l : bossLasers)
+		delete l;
+	bossLasers.clear();
+
+	for (BossExplosive* e : bossExplosives)
+		delete e;
+	bossExplosives.clear();
 }
 
 void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
@@ -42,8 +47,11 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 	timeSlow->Update(enemyList,dt);
 	tempAnch->Update(dt);
 
-	bossLaser->Update(dt);
-	bossExplosive->Update(dt);
+	for (BossLaser* l : bossLasers)
+		l->Update(dt);
+
+	for (BossExplosive* e : bossExplosives)
+		e->Update(dt);
 
 
 	if (AEInputCheckTriggered(AEVK_E))
@@ -72,11 +80,15 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 
 	if (AEInputCheckTriggered(AEVK_T))
 	{
-		lasered = bossLaser->Triggered(player->GetTransform().GetPosition());
+		BossLaser* newLaser = new BossLaser();
+		newLaser->Triggered(player->GetTransform().GetPosition());
+		bossLasers.push_back(newLaser);
 	}
 	if (AEInputCheckTriggered(AEVK_G))
 	{
-		exploded = bossExplosive->Triggered(player->GetTransform().GetPosition(), {1.f, 0.f});
+		BossExplosive* newExplosive = new BossExplosive();
+		newExplosive->Triggered(player->GetTransform().GetPosition(), {1.f, 0.f});
+		bossExplosives.push_back(newExplosive);
 	}
 
 
@@ -113,8 +125,11 @@ void AbilityHandler::Draw()
 	timeSlow->Draw();
 	tempAnch->Draw();
 
-	bossLaser->Draw();
-	bossExplosive->Draw();
+	for (BossLaser* l : bossLasers)
+		l->Draw();
+
+	for (BossExplosive* e : bossExplosives)
+		e->Draw();
 
 	//resource bar for the abilties
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);

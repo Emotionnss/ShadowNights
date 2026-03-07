@@ -9,6 +9,8 @@
 
 #include "../System/MeshManager.h"
 #include "../Sprite/Sprite.h"
+
+#include <vector>
 class AbilityHandler
 {
 private:
@@ -17,8 +19,8 @@ private:
 	TimeSlow* timeSlow = new TimeSlow();
 	TemporalAnchor* tempAnch = new TemporalAnchor();
 
-	BossLaser* bossLaser = new BossLaser();
-	BossExplosive* bossExplosive = new BossExplosive();
+	std::vector<BossLaser*> bossLasers;
+	std::vector<BossExplosive*> bossExplosives;
 
 	Player* player = nullptr;
 	f32 slowCost{}, stopCost, temporalCost;
@@ -36,8 +38,6 @@ private:
 
 	bool anchored{};
 
-	bool lasered{};
-	bool exploded{};
 public:
 	void TriggerAnchor();
 	AbilityHandler();

@@ -5,6 +5,14 @@ BossExplosive::BossExplosive()
 	: player{ Player::GetInstance() },
 	meshManager{ MeshManager::GetInstance() }
 {
+	numBullets = 16;
+}
+
+BossExplosive::BossExplosive(int numBullets)
+	: player{ Player::GetInstance() },
+	meshManager{ MeshManager::GetInstance() }
+{
+	this->numBullets = numBullets;
 }
 
 BossExplosive::~BossExplosive()
@@ -108,8 +116,6 @@ bool BossExplosive::Triggered(AEVec2 pos, AEVec2 dir)
 
 void BossExplosive::Explode(AEVec2 origin)
 {
-	int numBullets = 16;
-
 	for (int i = 0; i < numBullets; i++)
 	{
 		float angle = (2 * PI / numBullets) * i;

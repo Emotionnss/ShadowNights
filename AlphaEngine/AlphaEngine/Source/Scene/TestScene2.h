@@ -1,9 +1,13 @@
 #pragma once
 
 #include "AEEngine.h"
+#include "../Player/Player.h"
 #include "../../Source/Scene/BaseScene.h"
 #include "../System/MeshManager.h"
 #include "../System/Map.h"
+#include "../Abilities/AbilityHandler.h"
+#include "../Enemy/BaseEnemy.h" 
+#include "../Sprite/ParallaxBackground.h"
 
 class TestScene2 : public BaseScene {
 public:
@@ -15,12 +19,14 @@ public:
     void Unload() override;
 
 private:
-    float playerX, playerY;
-    float speed = 200.0f;
-
+    Player* player = nullptr;
+    AbilityHandler* abilityHandler = nullptr;
     MeshManager* meshManager = nullptr;
-
     Map* map = nullptr;
+    AEVec2 DoorTilePosition;
 
+    ParallaxBackground bg;
+
+    std::vector<BaseEnemy*> enemyList;
 };
 

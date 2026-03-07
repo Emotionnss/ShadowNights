@@ -1,4 +1,5 @@
 #include "GameObject.h"
+#include <iostream>
 
 GameObject::GameObject()
 	: isStatic(true), friction(0.0f), sprite(nullptr)

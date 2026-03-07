@@ -2,7 +2,7 @@
 
 Player::Player()
 	: input{ 0.f, 0.f }
-	, map{ Map::GetInstance() } // Might convert to function for cleaner execution
+	, map{ Map::GetInstance() }
 	, collidedTile{ }
 	, speed{ 4000.f }
 	, maxHP{ 100.f }
@@ -10,25 +10,25 @@ Player::Player()
 	, maxSpeed{ 800.f }
 	, friction{ 0.75f }
 	, size{ 70.f }
+	, jumpForce{ 1000.f }
 	, gravity{ -1400.f }
 	, isGrounded{ false }
 {
 	SetStatic(false);
+	GetTransform().SetScale(size, size); // Set Scale of transform
 
-	GetTransform().SetScale(size, size);
+	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y); // Get Camera Position
+	AEVec2Set(&cameraOffset, 200.f, -50.f); // Set Camera Offset Position
 
-	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y);
-	AEVec2Set(&cameraOffset, 200.f, -50.f);
-
+	// Sprite Handling
 	sprite = new Sprite(CSVManager::ReadInfo("ame"));
 	sprite->SetDefaultAnimation("bounce");
 	sprite->PlayDefaultAnimation(-1, 1.f);
-
-	SetAcceleration(4000.f, 4000.f);
 }
 
 Player::~Player()
 {
+	// Deleting of protectiles
 	for (BaseProjectile* pProj : projectileList)
 	{
 		if (pProj)
@@ -38,6 +38,7 @@ Player::~Player()
 	}
 	projectileList.clear();
 
+	// Clear Sprite
 	if (sprite)
 	{
 		delete sprite;
@@ -45,12 +46,12 @@ Player::~Player()
 	}
 }
 
-void Player::Health(float val)
+void Player::SetHealth(float val)
 {
 	currentHP = val;
 }
 
-f32 Player::Health()
+f32 Player::GetHealth()
 {
 	return currentHP;
 }
@@ -71,17 +72,18 @@ void Player::HandleInput()
 
 	if (AEInputCheckCurr(AEVK_D))
 	{
-		Player::input.x += 1.f;
+		this->input.x += 1.f;
 	}
 
 	if (AEInputCheckCurr(AEVK_A))
 	{
-		Player::input.x -= 1.f;
+		this->input.x -= 1.f;
 	}
 
-	if (AEInputCheckTriggered(AEVK_SPACE) && isGrounded && velocity.y >= 0.f)
+	// Jumping
+	if (AEInputCheckTriggered(AEVK_SPACE) && isGrounded)
 	{
-		SetVelocity(GetVelocity().x, 1000.f);
+		SetVelocity(GetVelocity().x, jumpForce);
 		isGrounded = false;
 	}
 	else if (!AEInputCheckCurr(AEVK_SPACE) && GetVelocity().y > 0)
@@ -89,6 +91,7 @@ void Player::HandleInput()
 		SetVelocity(GetVelocity().x, GetVelocity().y * 0.5f);
 	}
 
+	// Attacking
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
 		s32 xDir, yDir;
@@ -113,27 +116,23 @@ void Player::HandleInput()
 	}
 }
 
-void Player::ComputeCollision(AEVec2& position)
+void Player::ResolveX(AEVec2& position)
 {
-	AEVec2 halfSize{ size * 0.5f, size * 0.5f };
-	AEVec2 oldPosition = GetTransform().GetPosition();
+	const AEVec2 halfSize{ size * 0.5f, size * 0.5f };
+	const float  tileSizeHalf = map->GetTileSize() * 0.5f;
+	const AEVec2 tileHalf{ tileSizeHalf, tileSizeHalf };
 
-	float left = position.x - halfSize.x;
-	float right = position.x + halfSize.x;
-	float bottom = position.y - halfSize.y;
-	float top = position.y + halfSize.y;
+	AEVec2 minTile = map->GetTilePos(position.x - halfSize.x, position.y - halfSize.y);
+	AEVec2 maxTile = map->GetTilePos(position.x + halfSize.x, position.y + halfSize.y);
 
-	AEVec2 minTile = map->GetTilePos(left, bottom);
-	AEVec2 maxTile = map->GetTilePos(right, top);
+	int xMin = static_cast<int>((std::min)(minTile.x, maxTile.x));
+	int xMax = static_cast<int>((std::max)(minTile.x, maxTile.x));
+	int yMin = static_cast<int>((std::min)(minTile.y, maxTile.y));
+	int yMax = static_cast<int>((std::max)(minTile.y, maxTile.y));
 
-	int xMinTile = static_cast<int>((std::min)(minTile.x, maxTile.x));
-	int xMaxTile = static_cast<int>((std::max)(minTile.x, maxTile.x));
-	int yMinTile = static_cast<int>((std::min)(minTile.y, maxTile.y));
-	int yMaxTile = static_cast<int>((std::max)(minTile.y, maxTile.y));
-
-	for (int y = yMinTile; y <= yMaxTile; ++y)
+	for (int y = yMin; y <= yMax; ++y)
 	{
-		for (int x = xMinTile; x <= xMaxTile; ++x)
+		for (int x = xMin; x <= xMax; ++x)
 		{
 			if (x < 0 || y < 0 || y >= map->GetNumRow() || x >= map->GetNumCol())
 				continue;
@@ -142,55 +141,163 @@ void Player::ComputeCollision(AEVec2& position)
 			if (!map->CheckTile(tile.tileType))
 				continue;
 
-			AEVec2 tilePos = tile.transform.GetPosition();
-			AEVec2 tileHalf{ map->GetTileSize() * 0.5f, map->GetTileSize() * 0.5f };
+			TILE_TYPE type = tile.tileType;
 
+			// Ignore tile if it's platform
+			if (type == TILE_TYPE::BACKGROUND ||
+				type == TILE_TYPE::FLOOR ||
+				type == TILE_TYPE::LEFT_PLATFORM ||
+				type == TILE_TYPE::PLATFORM ||
+				type == TILE_TYPE::RIGHT_PLATFORM)
+				continue;
+
+			AEVec2 tilePos = tile.transform.GetPosition();
+
+			// X overlap
 			float dx = position.x - tilePos.x;
 			float px = (halfSize.x + tileHalf.x) - fabsf(dx);
-			if (px <= 0) continue;
+			if (px <= 0.f) continue;
 
+			// Y overlap — must overlap on both axes to be touching
 			float dy = position.y - tilePos.y;
 			float py = (halfSize.y + tileHalf.y) - fabsf(dy);
-			if (py <= 0) continue;
+			if (py <= 0.f) continue;
 
 			SetCollidedTile(tile);
 
-			if (tile.tileType == TILE_TYPE::FLOOR)
+			// Push Out Player
+			if ((dx > 0.f && GetVelocity().x < 0.f) ||
+				(dx < 0.f && GetVelocity().x > 0.f))
 			{
-				float prevBottom = oldPosition.y - halfSize.y;
-				float tileTop = tilePos.y + tileHalf.y;
+				position.x += (dx > 0.f) ? px : -px;
+				SetVelocity(0.f, GetVelocity().y);
+			}
+		}
+	}
+}
+
+// ============================================================
+//  ResolveY
+//  Called after position.y has been stepped by velocity.
+//  Handles solid tiles (top and bottom faces), one-way floors,
+//  and one-way platforms. Sets isGrounded.
+//
+//  Because the X pass already resolved walls, the Y pass will
+//  never misidentify a wall face as a floor.
+// ============================================================
+void Player::ResolveY(AEVec2& position)
+{
+	const AEVec2 halfSize{ size * 0.5f, size * 0.5f };
+	const float  tileSizeHalf = map->GetTileSize() * 0.5f;
+	const AEVec2 tileHalf{ tileSizeHalf, tileSizeHalf };
+
+	// oldPosition holds the player centre from the START of this frame
+	// (before any velocity was applied). Used for the one-way surface
+	// "was-above" check.
+	const AEVec2 oldPosition = GetTransform().GetPosition();
+
+	isGrounded = false;
+
+	AEVec2 minTile = map->GetTilePos(position.x - halfSize.x, position.y - halfSize.y);
+	AEVec2 maxTile = map->GetTilePos(position.x + halfSize.x, position.y + halfSize.y);
+
+	int xMin = static_cast<int>((std::min)(minTile.x, maxTile.x));
+	int xMax = static_cast<int>((std::max)(minTile.x, maxTile.x));
+	int yMin = static_cast<int>((std::min)(minTile.y, maxTile.y));
+	int yMax = static_cast<int>((std::max)(minTile.y, maxTile.y));
+
+	for (int y = yMin; y <= yMax; ++y)
+	{
+		for (int x = xMin; x <= xMax; ++x)
+		{
+			if (x < 0 || y < 0 || y >= map->GetNumRow() || x >= map->GetNumCol())
+				continue;
+
+			Tile& tile = map->GetMap()[y][x];
+
+			TILE_TYPE type = tile.tileType;
+			if (!map->CheckTile(tile.tileType) || type == TILE_TYPE::BACKGROUND)
+				continue;
+
+
+			AEVec2 tilePos = tile.transform.GetPosition();
+
+			// One way platform
+			if (type == TILE_TYPE::LEFT_PLATFORM ||
+				type == TILE_TYPE::PLATFORM ||
+				type == TILE_TYPE::RIGHT_PLATFORM)
+			{
+				// Surface sits at the tile's top edge
+				const float surfaceY = tilePos.y + tileSizeHalf;
+				const float prevBottom = oldPosition.y - halfSize.y;
+				const float newBottom = position.y - halfSize.y;
+
+				// Horizontal overlap check — only process if the player is actually above this platform tile
+				float dx = position.x - tilePos.x;
+				float px = (halfSize.x + tileHalf.x) - fabsf(dx);
+				if (px <= 0.f) continue;
+
+				// Land only when:
+				//   feet were above the surface last frame
+				//   player is falling
+				//   feet have reached or crossed the surface this frame
+				if (prevBottom >= surfaceY &&
+					GetVelocity().y <= 0.f &&
+					newBottom <= surfaceY)
+				{
+					position.y = surfaceY + halfSize.y;
+					SetVelocity(GetVelocity().x, 0.f);
+					isGrounded = true;
+					SetCollidedTile(tile);
+				}
+				continue;
+			}
+
+			/*
+			if (type == TILE_TYPE::FLOOR)
+			{
+				const float tileTop = tilePos.y + tileHalf.y;
+				const float prevBottom = oldPosition.y - halfSize.y;
+
+				// Horizontal overlap
+				float dx = position.x - tilePos.x;
+				float px = (halfSize.x + tileHalf.x) - fabsf(dx);
+				if (px <= 0.f) continue;
+
+				// Vertical overlap
+				float dy = position.y - tilePos.y;
+				float py = (halfSize.y + tileHalf.y) - fabsf(dy);
+				if (py <= 0.f) continue;
 
 				if (prevBottom >= tileTop && GetVelocity().y <= 0.f)
 				{
-					position.y = tilePos.y + tileHalf.y + halfSize.y;
+					position.y = tileTop + halfSize.y;
 					SetVelocity(GetVelocity().x, 0.f);
 					isGrounded = true;
+					SetCollidedTile(tile);
 				}
-
 				continue;
 			}
+			*/
 
-			if (tile.tileType == TILE_TYPE::BACKGROUND)
-			{
-				continue;
-			}
+			// Tile Resolution
+			float dx = position.x - tilePos.x;
+			float px = (halfSize.x + tileHalf.x) - fabsf(dx);
+			if (px <= 0.f) continue;
 
-			if (px < py)
+			float dy = position.y - tilePos.y;
+			float py = (halfSize.y + tileHalf.y) - fabsf(dy);
+			if (py <= 0.f) continue;
+
+			SetCollidedTile(tile);
+
+			// Push out player
+			if ((dy > 0.f && GetVelocity().y < 0.f) ||
+				(dy < 0.f && GetVelocity().y > 0.f))
 			{
-				if ((dx > 0 && GetVelocity().x < 0) || (dx < 0 && GetVelocity().x > 0))
-				{
-					position.x += (dx > 0) ? px : -px;
-					SetVelocity(0.f, GetVelocity().y);
-				}
-			}
-			else
-			{
-				if ((dy > 0 && GetVelocity().y < 0) || (dy < 0 && GetVelocity().y > 0))
-				{
-					position.y += (dy > 0) ? py : -py;
-					SetVelocity(GetVelocity().x, 0.f);
-					if (dy > 0) isGrounded = true;
-				}
+				position.y += (dy > 0.f) ? py : -py;
+				SetVelocity(GetVelocity().x, 0.f);
+				if (dy > 0.f) isGrounded = true;
 			}
 		}
 	}
@@ -198,43 +305,43 @@ void Player::ComputeCollision(AEVec2& position)
 
 void Player::Update(float deltaTime)
 {
-	HandleInput();
+	HandleInput(); // Handle Input Internally
+	AEVec2 currentForces{ 0.f, gravity }; // Acceleration
 
-	AEVec2 currentForces{ 0.f, gravity };
-
+	// Check For X Input
 	if (input.x != 0.f)
 	{
 		currentForces.x = input.x * speed;
 	}
 	else
 	{
-		AEVec2 vel = GetVelocity();
-		vel.x *= friction;
-		SetVelocity(vel.x, vel.y);
+		SetVelocity(GetVelocity().x * friction, GetVelocity().y);
 	}
 
-	SetAcceleration(currentForces.x, currentForces.y);
-
-	AEVec2 currentPosition = GetTransform().GetPosition();
+	// Update Current Velocity
 	AEVec2 currentVelocity = GetVelocity();
-
 	currentVelocity.x += currentForces.x * deltaTime;
 	currentVelocity.y += currentForces.y * deltaTime;
-
-	currentVelocity.x = AEClamp(currentVelocity.x, -maxSpeed, maxSpeed);
+	currentVelocity.x = AEClamp(currentVelocity.x, -maxSpeed, maxSpeed); // Apply y velocity later if needed
 	SetVelocity(currentVelocity.x, currentVelocity.y);
 
-	AEVec2 predictedPos = currentPosition;
-	predictedPos.x += currentVelocity.x * deltaTime;
-	predictedPos.y += currentVelocity.y * deltaTime;
+	// Update Current Position
+	AEVec2 currentPosition = GetTransform().GetPosition();
+	currentPosition.x += currentVelocity.x * deltaTime;
 
-	ComputeCollision(predictedPos);
+	// Collision
+	ResolveX(currentPosition);
+	currentPosition.y += currentVelocity.y * deltaTime;
+	ResolveY(currentPosition);
 
-	GetTransform().SetPosition(predictedPos.x, predictedPos.y);
+	// Set Final Position
+	GetTransform().SetPosition(currentPosition.x, currentPosition.y);
 
 	AEVec2 cameraLerpVector{ GetTransform().GetPosition().x + cameraOffset.x * input.x,
 							GetTransform().GetPosition().y + cameraOffset.y };
-	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpVector, deltaTime * 5.f);
+	AEVec2 newCameraPos;
+	AEVec2Lerp(&newCameraPos, &cameraPosition, &cameraLerpVector, deltaTime * 5.f);
+	cameraPosition = newCameraPos;
 	AEGfxSetCamPosition(cameraPosition.x, cameraPosition.y);
 
 	// Update projectiles and remove dead ones
@@ -289,7 +396,6 @@ void Player::TakeDamage(float damage)
 	if (currentHP < 0) {
 		currentHP = 0;
 	}
-
 }
 
 void Player::Draw(AEGfxVertexList* mesh)

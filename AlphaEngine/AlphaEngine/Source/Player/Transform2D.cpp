@@ -1,3 +1,10 @@
+/*!
+@file       Transform2D.cpp
+@author     Chng Wei Sheng Bennett (chng.w)
+@brief      This file contains definitions of functionst that help
+			concat the matrix for 2D transformations.
+*//*_______________________________________________________________________*/
+
 #include "Transform2D.h"
 
 Transform2D::Transform2D()

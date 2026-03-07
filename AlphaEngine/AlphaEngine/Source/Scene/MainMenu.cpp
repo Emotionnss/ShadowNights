@@ -1,6 +1,7 @@
 #include "MainMenu.h"
 #include "../System/Scenemanager.h"
 #include "TestScene.h"
+#include "TestScene2.h"
 #include "AEEngine.h"
 #include <iostream>
 
@@ -28,7 +29,7 @@ void MainMenu::Update() {
 
     if (btnPlay->IsClicked()) {
         std::cout << "Play Pressed! Loading Game..." << std::endl;
-        SceneManager::ChangeScene(new TestScene());
+        SceneManager::ChangeScene(new TestScene2());
         return;
     }
     

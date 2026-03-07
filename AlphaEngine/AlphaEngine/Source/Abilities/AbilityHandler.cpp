@@ -66,7 +66,7 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 
 	if (AEInputCheckTriggered(AEVK_R))
 	{
-		player->Health(100);
+		player->SetHealth(100);
 	}
 
 	if (AEInputCheckTriggered(AEVK_F) && resource >= temporalCost)

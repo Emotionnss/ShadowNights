@@ -4,53 +4,71 @@
 #include <iostream>
 
 void TestScene2::Load() {
-    AEGfxReset();
+	AEGfxReset();
 
-    meshManager = MeshManager::GetInstance();
-    map = Map::GetInstance();
-    
-    map->LoadMap("Level2");
+	meshManager = MeshManager::GetInstance();
+	map = Map::GetInstance();
+	player = Player::GetInstance();
+
+	map->LoadMap("Level2");
+
+	/*
+	bg.AddLayer("../../Assets/Sprites/Background/1.png", 0.2f, 1600.f);
+	bg.AddLayer("../../../Assets/Sprites/Background/2.png", 0.5f, 1600.f);
+	bg.AddLayer("../../../Assets/Sprites/Background/3.png", 0.8f, 1600.f);
+	*/
+
 }
 
 void TestScene2::Init() {
-    playerX = 100.0f;
-    playerY = 0.0f;
+	player->GetTransform().SetPosition(300.0f, 150.0f);
+	abilityHandler = new AbilityHandler();
 }
 
 void TestScene2::Update() {
-    float dt = (float)AEFrameRateControllerGetFrameTime();
+	float dt = (float)AEFrameRateControllerGetFrameTime();
 
-    if (AEInputCheckCurr(VK_UP))    playerY += speed * dt;
-    if (AEInputCheckCurr(VK_DOWN))  playerY -= speed * dt;
-    if (AEInputCheckCurr(VK_LEFT))  playerX -= speed * dt;
-    if (AEInputCheckCurr(VK_RIGHT)) playerX += speed * dt;
+	player->Update(dt);
 
-    if (AEInputCheckTriggered(VK_SPACE)) {
-        std::cout << "DEBUG: Space IS Held Down!" << std::endl;
-        SceneManager::ChangeScene(new TestScene());
-        return;
-    }
+	if (player->GetHealth() <= 0)
+	{
+		if (abilityHandler->Anchored())
+		{
+			abilityHandler->TriggerAnchor();
+		}
+		else
+		{
+			player->SetHealth(100);
+		}
+	}
+
+
+	if (AEInputCheckTriggered(AEVK_9)) {
+		SceneManager::ChangeScene(new TestScene());
+		return;
+	}
 }
 
 void TestScene2::Draw() {
-
-    map->RenderMap();
-
-    AEGfxSetCamPosition(0.0f, 0.0f);
-    AEGfxSetBackgroundColor(0.2f, 0.2f, 0.2f); // Dark Grey BG to differentiate scenes
-    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-
-    AEMtx33 scaleMtx, transMtx, finalMtx;
-    AEMtx33Scale(&scaleMtx, 100.0f, 100.0f);
-    AEMtx33Trans(&transMtx, playerX, playerY);
-    AEMtx33Concat(&finalMtx, &transMtx, &scaleMtx);
-    AEGfxSetTransform(finalMtx.m);
-
-    AEGfxMeshDraw(meshManager->GetMesh(TRIANGLE), AE_GFX_MDM_TRIANGLES);
+	AEGfxSetBackgroundColor(0.4f, 0.4f, 0.4f);
+	AEVec2 CamPos;
+	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
+	bg.Draw(meshManager->GetMesh(TEXTURE_SQUARE), CamPos.x, CamPos.y);
+	map->RenderMap();
+	if (abilityHandler) abilityHandler->Draw();
+	player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 }
 
-void TestScene2::Free() {}
-void TestScene2::Unload() 
+void TestScene2::Free() {
+	player->DestroyInstance();
+	if (abilityHandler) delete abilityHandler;
+}
+
+void TestScene2::Unload()
 {
-    meshManager = nullptr;
+	player = nullptr;
+	abilityHandler = nullptr;
+	meshManager = nullptr;
+	enemyList.clear();
+	bg.Clear();
 }

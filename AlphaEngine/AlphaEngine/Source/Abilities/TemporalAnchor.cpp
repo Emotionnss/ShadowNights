@@ -69,7 +69,7 @@ void TemporalAnchor::Update(f32 dt)
 		{
 			reversing = false;
 			//player->GetTransform().SetPosition(anchorTfm.GetPosition());
-			player->Health(savedHealth);	
+			player->SetHealth(savedHealth);	
 		}
 	}
 	else if (!active && !reversing)
@@ -93,7 +93,7 @@ bool TemporalAnchor::Anchor(AEVec2 anchPos)
 	else
 	{
 		active = true;
-		savedHealth = player->Health();
+		savedHealth = player->GetHealth();
 		anchorTfm.SetPosition(anchPos);
 		zoneTfm.SetPosition(anchPos);
 		anchorSprite->PlayAnimation("spawn",-1,0.5f);

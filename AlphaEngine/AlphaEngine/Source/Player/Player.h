@@ -15,6 +15,13 @@
 #include <iostream>
 #include <vector>
 
+struct LineSegment
+{
+	AEVec2 P0;      // Start point of directed line segment
+	AEVec2 P1;      // End   point of directed line segment
+	AEVec2 n_hat;   // Normalised outward normal:  n = (ey, -ex)  (rotate e by -90 deg)
+};
+
 class Player : public GameObject, public SingletonTemplate<Player>
 {
 	friend class SingletonTemplate<Player>;
@@ -23,7 +30,10 @@ public:
 	~Player() override;
 
 	void HandleInput();
-	void ComputeCollision(AEVec2& position);
+
+	void ResolveX(AEVec2& position);
+	void ResolveY(AEVec2& position);
+	//void ComputeCollision(AEVec2& position);
 
 	void Update(float deltaTime) override;
 
@@ -33,8 +43,8 @@ public:
 	void TakeDamage(float damage);
 	void TakeDamage(int value) { currentHP -= value; }
 
-	void Health(float val);
-	f32 Health();
+	void SetHealth(float val);
+	f32 GetHealth();
 
 	void SetCollidedTile(const Tile variable);
 	Tile GetCollidedTile();
@@ -53,9 +63,9 @@ private:
 	AEVec2 input;
 	bool isGrounded;
 
-	float speed, maxSpeed, friction, size, gravity;
+	f32 speed, maxSpeed, friction, size, gravity, jumpForce;
 
-	float maxHP, currentHP;
+	f32 maxHP, currentHP;
 
 	AEVec2 cameraPosition, cameraOffset;
 

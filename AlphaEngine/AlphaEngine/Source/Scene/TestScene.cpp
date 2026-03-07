@@ -18,6 +18,7 @@ void TestScene::Load() {
 
 	map->LoadMap("Level1");
 
+	// Collects the Door Tile <Will change to function or refactor> :)
 	for (s32 i = 0; i < map->GetNumRow(); ++i)
 	{
 		for (s32 j = 0; j < map->GetNumCol(); ++j)
@@ -25,7 +26,6 @@ void TestScene::Load() {
 			if (map->GetMap()[i][j].tileType == TILE_TYPE::CLOSED_DOOR)
 			{
 				AEVec2Set(&DoorTilePosition, static_cast<f32>(i), static_cast<f32>(j));
-				std::cout << "X: " << DoorTilePosition.x << "Y: " << DoorTilePosition.y << std::endl;
 				return;
 			}
 		}
@@ -64,7 +64,6 @@ void TestScene::Init() {
 void TestScene::Update() {
 	f32 dt = (f32)AEFrameRateControllerGetFrameTime();
 
-	player->HandleInput();
 	player->Update(dt);
 	if (abilityHandler) abilityHandler->AbilityUpdate(enemyList, dt);
 
@@ -114,15 +113,15 @@ void TestScene::Update() {
             }
         }
     }
-    if (player->Health() <= 0)
+    if (player->GetHealth() <= 0)
     {
         if (abilityHandler->Anchored())
         {
             abilityHandler->TriggerAnchor();
-        }
+        } 
         else
         {
-            player->Health(100);
+            player->SetHealth(100);
         }
     }
     // SWORD PEEPEEPOOPOO

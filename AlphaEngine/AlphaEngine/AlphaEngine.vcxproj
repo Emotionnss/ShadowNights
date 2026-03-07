@@ -22,6 +22,7 @@
     <ClCompile Include="Source\Abilities\AbilityHandler.cpp" />
     <ClCompile Include="Source\Scene\BossScene.cpp" />
     <ClCompile Include="Source\Sprite\Animation.cpp" />
+    <ClCompile Include="Source\Sprite\ParallaxBackground.cpp" />
     <ClCompile Include="Source\Sprite\Sprite.cpp" />
     <ClCompile Include="Source\System\Button.cpp" />
     <ClCompile Include="Source\Player\GameObject.cpp" />
@@ -58,6 +59,7 @@
     <ClInclude Include="Source\Abilities\AbilityHandler.h" />
     <ClInclude Include="Source\Scene\BossScene.h" />
     <ClInclude Include="Source\Sprite\Animation.h" />
+    <ClInclude Include="Source\Sprite\ParallaxBackground.h" />
     <ClInclude Include="Source\Sprite\Sprite.h" />
     <ClInclude Include="Source\System\Button.h" />
     <ClInclude Include="Source\Player\GameObject.h" />

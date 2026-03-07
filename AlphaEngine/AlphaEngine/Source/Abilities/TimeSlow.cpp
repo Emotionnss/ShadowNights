@@ -4,14 +4,14 @@ TimeSlow::TimeSlow()
 	:player{ Player::GetInstance() }, 
 	active{ false },
 	startDespawn{false},
-	timeSlow{ "timeslow2" },
+	timeSlow{ "timeslow" },
 	despawningTime{1.f},
 	despawningTimer{despawningTime}
 {
 	timeSlowSprite = new Sprite(CSVManager::ReadInfo(timeSlow));
 
-	timeSlowTransform.SetScale(player->GetTransform().GetScale().x * 1000,player->GetTransform().GetScale().y * 1000);
-	
+	timeSlowTransform.SetScale(player->GetTransform().GetScale().x * 10,player->GetTransform().GetScale().y * 10);
+	timeSlowSprite->PlayAnimation("spawn", 1,0.5f);
 }
 
 TimeSlow::~TimeSlow()
@@ -72,12 +72,12 @@ bool TimeSlow::ToggleSlow()
 	if (active == true)
 	{
 		startDespawn = true;
-		timeSlowSprite->PlayAnimation("despawn");
+		timeSlowSprite->PlayAnimation("despawn",1,despawningTime);
 		active = false;
 	}
 	else
 	{
-		timeSlowSprite->PlayAnimation("spawn",1);
+		timeSlowSprite->PlayAnimation("spawn",1,0.5f);
 		startDespawn = false;
 		active = true;
 	}

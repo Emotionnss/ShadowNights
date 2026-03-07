@@ -139,6 +139,7 @@ void Sprite::Render(Transform2D& transform, float alpha, float r, float g, float
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(alpha);
 
+	
 	AEGfxTextureSet(tex, currentUVWidth, currentUVHeight);
 	AEGfxSetTransform(transform.GetMatrix().m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
@@ -194,4 +195,33 @@ void Sprite::PlayDefaultAnimation(s32 count, f32 animTime)
 Animation* Sprite::GetCurrentAnimation() const
 {
 	return animationMap.find(currentAnimationName)->second;
+}
+
+AEVec2 Sprite::GetAnimationFrameUVCoords(u32 index) const
+{
+	AEVec2 uvCoords{};
+
+	Animation* currentAnim = GetCurrentAnimation();
+
+	u32 targetAnimFrame = currentAnim->GetFrame(index);
+
+	//Get uv coords
+	u32 currentSpriteRow = targetAnimFrame / spritesheetColumns;
+	u32 currentSpriteCol = targetAnimFrame % spritesheetColumns;
+
+	//x is ur width, y is ur height
+	uvCoords.x = spriteUVWidth * currentSpriteCol;
+	uvCoords.y = spriteUVHeight * currentSpriteRow;
+
+	return uvCoords;
+}
+
+AEVec2 Sprite::GetCurrentUVCoords() const
+{
+	return AEVec2{ currentUVWidth, currentUVHeight };
+}
+
+AEGfxTexture* Sprite::GetSpriteTexture() const
+{
+	return tex;
 }

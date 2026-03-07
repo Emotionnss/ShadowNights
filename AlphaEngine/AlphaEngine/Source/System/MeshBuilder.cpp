@@ -68,9 +68,9 @@ AEGfxVertexList* MeshBuilder::CreateCornerSquareMesh(bool texture)
         0.0f, 0.0f, 0xFFFFFFFF, uvCoords[0], uvCoords[0]);
 
     AEGfxTriAdd(
-        0.0f, 0.0f, 0xFFFFFFFF, uvCoords[1], uvCoords[1],
+        0.0f, 0.0f, 0xFFFFFFFF, uvCoords[0], uvCoords[0],
         1.0f, 0.0f, 0xFFFFFFFF, uvCoords[1], uvCoords[0],
-        1.0f, 1.0f, 0xFFFFFFFF, uvCoords[0], uvCoords[0]);
+        1.0f, 1.0f, 0xFFFFFFFF, uvCoords[1], uvCoords[1]);
 
     mesh = AEGfxMeshEnd();
 

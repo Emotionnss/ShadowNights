@@ -6,18 +6,20 @@
 
 BossLaser::BossLaser()
 	: meshManager{ MeshManager::GetInstance() },
+    player{ Player::GetInstance() },
 	active{ false },
     spriteName{ "bosslaser" }
 {
     laserSprite = new Sprite(CSVManager::ReadInfo(spriteName));
     laserSprite->PlayAnimation("spawn", 1, 1.f);
 
-    transform.SetScale(500, 500);
+    transform.SetScale(250, 1000);
 }
 
 BossLaser::~BossLaser()
 {
     meshManager = nullptr;
+    player = nullptr;
     if (laserSprite)
     {
         delete laserSprite;
@@ -27,7 +29,51 @@ BossLaser::~BossLaser()
 
 void BossLaser::Update(float deltaTime)
 {
+    if (!active)
+        return;
+
     laserSprite->Update();
+    
+    // charging phase
+    if (charging)
+    {
+        std::cout << "CHARGING" << std::endl;
+        startupDelay -= 1.f * deltaTime;
+        if (startupDelay <= 0.f)
+        {
+            charging = false;
+            laserSprite->PlayAnimation("attack", 1, 1.f);
+        }
+        return;
+    }
+
+    // attacking phase
+    AEVec2 laserPos = transform.GetPosition();
+    AEVec2 laserHalf = { transform.GetScale().x, transform.GetScale().y };
+
+    AEVec2 playerPos = player->GetTransform().GetPosition();
+    AEVec2 playerHalf = { 35.0f, 35.0f };
+
+    if (AABBOverlap(laserPos, laserHalf, playerPos, playerHalf) && damageCooldown <= 0.f)
+    {
+        std::cout << "LASER TICK" << std::endl;
+
+        player->TakeDamage(20);
+        damageCooldown = baseCooldown;
+    }
+
+    if (damageCooldown > 0.f)
+    {
+        damageCooldown -= 1.f * deltaTime;
+    }
+
+    lifespan -= 1.f * deltaTime;
+    if (lifespan <= 0.f)
+    {
+        active = false;
+        charging = false;
+        lifespan = Baselifespan;
+    }
 }
 void BossLaser::Draw()
 {
@@ -48,14 +94,19 @@ void BossLaser::Draw()
 
 bool BossLaser::Triggered(AEVec2 pos)
 {
-    if (active == true)//if its active
+    if (active)//if its active
     {
         active = false;//deactivate it
+        charging = false;
+        lifespan = Baselifespan;
     }
-    else if (active == false)//if not active
+    else //if not active
     {
-        active = true;//activate
+        active = true;
+        charging = true;
+        startupDelay = startupDelayBase;
         transform.SetPosition(pos);
+
         laserSprite->PlayAnimation("spawn", 1, 1.f);
     }
     return active;//return its activity

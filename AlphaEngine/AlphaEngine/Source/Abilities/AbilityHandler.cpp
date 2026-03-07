@@ -72,6 +72,10 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 	{
 		lasered = bossLaser->Triggered(player->GetTransform().GetPosition());
 	}
+	if (AEInputCheckTriggered(AEVK_G))
+	{
+		exploded = bossExplosive->Triggered(player->GetTransform().GetPosition(), {1.f, 1.f});
+	}
 
 
 

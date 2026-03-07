@@ -4,6 +4,7 @@
 #include "TemporalAnchor.h"
 
 #include "BossLaser.h"
+#include "BossExplosive.h"
 
 
 #include "../System/MeshManager.h"
@@ -17,6 +18,7 @@ private:
 	TemporalAnchor* tempAnch = new TemporalAnchor();
 
 	BossLaser* bossLaser = new BossLaser();
+	BossExplosive* bossExplosive = new BossExplosive();
 
 	Player* player = nullptr;
 	f32 slowCost{}, stopCost, temporalCost;
@@ -35,6 +37,7 @@ private:
 	bool anchored{};
 
 	bool lasered{};
+	bool exploded{};
 public:
 	void TriggerAnchor();
 	AbilityHandler();

@@ -18,7 +18,7 @@ AbilityHandler::AbilityHandler()
 
 	AEMtx33Concat(&a1Tfm, &rot, &scale);//concatenate rotation and scale together
 	AEMtx33Concat(&a1Tfm, &trans, &a1Tfm);//concatenate the transform and the translate
-	a1Tex = AEGfxTextureLoad("hourglass.png");
+	a1Tex = AEGfxTextureLoad("Assets/Abilities/hourglass.png");
 }
 
 AbilityHandler::~AbilityHandler()

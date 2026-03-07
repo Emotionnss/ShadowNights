@@ -29,7 +29,7 @@ void MainMenu::Update() {
 
     if (btnPlay->IsClicked()) {
         std::cout << "Play Pressed! Loading Game..." << std::endl;
-        SceneManager::ChangeScene(new TestScene2());
+        SceneManager::ChangeScene(new TestScene());
         return;
     }
     

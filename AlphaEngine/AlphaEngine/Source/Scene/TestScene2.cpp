@@ -10,14 +10,10 @@ void TestScene2::Load() {
 	map = Map::GetInstance();
 	player = Player::GetInstance();
 
+	bg = new Background;
+	bg->SetStatic(true);
+
 	map->LoadMap("Level2");
-
-	/*
-	bg.AddLayer("../../Assets/Sprites/Background/1.png", 0.2f, 1600.f);
-	bg.AddLayer("../../../Assets/Sprites/Background/2.png", 0.5f, 1600.f);
-	bg.AddLayer("../../../Assets/Sprites/Background/3.png", 0.8f, 1600.f);
-	*/
-
 }
 
 void TestScene2::Init() {
@@ -50,10 +46,8 @@ void TestScene2::Update() {
 }
 
 void TestScene2::Draw() {
-	AEGfxSetBackgroundColor(0.4f, 0.4f, 0.4f);
-	AEVec2 CamPos;
-	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
-	bg.Draw(meshManager->GetMesh(TEXTURE_SQUARE), CamPos.x, CamPos.y);
+	//AEGfxSetBackgroundColor(0.4f, 0.4f, 0.4f);
+	bg->Draw(meshManager->GetMesh(TEXTURE_SQUARE));
 	map->RenderMap();
 	if (abilityHandler) abilityHandler->Draw();
 	player->Draw(meshManager->GetMesh(CORNER_SQUARE));
@@ -70,5 +64,4 @@ void TestScene2::Unload()
 	abilityHandler = nullptr;
 	meshManager = nullptr;
 	enemyList.clear();
-	bg.Clear();
 }

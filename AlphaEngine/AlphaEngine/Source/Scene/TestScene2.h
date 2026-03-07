@@ -7,7 +7,7 @@
 #include "../System/Map.h"
 #include "../Abilities/AbilityHandler.h"
 #include "../Enemy/BaseEnemy.h" 
-#include "../Sprite/ParallaxBackground.h"
+#include "../Scene/Background.h"
 
 class TestScene2 : public BaseScene {
 public:
@@ -25,7 +25,7 @@ private:
     Map* map = nullptr;
     AEVec2 DoorTilePosition;
 
-    ParallaxBackground bg;
+    Background* bg;
 
     std::vector<BaseEnemy*> enemyList;
 };

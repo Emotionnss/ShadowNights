@@ -35,7 +35,7 @@
     <ClCompile Include="Source\Abilities\TemporalAnchor.cpp" />
     <ClCompile Include="Source\Utils\Slider.cpp" />
     <ClCompile Include="Source\Utils\utils.cpp" />
-    <ClCompile Include="Source\Sprite\ParallaxBackground.cpp" />
+    <ClCompile Include="Source\Scene\Background.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Abilities\BossExplosive.h" />
@@ -73,6 +73,6 @@
     <ClInclude Include="Source\System\SoundManager.h" />
     <ClInclude Include="Source\Utils\Slider.h" />
     <ClInclude Include="Source\Utils\utils.h" />
-    <ClInclude Include="Source\Sprite\ParallaxBackground.h" />
+    <ClInclude Include="Source\Scene\Background.h" />
   </ItemGroup>
 </Project>

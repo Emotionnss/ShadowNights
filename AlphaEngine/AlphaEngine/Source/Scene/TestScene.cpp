@@ -16,6 +16,8 @@ void TestScene::Load() {
 	map = Map::GetInstance();
 	player = Player::GetInstance();
 
+	bg = new Background;
+
 	map->LoadMap("Level1");
 
 	// Collects the Door Tile <Will change to function or refactor> :)
@@ -99,33 +101,33 @@ void TestScene::Update() {
 			AEVec2 playerPos = player->GetTransform().GetPosition();
 			AEVec2 playerHalf = { 35.0f, 35.0f };
 
-            if (AABBOverlap(projPos, projHalf, playerPos, playerHalf) && !abilityHandler->Reverse())
-            {
-                std::cout << "OUCH! Player Hit!" << std::endl;
-                player->TakeDamage(10);
+			if (AABBOverlap(projPos, projHalf, playerPos, playerHalf) && !abilityHandler->Reverse())
+			{
+				std::cout << "OUCH! Player Hit!" << std::endl;
+				player->TakeDamage(10);
 
-                delete proj;
-                it = enemyProjs.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-    }
-    if (player->GetHealth() <= 0)
-    {
-        if (abilityHandler->Anchored())
-        {
-            abilityHandler->TriggerAnchor();
-        } 
-        else
-        {
-            player->SetHealth(100);
-        }
-    }
-    // SWORD PEEPEEPOOPOO
-    std::vector<BaseProjectile*>& projs = player->projectileList;
+				delete proj;
+				it = enemyProjs.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
+	if (player->GetHealth() <= 0)
+	{
+		if (abilityHandler->Anchored())
+		{
+			abilityHandler->TriggerAnchor();
+		}
+		else
+		{
+			player->SetHealth(100);
+		}
+	}
+	// SWORD PEEPEEPOOPOO
+	std::vector<BaseProjectile*>& projs = player->projectileList;
 
 	for (auto it = projs.begin(); it != projs.end(); )
 	{
@@ -188,7 +190,8 @@ void TestScene::Update() {
 }
 
 void TestScene::Draw() {
-	AEGfxSetBackgroundColor(0.4f, 0.4f, 0.4f);
+	//AEGfxSetBackgroundColor(0.4f, 0.4f, 0.4f);
+	bg->Draw(meshManager->GetMesh(TEXTURE_SQUARE));
 	map->RenderMap();
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -210,6 +213,7 @@ void TestScene::Free() {
 		delete enemy;
 	}
 	enemyList.clear();
+	delete bg;
 }
 
 void TestScene::Unload()

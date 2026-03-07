@@ -6,7 +6,8 @@
 #include "../System/MeshManager.h"
 #include "../System/Map.h"
 #include "../Abilities/AbilityHandler.h"
-#include "../Enemy/BaseEnemy.h" 
+#include "../Enemy/BaseEnemy.h"
+#include "background.h"
 
 class TestScene : public BaseScene {
 public:
@@ -23,6 +24,7 @@ private:
     MeshManager* meshManager = nullptr;
     Map* map = nullptr;
     AEVec2 DoorTilePosition;
+    Background* bg;
 
     std::vector<BaseEnemy*> enemyList;
 };

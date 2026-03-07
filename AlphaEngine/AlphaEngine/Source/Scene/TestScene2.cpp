@@ -56,6 +56,7 @@ void TestScene2::Draw() {
 void TestScene2::Free() {
 	player->DestroyInstance();
 	if (abilityHandler) delete abilityHandler;
+	delete bg;
 }
 
 void TestScene2::Unload()

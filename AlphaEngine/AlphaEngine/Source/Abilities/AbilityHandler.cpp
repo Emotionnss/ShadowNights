@@ -32,6 +32,7 @@ AbilityHandler::~AbilityHandler()
 	delete tempAnch;
 
 	delete bossLaser;
+	delete bossExplosive;
 }
 
 void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
@@ -42,6 +43,7 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 	tempAnch->Update(dt);
 
 	bossLaser->Update(dt);
+	bossExplosive->Update(dt);
 
 
 	if (AEInputCheckTriggered(AEVK_E))
@@ -74,7 +76,7 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 	}
 	if (AEInputCheckTriggered(AEVK_G))
 	{
-		exploded = bossExplosive->Triggered(player->GetTransform().GetPosition(), {1.f, 1.f});
+		exploded = bossExplosive->Triggered(player->GetTransform().GetPosition(), {1.f, 0.f});
 	}
 
 
@@ -112,6 +114,7 @@ void AbilityHandler::Draw()
 	tempAnch->Draw();
 
 	bossLaser->Draw();
+	bossExplosive->Draw();
 
 	//resource bar for the abilties
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);

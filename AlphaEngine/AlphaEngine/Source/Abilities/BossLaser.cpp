@@ -77,7 +77,6 @@ void BossLaser::Update(float deltaTime)
 }
 void BossLaser::Draw()
 {
-    //zone for timestop
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
     AEGfxSetBlendMode(AE_GFX_BM_BLEND);
     if (active)

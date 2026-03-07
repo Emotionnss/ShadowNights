@@ -21,8 +21,8 @@ Player::Player()
 	AEVec2Set(&cameraOffset, 200.f, -50.f); // Set Camera Offset Position
 
 	// Sprite Handling
-	sprite = new Sprite(CSVManager::ReadInfo("ame"));
-	sprite->SetDefaultAnimation("bounce");
+	sprite = new Sprite(CSVManager::ReadInfo("tempPlayer"));
+	sprite->SetDefaultAnimation("idle");
 	sprite->PlayDefaultAnimation(-1, 1.f);
 }
 
@@ -69,6 +69,15 @@ Tile Player::GetCollidedTile()
 Sprite* Player::GetSprite() const
 {
 	return this->sprite;
+}
+
+void Player::PlayAnim(std::string name)
+{
+	if (currentAnimState != name)
+	{
+		currentAnimState = name;
+		if (sprite) sprite->PlayAnimation(name, -1, 1.f);
+	}
 }
 
 void Player::HandleInput()
@@ -181,15 +190,6 @@ void Player::ResolveX(AEVec2& position)
 	}
 }
 
-// ============================================================
-//  ResolveY
-//  Called after position.y has been stepped by velocity.
-//  Handles solid tiles (top and bottom faces), one-way floors,
-//  and one-way platforms. Sets isGrounded.
-//
-//  Because the X pass already resolved walls, the Y pass will
-//  never misidentify a wall face as a floor.
-// ============================================================
 void Player::ResolveY(AEVec2& position)
 {
 	const AEVec2 halfSize{ size * 0.5f, size * 0.5f };
@@ -348,6 +348,24 @@ void Player::Update(float deltaTime)
 	AEVec2Lerp(&newCameraPos, &cameraPosition, &cameraLerpVector, deltaTime * 5.f);
 	cameraPosition = newCameraPos;
 	AEGfxSetCamPosition(cameraPosition.x, cameraPosition.y);
+
+	// Update Animation FSM
+	if (input.x != 0 && isGrounded)
+	{
+		this->PlayAnim("walk");
+	}
+	else if (!isGrounded && velocity.y > 0.f)
+	{
+		this->PlayAnim("jump");
+	}
+	else if (!isGrounded && velocity.y < 0.f)
+	{
+		this->PlayAnim("fall");
+	}
+	else
+	{
+		this->PlayAnim("idle");
+	}
 
 	// Update projectiles and remove dead ones
 	for (auto it = projectileList.begin(); it != projectileList.end(); )

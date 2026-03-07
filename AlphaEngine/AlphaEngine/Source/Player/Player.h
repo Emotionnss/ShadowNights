@@ -55,7 +55,6 @@ public:
 
 	Sprite* GetSprite() const;
 private:
-
 	Transform2D healthbar;
 
 	enum Direction { LEFT = -1, RIGHT = 1, IDLE = 0 };
@@ -73,4 +72,7 @@ private:
 	Map* map;
 
 	Tile collidedTile;
+protected:
+	std::string currentAnimState = "";
+	void PlayAnim(std::string name);
 };

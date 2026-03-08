@@ -23,6 +23,11 @@ AbilityHandler::~AbilityHandler()
 {
 	if(a1Tex)
 		AEGfxTextureUnload(a1Tex);
+	if(a2Tex)
+		AEGfxTextureUnload(a2Tex);
+	if(a3Tex)
+		AEGfxTextureUnload(a3Tex);
+
 	player = nullptr;
 	meshManager = nullptr;
 	delete timeStop;

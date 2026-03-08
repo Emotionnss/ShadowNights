@@ -137,9 +137,16 @@ public:
 	AEVec2 GetCurrentUVCoords() const;
 
 	/*!
-	@brief    Get the spritesheet of the sprite
-	@param    void
+	@brief  Get the spritesheet of the sprite
+	@param  void
 	@return AEGfxTexture*
 	*/
 	AEGfxTexture* GetSpriteTexture() const;
+
+	/*!
+	@brief	Get the sprite mesh that this sprite users
+	@param  void
+	@return AEGfxVertexList*
+	*/
+	AEGfxVertexList* GetSpriteMesh() const;
 };

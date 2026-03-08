@@ -131,14 +131,17 @@ void TemporalAnchor::Draw()
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetTransparency(0.25f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+
+		Sprite* sprite = player->GetSprite();
+
 		for (Ghosts ghost: ghostVect)
 		{
 
 			ghostTfm.SetPosition(ghost.position);
 			std::cout << "using UV" << ghost.spriteUV.x << " " << ghost.spriteUV.y << " vector size" << ghostVect.size() << '\n';
-			AEGfxTextureSet(player->GetSprite()->GetSpriteTexture(), ghost.spriteUV.x, ghost.spriteUV.y);
+			AEGfxTextureSet(sprite->GetSpriteTexture(), ghost.spriteUV.x, ghost.spriteUV.y);
 			AEGfxSetTransform(ghostTfm.GetMatrix().m);
-			AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+			AEGfxMeshDraw(sprite->GetSpriteMesh(), AE_GFX_MDM_TRIANGLES);
 		}
 
 	}

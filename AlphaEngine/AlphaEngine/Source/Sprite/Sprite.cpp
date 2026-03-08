@@ -225,3 +225,8 @@ AEGfxTexture* Sprite::GetSpriteTexture() const
 {
 	return tex;
 }
+
+AEGfxVertexList* Sprite::GetSpriteMesh() const
+{
+	return mesh;
+}

@@ -11,7 +11,7 @@ TimeSlow::TimeSlow()
 	timeSlowSprite = new Sprite(CSVManager::ReadInfo(timeSlow));
 
 	timeSlowTransform.SetScale(player->GetTransform().GetScale().x * 10,player->GetTransform().GetScale().y * 10);
-	timeSlowSprite->PlayAnimation("spawn", 1,0.5f);
+	timeSlowSprite->PlayAnimation("spawn", 1,0.6f);
 }
 
 TimeSlow::~TimeSlow()
@@ -77,7 +77,7 @@ bool TimeSlow::ToggleSlow()
 	}
 	else
 	{
-		timeSlowSprite->PlayAnimation("spawn",1,0.5f);
+		timeSlowSprite->PlayAnimation("spawn",1,0.6f);
 		startDespawn = false;
 		active = true;
 	}

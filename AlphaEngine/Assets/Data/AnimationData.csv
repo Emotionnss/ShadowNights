@@ -16,7 +16,7 @@ sniperenemy,archerdeath,0,10
 boss,spawn,1,4
 boss,idle,2,6
 boss,death,0,7
-timeslow,spawn,0,5
+timeslow,spawn,0,6
 timeslow,despawn,1,9
 bosslaser,spawn,0,6
 bosslaser,attack,1,6

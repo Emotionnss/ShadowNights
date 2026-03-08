@@ -21,11 +21,11 @@ AbilityHandler::AbilityHandler()
 
 AbilityHandler::~AbilityHandler()
 {
-	if(a1Tex)
+	if (a1Tex)
 		AEGfxTextureUnload(a1Tex);
-	if(a2Tex)
+	if (a2Tex)
 		AEGfxTextureUnload(a2Tex);
-	if(a3Tex)
+	if (a3Tex)
 		AEGfxTextureUnload(a3Tex);
 
 	player = nullptr;
@@ -43,11 +43,11 @@ AbilityHandler::~AbilityHandler()
 	bossExplosives.clear();
 }
 
-void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
+void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList, float dt)
 {
 	AEGfxGetCamPosition(&camPos.x, &camPos.y);
-	timeStop->Update(enemyList,dt);
-	timeSlow->Update(enemyList,dt);
+	timeStop->Update(enemyList, dt);
+	timeSlow->Update(dt);
 	tempAnch->Update(dt);
 
 	for (BossLaser* l : bossLasers)
@@ -64,7 +64,7 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 
 	if (AEInputCheckTriggered(AEVK_Q))
 	{
-		timeSlowed = timeSlow->ToggleSlow();
+		timeSlowed = timeSlow->ToggleSlow(enemyList);
 	}
 
 	if (AEInputCheckTriggered(AEVK_R))
@@ -90,7 +90,7 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 	if (AEInputCheckTriggered(AEVK_G))
 	{
 		BossExplosive* newExplosive = new BossExplosive();
-		newExplosive->Triggered(player->GetTransform().GetPosition(), {1.f, 0.f});
+		newExplosive->Triggered(player->GetTransform().GetPosition(), { 1.f, 0.f });
 		bossExplosives.push_back(newExplosive);
 	}
 
@@ -107,15 +107,15 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList,float dt)
 
 	if (resource <= 0)
 	{
-		timeStopped = timeStopped?timeStop->ToggleTime(player->GetTransform().GetPosition()):false;
-		timeSlowed = timeSlowed?timeSlow->ToggleSlow():false;
+		timeStopped = timeStopped ? timeStop->ToggleTime(player->GetTransform().GetPosition()) : false;
+		timeSlowed = timeSlowed ? timeSlow->ToggleSlow(enemyList) : false;
 	}
 
 	if (!timeStopped && !timeSlowed && !anchored)
 	{
 		resource += 100 * dt;
 	}
-	
+
 	a1Alpha = timeStopped ? 0.5f : 1.f;
 	a2Alpha = timeSlowed ? 0.5f : 1.f;
 	a3Alpha = anchored ? 0.5f : resource < temporalCost ? 0.5f : 1.f;
@@ -191,4 +191,3 @@ void AbilityHandler::TriggerAnchor()
 {
 	anchored = tempAnch->Anchor(player->GetTransform().GetPosition());
 }
-

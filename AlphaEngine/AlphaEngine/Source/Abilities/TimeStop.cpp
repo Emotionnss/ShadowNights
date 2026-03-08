@@ -24,17 +24,18 @@ TimeStop::~TimeStop()//destructor
     }
 }
 
-void TimeStop::Update(std::vector<BaseEnemy*> enemyList,float dt)
+void TimeStop::Update(std::vector<BaseEnemy*> enemyList, float dt)
 {
     if (active)//if time stopped
     {
         zoneScale += 1500 * dt;//rapidly increase zone
         for (BaseProjectile* proj : player->GetProjectileList())//for every projectile the player throws
         {
-            if (AreCirclesIntersecting(proj->transform.GetPosition().x, proj->transform.GetPosition().y, 0.1f ,
+            if (AreCirclesIntersecting(proj->transform.GetPosition().x, proj->transform.GetPosition().y, 0.1f,
                 zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))//if its in the timestop zone
             {
                 proj->stopped = true;//stop moving the projectile
+
             }
         }
         for (BaseEnemy* enemy : enemyList)//same for the enemies
@@ -43,6 +44,14 @@ void TimeStop::Update(std::vector<BaseEnemy*> enemyList,float dt)
                 zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))
             {
                 enemy->isStopped(true);//stop the enemies
+            }
+            for (EnemyProjectile* enemyProj : enemy->GetProjectiles())
+            {
+                if (AreCirclesIntersecting(enemyProj->transform.GetPosition().x, enemyProj->transform.GetPosition().y, 0.1f,
+                    zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))
+                {
+                    enemyProj->stopped = true;;//stop the enemies projectiles
+                }
             }
         }
     }
@@ -55,9 +64,15 @@ void TimeStop::Update(std::vector<BaseEnemy*> enemyList,float dt)
         }
         for (BaseEnemy* enemy : enemyList)//same for the enemies
         {
-            
             enemy->isStopped(true);//stop the enemies
-            
+            for (EnemyProjectile* enemyProj : enemy->GetProjectiles())
+            {
+                if (AreCirclesIntersecting(enemyProj->transform.GetPosition().x, enemyProj->transform.GetPosition().y, 0.1f,
+                    zoneTransform.GetPosition().x, zoneTransform.GetPosition().y, GetScale()))
+                {
+                    enemyProj->stopped = true;;//stop the enemies projectiles as well
+                }
+            }
         }
     }
 
@@ -65,15 +80,15 @@ void TimeStop::Update(std::vector<BaseEnemy*> enemyList,float dt)
     {
         for (BaseProjectile* proj : player->GetProjectileList())//every player thrown projectile
         {
-
             proj->stopped = false;//not stopped
-            
         }
-        for (BaseEnemy* enemy : enemyList)//every enemy thrown projectile
+        for (BaseEnemy* enemy : enemyList)//every enemy
         {
-
             enemy->isStopped(false);//not stopped
-            
+            for (EnemyProjectile* enemyProj : enemy->GetProjectiles())//every enemy thrown projectile
+            {
+                enemyProj->stopped = false;//dont stop the projectiles
+            }
         }
         zoneScale = originalScale;//revert the zonescale back to the original
 
@@ -99,7 +114,7 @@ bool TimeStop::ToggleTime(AEVec2 position)//toggle the ability
     return active;//return its activity
 }
 
-void TimeStop::TempStop( bool activity)
+void TimeStop::TempStop(bool activity)
 {
     tempStop = activity;
 }
@@ -123,7 +138,7 @@ void TimeStop::SetZonePos(AEVec2 position)//setter for the zones position
 void TimeStop::Draw()//Rendering the sprites
 {
     //zone for timestop
-    AEGfxSetRenderMode(AE_GFX_RM_COLOR); 
+    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
     AEGfxSetBlendMode(AE_GFX_BM_BLEND);
     if (active)
     {
@@ -133,6 +148,6 @@ void TimeStop::Draw()//Rendering the sprites
         AEGfxSetTransform(zoneTransform.GetMatrix().m);
         AEGfxMeshDraw(meshManager->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
 
-        zoneSprite->Render(spriteTransform,0.75f);
+        zoneSprite->Render(spriteTransform, 0.75f);
     }
 }

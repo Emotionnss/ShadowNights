@@ -36,6 +36,8 @@
     <ClCompile Include="Source\Utils\Slider.cpp" />
     <ClCompile Include="Source\Utils\utils.cpp" />
     <ClCompile Include="Source\Scene\Background.cpp" />
+    <ClCompile Include="Source\particle\ParticleManager.cpp" />
+    <ClCompile Include="Source\Scene\LoseScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Abilities\BossExplosive.h" />
@@ -74,5 +76,7 @@
     <ClInclude Include="Source\Utils\Slider.h" />
     <ClInclude Include="Source\Utils\utils.h" />
     <ClInclude Include="Source\Scene\Background.h" />
+    <ClInclude Include="Source\particle\ParticleManager.h" />
+    <ClInclude Include="Source\Scene\LoseScene.h" />
   </ItemGroup>
 </Project>

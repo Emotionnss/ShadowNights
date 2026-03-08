@@ -21,7 +21,6 @@ public:
     void Free() override;
     void Unload() override;
 
-    // Save/Load System Helpers
     void SaveGame(int slot);
     void LoadGame(int slot);
     bool FileExists(int slot);
@@ -38,7 +37,6 @@ private:
 
     std::vector<BaseEnemy*> enemyList;
 
-    // Menu States & Timers
     bool isPaused = false;
     int menuPage = 0; // 0 = Main Pause, 1 = Save Menu, 2 = Load Menu
     float popupTimer = 0.0f;

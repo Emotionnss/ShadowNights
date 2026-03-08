@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "particle/ParticleManager.h"
 
 bool gGameRunning = true;
 
@@ -54,6 +55,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     Button::FreeResources();
     SettingsManager::DestroyInstance();
     sManager = nullptr;
+    ParticleManager::DestroyInstance();
     AESysExit();
 
     return 1;

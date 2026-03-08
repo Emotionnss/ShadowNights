@@ -11,6 +11,8 @@
 #include "../Enemy/ShadowEnemy.h"
 #include "../Enemy/BatEnemy.h"
 #include "../Enemy/ArcherEnemy.h"
+#include "../particle/ParticleManager.h"
+#include "LoseScene.h"
 
 void TestScene::Load() {
     AEGfxReset();
@@ -22,12 +24,12 @@ void TestScene::Load() {
 
     map->LoadMap("Level1");
 
-	// Collects the Door Tile <Will change to function or refactor> :)
+    // Collects the Door Tile <Will change to function or refactor> :)
     for (s32 i = 0; i < map->GetNumRow(); ++i) {
         for (s32 j = 0; j < map->GetNumCol(); ++j) {
             if (map->GetMap()[i][j].tileType == TILE_TYPE::CLOSED_DOOR) {
                 AEVec2Set(&DoorTilePosition, static_cast<f32>(i), static_cast<f32>(j));
-                break; 
+                break;
             }
         }
     }
@@ -93,28 +95,29 @@ void TestScene::Update() {
 
     if (!isPaused) {
         player->Update(dt);
+
+        ParticleManager::GetInstance()->Update(dt);
+
         if (abilityHandler) abilityHandler->AbilityUpdate(enemyList, dt);
 
         for (BaseEnemy* enemy : enemyList) {
             enemy->Update(dt);
         }
 
-        // Open Door Once Enemy has been defeated
         if (enemyList.size() == 0) {
             map->SetTile(TILE_TYPE::OPEN_DOOR, DoorTilePosition.y, DoorTilePosition.x);
         }
 
-	// Change scene when player collides with an open door
-	if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR)
-	{
-		SceneManager::ChangeScene(new TestScene2());
-	}
+        if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR)
+        {
+            SceneManager::ChangeScene(new BossScene());
+        }
 
-	//Delete later
-	if (AEInputCheckTriggered(AEVK_0))
-	{
-		SceneManager::ChangeScene(new BossScene());
-	}
+        //Delete later
+        if (AEInputCheckTriggered(AEVK_0))
+        {
+            SceneManager::ChangeScene(new BossScene());
+        }
 
         // Enemy projectile collision
         for (BaseEnemy* enemy : enemyList) {
@@ -123,15 +126,22 @@ void TestScene::Update() {
             for (auto it = enemyProjs.begin(); it != enemyProjs.end(); ) {
                 EnemyProjectile* proj = *it;
 
+                
+                ParticleManager::GetInstance()->SpawnTrail(
+                    proj->transform.GetPosition(),
+                    { 15.0f, 15.0f }, 
+                    0.2f,             
+                    1.0f, 0.0f, 0.0f  
+                );
+
                 AEVec2 projPos = proj->transform.GetPosition();
                 AEVec2 projHalf = { 20.0f, 20.0f };
-
                 AEVec2 playerPos = player->GetTransform().GetPosition();
                 AEVec2 playerHalf = { 35.0f, 35.0f };
 
                 if (AABBOverlap(projPos, projHalf, playerPos, playerHalf) && !abilityHandler->Reverse()) {
                     std::cout << "OUCH! Player Hit!" << std::endl;
-                    player->TakeDamage(10);
+                    player->TakeDamage(3);
 
                     delete proj;
                     it = enemyProjs.erase(it);
@@ -147,6 +157,7 @@ void TestScene::Update() {
                 abilityHandler->TriggerAnchor();
             }
             else {
+                //SceneManager::ChangeScene(new LoseScene());
                 player->SetHealth(100);
             }
         }
@@ -165,23 +176,24 @@ void TestScene::Update() {
             for (int j = 0; j < enemyList.size(); j++) {
                 BaseEnemy* enemy = enemyList[j];
 
+                if (enemy->IsDying()) continue;
+
                 AEVec2 enemyPos = enemy->transform.GetPosition();
                 AEVec2 enemyHalf = { fabs(enemy->transform.GetScale().x) / 2.0f, enemy->transform.GetScale().y / 2.0f };
 
                 if (AABBOverlap(projPos, projHalf, enemyPos, enemyHalf)) {
-                    if (!enemy->IsReadyToDelete()) {
-                        enemy->TakeDamage();
+                    enemy->TakeDamage();
 
-                        SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
-                        if (!swordProj) {
-                            destroyProjectile = true;
-                            break;
-                        }
+                    // Check for piercing
+                    SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
+                    if (!swordProj) {
+                        destroyProjectile = true;
+                        break;
                     }
                 }
             }
 
-            // Erase the projectile
+            // Erase projectile if it hit something or ran out of time
             if (destroyProjectile || pProj->GetLifespan() <= 0.f) {
                 delete pProj;
                 it = projs.erase(it);
@@ -192,6 +204,7 @@ void TestScene::Update() {
         }
 
         for (auto it = enemyList.begin(); it != enemyList.end(); ) {
+            // This stays as IsReadyToDelete because we only delete after the fade timer ends
             if ((*it)->IsReadyToDelete()) {
                 delete* it;
                 it = enemyList.erase(it);
@@ -200,11 +213,6 @@ void TestScene::Update() {
             else {
                 ++it;
             }
-        }
-    }
-    else {
-        if (popupTimer > 0.0f) {
-            popupTimer -= dt;
         }
 
         AEVec2 CamPos;
@@ -254,6 +262,9 @@ void TestScene::Draw() {
     for (BaseEnemy* enemy : enemyList) {
         enemy->Draw();
     }
+
+    ParticleManager::GetInstance()->Draw(meshManager->GetMesh(SQUARE));
+
     if (abilityHandler) abilityHandler->Draw();
     player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 
@@ -336,6 +347,8 @@ void TestScene::Free() {
     }
     enemyList.clear();
     delete bg;
+
+    ParticleManager::GetInstance()->ClearAll();
 
     Button::FreeResources();
 }

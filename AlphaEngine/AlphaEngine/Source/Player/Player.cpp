@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "../particle/ParticleManager.h"
 
 Player::Player()
 	: input{ 0.f, 0.f }
@@ -181,7 +182,7 @@ void Player::ResolveX(AEVec2& position)
 			float px = (halfSize.x + tileHalf.x) - fabsf(dx);
 			if (px <= 0.f) continue;
 
-			// Y overlap — must overlap on both axes to be touching
+			// Y overlap ï¿½ must overlap on both axes to be touching
 			float dy = position.y - tilePos.y;
 			float py = (halfSize.y + tileHalf.y) - fabsf(dy);
 			if (py <= 0.f) continue;
@@ -246,7 +247,7 @@ void Player::ResolveY(AEVec2& position)
 				const float prevBottom = oldPosition.y - halfSize.y;
 				const float newBottom = position.y - halfSize.y;
 
-				// Horizontal overlap check — only process if the player is actually above this platform tile
+				// Horizontal overlap check ï¿½ only process if the player is actually above this platform tile
 				float dx = position.x - tilePos.x;
 				float px = (halfSize.x + tileHalf.x) - fabsf(dx);
 				if (px <= 0.f) continue;
@@ -390,10 +391,14 @@ void Player::Update(float deltaTime)
 	if (input.x != 0 && isGrounded)
 	{
 		this->PlayAnim("walk");
+		
 	}
 	else if (!isGrounded && velocity.y > 0.f)
 	{
 		this->PlayAnim("jump");
+
+		// Spawns a trail at the player's position matching the player size
+		ParticleManager::GetInstance()->SpawnTrail(GetTransform().GetPosition(), GetTransform().GetScale(), 0.3f);
 	}
 	else if (!isGrounded && velocity.y < 0.f)
 	{
@@ -408,6 +413,15 @@ void Player::Update(float deltaTime)
 	for (auto it = projectileList.begin(); it != projectileList.end(); )
 	{
 		(*it)->Update(deltaTime);
+
+		// Spawns a cyan-colored trail that follows the projectile
+		ParticleManager::GetInstance()->SpawnTrail(
+			(*it)->transform.GetPosition(),
+			(*it)->transform.GetScale(),
+			0.15f,              
+			0.0f, 1.0f, 1.0f 
+		);
+
 		if ((*it)->GetLifespan() <= 0.f)
 		{
 			delete* it;

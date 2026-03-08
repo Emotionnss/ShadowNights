@@ -24,7 +24,8 @@ public:
     void Slowed(bool active);
     bool isStopped() const;
     void isStopped(bool active);
-    
+    bool IsDying() const { return isDying; }
+
 protected:
     Sprite* sprite = nullptr;
 
@@ -40,7 +41,7 @@ protected:
     // Death Logic
     bool isDying = false;
     float deathTimer = 0.0f;
-    f32 oriDeathTimer = 1.f;
+    float oriDeathTimer = 1.0f;
 
     // Projectile Logic
     std::vector<EnemyProjectile*> enemyProjectiles;
@@ -50,8 +51,8 @@ protected:
     std::string currentAnimState = "";
     void PlayAnim(std::string name);
 
-    f32 origAnimSpeed{ 1.f };
-    f32 animSpeed{ origAnimSpeed };
+    float origAnimSpeed{ 1.f };
+    float animSpeed{ origAnimSpeed };
 
     SettingsManager* settingsManager = nullptr;
     Map* map = nullptr;

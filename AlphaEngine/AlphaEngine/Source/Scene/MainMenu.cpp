@@ -42,6 +42,11 @@ void MainMenu::Update() {
         std::cout << "Quit Pressed! Exiting..." << std::endl;
         gGameRunning = false; //shall change this if have time
     }
+
+    if (AEInputCheckTriggered(AEVK_SPACE))
+    {
+        std::cout << "Zavier Sucks!!!" << std::endl;
+    }
 }
 
 void MainMenu::Draw() {

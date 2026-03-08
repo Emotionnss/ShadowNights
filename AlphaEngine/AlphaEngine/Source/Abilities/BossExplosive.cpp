@@ -99,11 +99,6 @@ bool BossExplosive::Triggered(AEVec2 pos, AEVec2 dir)
 {
 	if (bigProjectile)
 		delete bigProjectile;
-	if (bigSprite)
-	{
-		delete bigSprite;
-		bigSprite = nullptr;
-	}
 
 	bigProjectile = new BaseProjectile(pos, dir, true);
 	bigProjectile->transform.SetScale(100.f, 100.f);

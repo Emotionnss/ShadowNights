@@ -1,6 +1,5 @@
 #include "../Player/Player.h"
 #include "../Player/Transform2D.h"
-#include "../Sprite/Sprite.h"
 #include "../System/MeshManager.h"
 #include "../Projectiles/BaseProjectile.h"
 
@@ -11,10 +10,7 @@ class BossExplosive
 {
 private:
 	BaseProjectile* bigProjectile = nullptr;
-	Sprite* bigSprite = nullptr;
-
 	std::vector <BaseProjectile*> smallProjectiles;
-	Sprite* smallSprite = nullptr;
 
 	bool active = false;
 	Player* player = nullptr;

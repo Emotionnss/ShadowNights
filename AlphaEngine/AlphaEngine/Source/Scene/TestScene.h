@@ -8,9 +8,12 @@
 #include "../Abilities/AbilityHandler.h"
 #include "../Enemy/BaseEnemy.h"
 #include "background.h"
+#include "../System/Button.h" 
 
 class TestScene : public BaseScene {
 public:
+    TestScene(int slot = 0) : loadFromSlot(slot) {}
+
     void Load() override;
     void Init() override;
     void Update() override;
@@ -18,7 +21,14 @@ public:
     void Free() override;
     void Unload() override;
 
+    // Save/Load System Helpers
+    void SaveGame(int slot);
+    void LoadGame(int slot);
+    bool FileExists(int slot);
+
 private:
+    int loadFromSlot = 0;
+
     Player* player = nullptr;
     AbilityHandler* abilityHandler = nullptr;
     MeshManager* meshManager = nullptr;
@@ -27,4 +37,21 @@ private:
     Background* bg;
 
     std::vector<BaseEnemy*> enemyList;
+
+    // Menu States & Timers
+    bool isPaused = false;
+    int menuPage = 0; // 0 = Main Pause, 1 = Save Menu, 2 = Load Menu
+    float popupTimer = 0.0f;
+
+    // Main Menu Buttons
+    Button* btnResume = nullptr;
+    Button* btnSaveMenu = nullptr;
+    Button* btnLoadMenu = nullptr;
+    Button* btnExit = nullptr;
+
+    // Slot Menu Buttons
+    Button* btnSlot1 = nullptr;
+    Button* btnSlot2 = nullptr;
+    Button* btnSlot3 = nullptr;
+    Button* btnBack = nullptr;
 };

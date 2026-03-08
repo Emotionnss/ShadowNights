@@ -22,25 +22,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     if (AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL) == 0) {
         return 0;
     }
-   // _CrtSetBreakAlloc(8067);
 
     //Init settings
     std::vector<std::string> settingsInfo = CSVManager::ReadSettingsInfo();
     SettingsManager* sManager = SettingsManager::GetInstance(settingsInfo);
 
-    // 2. Set Scene
     SceneManager::ChangeScene(new MainMenu());
 
-    // 3. Game Loop
     while (gGameRunning) {
 
         AESysFrameStart();
 
-        // check if forcing the application to quit
-        if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
+        if (0 == AESysDoesWindowExist())
             gGameRunning = false;
 
-        //Check inputs for settings
         sManager->CheckSettingsInputs();
 
         SceneManager::Update();

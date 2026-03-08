@@ -13,46 +13,67 @@ enum class BOSS_STATE
     DEATH
 };
 
+struct Weakpoint
+{
+    Transform2D transform;
+    AEVec2 lerpVector{};
+    f32 maxY = 0.0f;
+    f32 minY = 0.0f;
+    s32 dir = 1;    //1 to go up, -1 to go down
+    AEGfxTexture* tex = nullptr;
+    bool active = false;
+};
+
 class BossEnemy : public BaseEnemy
 {
 public:
     BossEnemy();
     ~BossEnemy() override;
 
-    void Init(float x, float y, float w, float h, std::string spriteName) override;
-    void Update(float deltaTime) override;
+    void Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName) override;
+    void Update(f32 deltaTime) override;
     void Draw() override;
 
+    Weakpoint GetWeakpoint() const;
+
 private:
+    Weakpoint weakpoint;
+
     //FSM Variables
     BOSS_STATE currentBossState = BOSS_STATE::SPAWNING;
-    float timer{1.0f};
+    f32 timer{1.0f};
     AEVec2 targetPos{};
     AEVec2 minCoordLimit{}, maxCoordLimit{};
 
     //Const timer nums
-    const float idleTimer = 4.0f;
-    const float exhaustedTimer = 6.0f;
-    const float deathTimer = 1.0f;
+    const f32 idleTimer = 4.0f;
+    const f32 exhaustedTimer = 15.0f;
+    const f32 deathTimer = 1.0f;
 
     //FSM Functions
-    void EnemyFSM(float deltaTime);
+    void EnemyFSM(f32 deltaTime);
     void EnterIdling();
     void EnterMoving();
-    bool UpdateMoving(float deltaTime);
+    bool UpdateMoving(f32 deltaTime);
     void EnterExhausted();
     void EnterDeath();
-    bool UpdateTimer(float deltaTime);
+    bool UpdateTimer(f32 deltaTime);
+
+    void ActivateWeakpoint();
+    void UpdateWeakpoint(f32 deltaTime);
 
     // Attack Logic
     bool isAttacking = false;
-    float attackTimer = 0.0f;
-    float originalTimer = 1.0f;
+    f32 attackTimer = 0.0f;
+    f32 originalTimer = 1.0f;
     bool hasFired = false;
 
     // Aggro Logic
     bool isAggroed = false;
     bool isSurprised = false;
-    float surpriseTimer = 0.0f;
+    f32 surpriseTimer = 0.0f;
+
+    u32 stateCounter;
+    u32 maxStateCounter = 3;
 };
 

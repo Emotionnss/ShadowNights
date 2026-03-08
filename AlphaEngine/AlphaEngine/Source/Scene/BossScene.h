@@ -8,6 +8,7 @@
 #include "../Abilities/AbilityHandler.h"
 #include "../Enemy/BaseEnemy.h" 
 #include "../Enemy/BossEnemy.h"
+#include "../Scene/Background.h"
 
 class BossScene : public BaseScene {
 public:
@@ -25,6 +26,8 @@ private:
     Map* map = nullptr;
 
     BossEnemy* boss = nullptr;
+
+    Background* bg;
 
     std::vector<BaseEnemy*> enemyList;
 };

@@ -86,6 +86,13 @@ void TestScene::Update() {
 		SceneManager::ChangeScene(new TestScene2());
 	}
 
+	//Delete later
+	if (AEInputCheckTriggered(AEVK_0))
+	{
+		SceneManager::ChangeScene(new BossScene());
+	}
+
+
 	// N***A enemy projectile
 	for (BaseEnemy* enemy : enemyList)
 	{

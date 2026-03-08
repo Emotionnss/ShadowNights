@@ -81,7 +81,7 @@ void TestScene::Update() {
 	}
 
 	// Change scene when player collides with an open door
-	if (player->GetCollidedTile().tileType == TILE_TYPE::OPEN_DOOR)
+	if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR)
 	{
 		SceneManager::ChangeScene(new TestScene2());
 	}

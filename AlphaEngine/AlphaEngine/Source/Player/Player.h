@@ -46,8 +46,11 @@ public:
 	void SetHealth(float val);
 	f32 GetHealth();
 
-	void SetCollidedTile(const Tile variable);
-	Tile GetCollidedTile();
+	void SetCollidedXTile(const Tile variable);
+	Tile GetCollidedXTile();
+
+	void SetCollidedYTile(const Tile variable);
+	Tile GetCollidedYTile();
 
 	std::vector<BaseProjectile*> GetProjectileList() { return projectileList; }
 
@@ -55,10 +58,12 @@ public:
 
 	Sprite* GetSprite() const;
 private:
+	void AimRotation();
+
 	Transform2D healthbar;
 
 	enum Direction { LEFT = -1, RIGHT = 1, IDLE = 0 };
-	Direction playerDirection = IDLE;
+	Direction playerDirection = RIGHT;
 
 	AEVec2 input;
 	bool isGrounded;
@@ -71,7 +76,7 @@ private:
 
 	Map* map;
 
-	Tile collidedTile;
+	Tile collidedXTile, collidedYTile;
 protected:
 	std::string currentAnimState = "";
 	void PlayAnim(std::string name);

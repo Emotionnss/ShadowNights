@@ -3,7 +3,8 @@
 Player::Player()
 	: input{ 0.f, 0.f }
 	, map{ Map::GetInstance() }
-	, collidedTile{ }
+	, collidedXTile{ Tile{} }
+	, collidedYTile{ Tile{} }
 	, speed{ 4000.f }
 	, maxHP{ 100.f }
 	, currentHP{ maxHP }
@@ -56,14 +57,23 @@ f32 Player::GetHealth()
 	return currentHP;
 }
 
-void Player::SetCollidedTile(const Tile variable)
+void Player::SetCollidedXTile(const Tile variable)
 {
-	collidedTile = variable;
+	collidedXTile = variable;
 }
 
-Tile Player::GetCollidedTile()
+Tile Player::GetCollidedXTile()
 {
-	return collidedTile;
+	return collidedXTile;
+}
+
+void Player::SetCollidedYTile(const Tile variable)
+{
+	collidedYTile = variable;
+}
+Tile Player::GetCollidedYTile()
+{
+	return collidedYTile;
 }
 
 Sprite* Player::GetSprite() const
@@ -159,7 +169,6 @@ void Player::ResolveX(AEVec2& position)
 
 			// Ignore tile if it's platform
 			if (type == TILE_TYPE::BACKGROUND ||
-				type == TILE_TYPE::FLOOR ||
 				type == TILE_TYPE::LEFT_PLATFORM ||
 				type == TILE_TYPE::PLATFORM ||
 				type == TILE_TYPE::RIGHT_PLATFORM)
@@ -177,7 +186,7 @@ void Player::ResolveX(AEVec2& position)
 			float py = (halfSize.y + tileHalf.y) - fabsf(dy);
 			if (py <= 0.f) continue;
 
-			SetCollidedTile(tile);
+			SetCollidedXTile(tile);
 
 			// Push Out Player
 			if ((dx > 0.f && GetVelocity().x < 0.f) ||
@@ -253,11 +262,10 @@ void Player::ResolveY(AEVec2& position)
 					position.y = surfaceY + halfSize.y;
 					SetVelocity(GetVelocity().x, 0.f);
 					isGrounded = true;
-					SetCollidedTile(tile);
+					SetCollidedYTile(tile);
 				}
 				continue;
 			}
-
 			/*
 			if (type == TILE_TYPE::FLOOR)
 			{
@@ -279,7 +287,7 @@ void Player::ResolveY(AEVec2& position)
 					position.y = tileTop + halfSize.y;
 					SetVelocity(GetVelocity().x, 0.f);
 					isGrounded = true;
-					SetCollidedTile(tile);
+					SetCollidedYTile(tile);
 				}
 				continue;
 			}
@@ -294,7 +302,7 @@ void Player::ResolveY(AEVec2& position)
 			float py = (halfSize.y + tileHalf.y) - fabsf(dy);
 			if (py <= 0.f) continue;
 
-			SetCollidedTile(tile);
+			SetCollidedYTile(tile);
 
 			// Push out player
 			if ((dy > 0.f && GetVelocity().y < 0.f) ||
@@ -308,9 +316,38 @@ void Player::ResolveY(AEVec2& position)
 	}
 }
 
+void Player::AimRotation()
+{
+	s32 xDir, yDir;
+	AEInputGetCursorPosition(&xDir, &yDir);
+	AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
+
+	AEVec2 playerDir = ScreenToWorldPos(mousePos);
+	AEVec2Normalize(&playerDir, &playerDir);
+
+	switch (playerDirection)
+	{
+	case LEFT:
+		if (playerDir.x > 0)
+		{
+			playerDirection = RIGHT;
+			transform.SetScale(-transform.GetScale().x, transform.GetScale().y);
+		}
+		break;
+	case RIGHT:
+		if (playerDir.x < 0)
+		{
+			playerDirection = LEFT;
+			transform.SetScale(-transform.GetScale().x, transform.GetScale().y);
+		}
+		break;
+	}
+}
+
 void Player::Update(float deltaTime)
 {
 	HandleInput(); // Handle Input Internally
+	AimRotation();
 	AEVec2 currentForces{ 0.f, gravity }; // Acceleration
 
 	// Check For X Input
@@ -430,19 +467,44 @@ void Player::Draw(AEGfxVertexList* mesh)
 	if (SettingsManager::GetInstance()->GetPlayerColDebug())
 	{
 		AEGfxVertexList* squareMesh = MeshManager::GetInstance()->GetMesh(SQUARE);
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-		AEGfxSetColorToAdd(0.25f, 0.75f, 0.25f, 1.f);
-		AEGfxSetColorToMultiply(0.0f, 0.5f, 0.0f, 1.f);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		// Draw For X Collision
 
-		//Create transform
-		Transform2D tileTransform{ GetCollidedTile().transform };
+		if (collidedXTile.tileType != TILE_TYPE::NONE)
+		{
+			Transform2D tileXTransform{ GetCollidedXTile().transform };
+			AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-		tileTransform.SetScale(tileTransform.GetScale().x + 10.f, tileTransform.GetScale().y + 10.f);
+			AEGfxSetColorToAdd(0.25f, 0.75f, 0.25f, 1.f);
+			AEGfxSetColorToMultiply(0.0f, 0.5f, 0.0f, 1.f);
+			AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 
-		AEGfxSetTransform(tileTransform.GetMatrix().m);
-		AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
+			//Create transform
+
+			tileXTransform.SetScale(tileXTransform.GetScale().x + 10.f, tileXTransform.GetScale().y + 10.f);
+
+			AEGfxSetTransform(tileXTransform.GetMatrix().m);
+			AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
+		}
+
+		if (collidedYTile.tileType != TILE_TYPE::NONE)
+		{
+			// Draw For Y Collision
+			//AEGfxVertexList* squareMesh = MeshManager::GetInstance()->GetMesh(SQUARE);
+			AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+
+			AEGfxSetColorToAdd(0.25f, 0.75f, 0.25f, 1.f);
+			AEGfxSetColorToMultiply(0.0f, 0.5f, 0.0f, 1.f);
+			AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
+			//Create transform
+			Transform2D tileYTransform{ GetCollidedYTile().transform };
+
+			tileYTransform.SetScale(tileYTransform.GetScale().x + 10.f, tileYTransform.GetScale().y + 10.f);
+
+			AEGfxSetTransform(tileYTransform.GetMatrix().m);
+			AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
+		}
 	}
 
 	DrawHealthBar(mesh, currentHP, healthbar);

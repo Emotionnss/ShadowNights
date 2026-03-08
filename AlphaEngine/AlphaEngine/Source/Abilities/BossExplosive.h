@@ -30,4 +30,3 @@ public:
 	bool Triggered(AEVec2 pos, AEVec2 dir);
 	void Explode(AEVec2 origin);
 };
-

@@ -409,14 +409,6 @@ void Map::SetSpawnpoint(AEVec2 spawnpoint)
 
 void Map::CleanAStarLists()
 {
-	/*while (!openList.empty())
-	{
-		Node* node = openList.top();
-		delete node;
-		node = nullptr;
-		openList.pop();
-	}*/
-
 	for (Node* node : openList)
 	{
 		if (node != nullptr)

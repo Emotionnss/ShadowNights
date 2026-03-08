@@ -15,6 +15,9 @@ void BossScene::Load() {
     map = Map::GetInstance();
     player = Player::GetInstance();
 
+    bg = new Background;
+    bg->SetStatic(true);
+
     map->LoadMap("Level2");
 }
 
@@ -24,7 +27,6 @@ void BossScene::Init() {
 
     boss = new BossEnemy();
     boss->Init(1400.f, 300.0f, 85.0f, 60.0f, "boss");
-    enemyList.push_back(boss);
 }
 
 void BossScene::Update() {
@@ -38,6 +40,8 @@ void BossScene::Update() {
     for (BaseEnemy* enemy : enemyList) {
         enemy->Update(dt);
     }
+
+    boss->Update(dt);
 
     //Go back to main menu
     /*if (player->GetCollidedTile().tileType == TILE_TYPE::BACKGROUND && enemyList.size() == 0)
@@ -110,6 +114,24 @@ void BossScene::Update() {
             }
         }
 
+        Transform2D bossWeakpointTransform = boss->GetWeakpoint().transform;
+        AEVec2 bossWeakpointHalf = { fabs(bossWeakpointTransform.GetScale().x) / 2.0f, bossWeakpointTransform.GetScale().y / 2.0f };
+
+        if (AABBOverlap(projPos, projHalf, bossWeakpointTransform.GetPosition(), bossWeakpointHalf))
+        {
+            if (!boss->IsReadyToDelete())
+            {
+                boss->TakeDamage();
+
+                SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
+                if (!swordProj)
+                {
+                    destroyProjectile = true;
+                    break;
+                }
+            }
+        }
+
         // erase the projectile (zav is gay)
         if (destroyProjectile || pProj->GetLifespan() <= 0.f)
         {
@@ -141,6 +163,8 @@ void BossScene::Update() {
 void BossScene::Draw() {
     AEGfxSetBackgroundColor(0.4f, 0.4f, 0.4f);
 
+    bg->Draw(meshManager->GetMesh(TEXTURE_SQUARE));
+
     if (boss != nullptr)
         boss->Draw();
 
@@ -165,6 +189,8 @@ void BossScene::Free() {
         delete enemy;
     }
     enemyList.clear();
+    delete boss;
+    delete bg;
 }
 
 void BossScene::Unload()

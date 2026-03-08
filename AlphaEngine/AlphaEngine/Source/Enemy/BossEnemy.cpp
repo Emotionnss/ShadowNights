@@ -1,6 +1,7 @@
 #include "BossEnemy.h"
 #include "../System/Map.h"
 #include "../Player/Player.h"
+#include "../System/MeshManager.h"
 #include <cmath>
 #include <algorithm>
 
@@ -10,11 +11,14 @@ BossEnemy::BossEnemy() : BaseEnemy()
 
 BossEnemy::~BossEnemy()
 {
+    AEGfxTextureUnload(weakpoint.tex);
 }
 
-void BossEnemy::Init(float x, float y, float w, float h, std::string spriteName)
+void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
 {
     BaseEnemy::Init(x, y, w, h, spriteName);
+
+    deathAnimName = "death";
 
     //variables
     isAttacking = false;
@@ -25,10 +29,13 @@ void BossEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     isSurprised = false;
     surpriseTimer = 0.0f;
 
-    transform.SetScale(400, 400);
+    transform.SetScale(400.f, 400.f);
+    
+    weakpoint.tex = AEGfxTextureLoad("Assets/Sprites/pearl_01c.png");
+    weakpoint.transform.SetScale(100.f, 100.f);
 }
 
-void BossEnemy::Update(float deltaTime)
+void BossEnemy::Update(f32 deltaTime)
 {
     // BaseEnemy handles Projectiles and Death animations
     BaseEnemy::Update(deltaTime);
@@ -54,16 +61,30 @@ void BossEnemy::Update(float deltaTime)
     if (dx > 0) transform.SetScale(visualWidth, visualHeight);
     else        transform.SetScale(-visualWidth, visualHeight);
 
-
     if (sprite) sprite->Update();
 }
 
 void BossEnemy::Draw()
 {
     BaseEnemy::Draw();
+
+    if (weakpoint.active)
+    {
+        AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+        AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+        AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+        AEGfxSetTransparency(1.0f);
+
+        AEGfxTextureSet(weakpoint.tex, 0, 0);
+        AEGfxSetTransform(weakpoint.transform.GetMatrix().m);
+        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+    }
 }
 
-void BossEnemy::EnemyFSM(float deltaTime)
+void BossEnemy::EnemyFSM(f32 deltaTime)
 {
     switch (currentBossState)
     {
@@ -89,11 +110,18 @@ void BossEnemy::EnemyFSM(float deltaTime)
         }
         break;
     case BOSS_STATE::EXHAUSTED:
+        UpdateWeakpoint(deltaTime);
         if (UpdateTimer(deltaTime))
         {
             EnterMoving();
+            weakpoint.active = false;
         }
         break;
+    }
+
+    if (stateCounter == maxStateCounter)
+    {
+        EnterExhausted();
     }
 
     //Enter exhaustion mode thru some means idk yet
@@ -110,6 +138,7 @@ void BossEnemy::EnterIdling()
 {
     currentBossState = BOSS_STATE::IDLING;
     timer = idleTimer;
+    ++stateCounter;
 }
 
 void BossEnemy::EnterMoving()
@@ -122,17 +151,18 @@ void BossEnemy::EnterMoving()
 
     //Get vector from target to current pos;
     AEVec2 currentPos = transform.GetPosition();
-    float dx = targetPos.x - currentPos.x;
-    float dy = targetPos.y - currentPos.y;
-    float dist = sqrt(dx * dx + dy * dy);
+    f32 dx = targetPos.x - currentPos.x;
+    f32 dy = targetPos.y - currentPos.y;
+    f32 dist = sqrt(dx * dx + dy * dy);
 
-    float dirX = dx / dist;
-    float dirY = dy / dist;
+    f32 dirX = dx / dist;
+    f32 dirY = dy / dist;
 
     velocity = { dirX * moveSpeed, dirY * moveSpeed };
+    ++stateCounter;
 }
 
-bool BossEnemy::UpdateMoving(float deltaTime)
+bool BossEnemy::UpdateMoving(f32 deltaTime)
 {
     //Update boss to move towards waypoint
     AEVec2 position = transform.GetPosition();
@@ -155,8 +185,10 @@ void BossEnemy::EnterExhausted()
     currentBossState = BOSS_STATE::EXHAUSTED;
 
     //Enable weakpoint or smth idk
+    ActivateWeakpoint();
 
     timer = exhaustedTimer;
+    stateCounter = 0;
 }
 
 void BossEnemy::EnterDeath()
@@ -177,4 +209,42 @@ bool BossEnemy::UpdateTimer(float deltaTime)
     }
 
     return false;
+}
+
+void BossEnemy::ActivateWeakpoint()
+{
+    weakpoint.active = true;
+    weakpoint.dir = 1;
+    AEVec2 currentPos = transform.GetPosition();
+    weakpoint.transform.SetPosition(currentPos);
+    weakpoint.maxY = currentPos.y + 5.f;
+    weakpoint.minY = currentPos.y - 5.f;
+    weakpoint.lerpVector = { currentPos.x, weakpoint.maxY + 2.f };
+}
+
+void BossEnemy::UpdateWeakpoint(f32 deltaTime)
+{
+    AEVec2 pos = weakpoint.transform.GetPosition();
+
+    if (pos.y >= weakpoint.maxY)
+    {
+        weakpoint.dir = -1;
+        weakpoint.lerpVector = { pos.x, weakpoint.minY - 2.f };
+    }
+    else if (pos.y <= weakpoint.minY)
+    {
+        weakpoint.dir = 1;
+        weakpoint.lerpVector = { pos.x, weakpoint.maxY + 2.f };
+    }
+
+    //pos.y += weakpoint.dir * 25.f * deltaTime;
+
+    AEVec2Lerp(&pos, &pos, &weakpoint.lerpVector, deltaTime);
+
+    weakpoint.transform.SetPosition(pos.x, pos.y);
+}
+
+Weakpoint BossEnemy::GetWeakpoint() const
+{
+    return weakpoint;
 }

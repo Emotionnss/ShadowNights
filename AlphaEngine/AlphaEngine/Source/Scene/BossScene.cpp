@@ -7,6 +7,8 @@
 #include "../Enemy/ShadowEnemy.h"
 #include "../Enemy/BatEnemy.h"
 #include "../Enemy/ArcherEnemy.h"
+#include "../particle/ParticleManager.h"
+#include "WinScene.h"
 
 
 void BossScene::Load() {
@@ -42,6 +44,8 @@ void BossScene::Update() {
     }
 
     boss->Update(dt);
+
+    ParticleManager::GetInstance()->Update(dt);
 
     //Go back to main menu
     /*if (player->GetCollidedTile().tileType == TILE_TYPE::BACKGROUND && enemyList.size() == 0)
@@ -158,6 +162,13 @@ void BossScene::Update() {
             ++it;
         }
     }
+
+    if (boss && boss->IsReadyToDelete())
+    {
+        SceneManager::ChangeScene(new WinScene());
+        return;
+    }
+
 }
 
 void BossScene::Draw() {
@@ -178,6 +189,10 @@ void BossScene::Draw() {
    /* for (BaseEnemy* enemy : enemyList) {
         enemy->Draw();
     }*/
+
+    ParticleManager::GetInstance()->Draw(meshManager->GetMesh(SQUARE));
+
+    player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 }
 
 void BossScene::Free() {
@@ -191,6 +206,7 @@ void BossScene::Free() {
     enemyList.clear();
     delete boss;
     delete bg;
+    ParticleManager::GetInstance()->ClearAll();
 }
 
 void BossScene::Unload()

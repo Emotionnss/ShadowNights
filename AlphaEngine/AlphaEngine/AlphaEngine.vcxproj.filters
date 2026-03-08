@@ -38,6 +38,7 @@
     <ClCompile Include="Source\Scene\Background.cpp" />
     <ClCompile Include="Source\particle\ParticleManager.cpp" />
     <ClCompile Include="Source\Scene\LoseScene.cpp" />
+    <ClCompile Include="Source\Scene\WinScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Abilities\BossExplosive.h" />
@@ -78,5 +79,6 @@
     <ClInclude Include="Source\Scene\Background.h" />
     <ClInclude Include="Source\particle\ParticleManager.h" />
     <ClInclude Include="Source\Scene\LoseScene.h" />
+    <ClInclude Include="Source\Scene\WinScene.h" />
   </ItemGroup>
 </Project>

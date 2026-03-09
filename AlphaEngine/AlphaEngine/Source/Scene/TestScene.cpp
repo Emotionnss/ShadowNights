@@ -126,12 +126,12 @@ void TestScene::Update() {
             for (auto it = enemyProjs.begin(); it != enemyProjs.end(); ) {
                 EnemyProjectile* proj = *it;
 
-                
+
                 ParticleManager::GetInstance()->SpawnTrail(
                     proj->transform.GetPosition(),
-                    { 15.0f, 15.0f }, 
-                    0.2f,             
-                    1.0f, 0.0f, 0.0f  
+                    { 15.0f, 15.0f },
+                    0.2f,
+                    1.0f, 0.0f, 0.0f
                 );
 
                 AEVec2 projPos = proj->transform.GetPosition();
@@ -215,6 +215,8 @@ void TestScene::Update() {
             }
         }
 
+    }
+    else{
         AEVec2 CamPos;
         AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
 
@@ -224,7 +226,10 @@ void TestScene::Update() {
             btnLoadMenu->SetPosition(CamPos.x, CamPos.y - 40.0f);
             btnExit->SetPosition(CamPos.x, CamPos.y - 110.0f);
 
-            if (btnResume->IsClicked()) isPaused = false;
+            if (btnResume->IsClicked()) { 
+                isPaused = false; 
+				std::cout << "Game Resumed!" << std::endl;
+            }
             if (btnSaveMenu->IsClicked()) {
                 menuPage = 1;
                 btnSlot1->SetLabel(FileExists(1) ? "Slot 1 (Used)" : "Slot 1 (Empty)");

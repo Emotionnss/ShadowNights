@@ -118,20 +118,24 @@ void BossScene::Update() {
             }
         }
 
-        Transform2D bossWeakpointTransform = boss->GetWeakpoint().transform;
-        AEVec2 bossWeakpointHalf = { fabs(bossWeakpointTransform.GetScale().x) / 2.0f, bossWeakpointTransform.GetScale().y / 2.0f };
-
-        if (AABBOverlap(projPos, projHalf, bossWeakpointTransform.GetPosition(), bossWeakpointHalf))
+        //Only update if its active
+        if (boss->GetWeakpoint().active)
         {
-            if (!boss->IsReadyToDelete())
-            {
-                boss->TakeDamage();
+            Transform2D bossWeakpointTransform = boss->GetWeakpoint().transform;
+            AEVec2 bossWeakpointHalf = { fabs(bossWeakpointTransform.GetScale().x) / 2.0f, bossWeakpointTransform.GetScale().y / 2.0f };
 
-                SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
-                if (!swordProj)
+            if (AABBOverlap(projPos, projHalf, bossWeakpointTransform.GetPosition(), bossWeakpointHalf))
+            {
+                if (!boss->IsReadyToDelete())
                 {
-                    destroyProjectile = true;
-                    break;
+                    boss->TakeDamage();
+
+                    SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
+                    if (!swordProj)
+                    {
+                        destroyProjectile = true;
+                        break;
+                    }
                 }
             }
         }

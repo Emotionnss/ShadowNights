@@ -13,6 +13,7 @@
 #include "../Enemy/ArcherEnemy.h"
 #include "../particle/ParticleManager.h"
 #include "LoseScene.h"
+#include "../System/SettingsManager.h"
 
 void TestScene::Load() {
     AEGfxReset();
@@ -89,6 +90,12 @@ void TestScene::Update() {
     if (AEInputCheckTriggered(AEVK_ESCAPE)) {
         isPaused = !isPaused;
         menuPage = 0;
+    }
+
+	//debug toggle for pathfinding lines
+    if (AEInputCheckTriggered(AEVK_P)) {
+        bool currentState = SettingsManager::GetInstance()->GetPathDebug();
+        SettingsManager::GetInstance()->SetPathDebug(!currentState);
     }
 
     f32 dt = (f32)AEFrameRateControllerGetFrameTime();
@@ -217,7 +224,7 @@ void TestScene::Update() {
 
     }
     else{
-        AEVec2 CamPos;
+        AEVec2 CamPos = { 0.0f, 0.0f };;
         AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
 
         if (menuPage == 0) {
@@ -274,7 +281,7 @@ void TestScene::Draw() {
     player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 
     if (isPaused) {
-        AEVec2 CamPos;
+        AEVec2 CamPos = { 0.0f, 0.0f };;
         AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
 
         AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -335,7 +342,7 @@ void TestScene::LoadGame(int slot) {
     }
 }
 
-bool TestScene::FileExists(int slot) {
+bool TestScene::FileExists(int slot) const {
     std::ifstream f("save_slot_" + std::to_string(slot) + ".txt");
     return f.good();
 }

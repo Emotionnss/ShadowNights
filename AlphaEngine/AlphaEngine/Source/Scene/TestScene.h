@@ -23,7 +23,7 @@ public:
 
     void SaveGame(int slot);
     void LoadGame(int slot);
-    bool FileExists(int slot);
+    bool FileExists(int slot) const;
 
 private:
     int loadFromSlot = 0;
@@ -32,8 +32,8 @@ private:
     AbilityHandler* abilityHandler = nullptr;
     MeshManager* meshManager = nullptr;
     Map* map = nullptr;
-    AEVec2 DoorTilePosition;
-    Background* bg;
+    AEVec2 DoorTilePosition = { 0.0f, 0.0f };
+    Background* bg = nullptr;
 
     std::vector<BaseEnemy*> enemyList;
 

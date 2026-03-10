@@ -63,7 +63,7 @@ void BaseEnemy::TakeDamage()
     }
 }
 
-bool BaseEnemy::IsReadyToDelete()
+bool BaseEnemy::IsReadyToDelete() const
 {
     return isDying && (deathTimer <= 0.0f);
 }

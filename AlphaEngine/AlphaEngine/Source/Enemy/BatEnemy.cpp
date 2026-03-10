@@ -23,15 +23,18 @@ void BatEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     startY = y;
 
     isAwake = false;
-    moveSpeed = 150.0f; 
+    moveSpeed = 150.0f;
 
     PlayAnim("batidle");
 }
 
 void BatEnemy::Update(float deltaTime)
 {
-    BaseEnemy::Update(deltaTime);
+    if (AEInputCheckTriggered(AEVK_P)) {
+        showDebugPath = !showDebugPath;
+    }
 
+    BaseEnemy::Update(deltaTime);
     if (stopped || isDying) return;
 
     // --- BAT AI ---
@@ -45,6 +48,8 @@ void BatEnemy::Update(float deltaTime)
 
     float visualWidth = fabs(transform.GetScale().x);
     float visualHeight = transform.GetScale().y;
+
+    map = Map::GetInstance();
 
     // --- STATE MACHINE ---
     if (!isAwake)
@@ -69,19 +74,63 @@ void BatEnemy::Update(float deltaTime)
         }
         else
         {
-            float dirX = dx / dist;
-            float dirY = dy / dist;
+            // A* PATHFINDING LOGIC
+            //RECALCULATE PATH PERIODICALLY
+            pathTimer -= deltaTime;
+            if (pathTimer <= 0.0f)
+            {
+                Node targetNode;
+                AEVec2 minLimits = { 0.0f, 0.0f };
+                AEVec2 maxLimits = { static_cast<float>(map->GetNumCol() - 1),
+                                     static_cast<float>(map->GetNumRow() - 1) };
 
-            velocity.x = dirX * moveSpeed;
-            velocity.y = dirY * moveSpeed;
+                // Run your A* logic
+                if (map->GeneratePath(myPos, playerPos, minLimits, maxLimits, targetNode))
+                {
+                    map->BuildPath(path, targetNode);
+                    pathIndex = 0; // Reset to the first node in the new path
+                }
 
+                pathTimer = 0.5f; // Wait 0.5 seconds before recalculating
+            }
+
+            //MOVE ALONG THE PATH
+            if (!path.empty() && pathIndex < path.size())
+            {
+                AEVec2 targetWaypoint = path[pathIndex];
+
+                float wpDx = targetWaypoint.x - myPos.x;
+                float wpDy = targetWaypoint.y - myPos.y;
+                float wpDist = sqrt(wpDx * wpDx + wpDy * wpDy);
+
+                // If we are close enough to the waypoint target the next one
+                if (wpDist < 10.0f)
+                {
+                    pathIndex++;
+                }
+                else
+                {
+                    velocity.x = (wpDx / wpDist) * moveSpeed;
+                    velocity.y = (wpDy / wpDist) * moveSpeed;
+                }
+            }
+            else
+            {
+                // Fallback: If no path is found, just fly straight at the player
+                float dirX = dx / dist;
+                float dirY = dy / dist;
+                velocity.x = dirX * moveSpeed;
+                velocity.y = dirY * moveSpeed;
+            }
+
+            //SPRITE FACING AND SHOOTING
             if (velocity.x > 0) transform.SetScale(-visualWidth, visualHeight);
             else                transform.SetScale(visualWidth, visualHeight);
 
             shootTimer -= deltaTime;
             if (shootTimer <= 0.0f)
             {
-                Shoot();               
+                Shoot();
                 shootTimer = 2.0f;
             }
         }
@@ -97,7 +146,6 @@ void BatEnemy::Update(float deltaTime)
 
     AEVec2 halfSize{ colliderWidth / 2.f, colliderHeight / 2.f };
 
-    Map* map = Map::GetInstance();
     float left = position.x - halfSize.x;
     float right = position.x + halfSize.x;
     float bottom = position.y - halfSize.y;

@@ -18,7 +18,7 @@ public:
     virtual void Draw();
 
     virtual void TakeDamage();
-    bool IsReadyToDelete();
+    bool IsReadyToDelete() const;
     std::vector<EnemyProjectile*>& GetProjectiles() { return enemyProjectiles; }
     bool Slowed() const;
     void Slowed(bool active);

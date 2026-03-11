@@ -205,10 +205,8 @@ void Player::ResolveY(AEVec2& position)
 	const float  tileSizeHalf = map->GetTileSize() * 0.5f;
 	const AEVec2 tileHalf{ tileSizeHalf, tileSizeHalf };
 
-	// oldPosition holds the player centre from the START of this frame
-	// (before any velocity was applied). Used for the one-way surface
-	// "was-above" check.
-	const AEVec2 oldPosition = GetTransform().GetPosition();
+
+	const AEVec2 oldPosition = GetTransform().GetPosition(); // Should change this
 
 	isGrounded = false;
 
@@ -228,7 +226,6 @@ void Player::ResolveY(AEVec2& position)
 				continue;
 
 			Tile& tile = map->GetMap()[y][x];
-
 			TILE_TYPE type = tile.tileType;
 			if (!map->CheckTile(tile.tileType) || type == TILE_TYPE::BACKGROUND)
 				continue;
@@ -469,7 +466,6 @@ void Player::Draw(AEGfxVertexList* mesh)
 		AEGfxVertexList* squareMesh = MeshManager::GetInstance()->GetMesh(SQUARE);
 
 		// Draw For X Collision
-
 		if (collidedXTile.tileType != TILE_TYPE::NONE)
 		{
 			Transform2D tileXTransform{ GetCollidedXTile().transform };
@@ -487,9 +483,9 @@ void Player::Draw(AEGfxVertexList* mesh)
 			AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
 		}
 
+		// Draw For Y Collision
 		if (collidedYTile.tileType != TILE_TYPE::NONE)
 		{
-			// Draw For Y Collision
 			//AEGfxVertexList* squareMesh = MeshManager::GetInstance()->GetMesh(SQUARE);
 			AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 

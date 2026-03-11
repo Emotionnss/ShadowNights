@@ -92,12 +92,6 @@ void TestScene::Update() {
         menuPage = 0;
     }
 
-	//debug toggle for pathfinding lines
-    if (AEInputCheckTriggered(AEVK_P)) {
-        bool currentState = SettingsManager::GetInstance()->GetPathDebug();
-        SettingsManager::GetInstance()->SetPathDebug(!currentState);
-    }
-
     f32 dt = (f32)AEFrameRateControllerGetFrameTime();
 
     if (!isPaused) {

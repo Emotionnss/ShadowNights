@@ -198,7 +198,7 @@ void BossEnemy::EnterDeath()
     sprite->PlayAnimation("death", 1, deathTimer);
 }
 
-bool BossEnemy::UpdateTimer(float deltaTime)
+bool BossEnemy::UpdateTimer(f32 deltaTime)
 {
     timer -= deltaTime;
 

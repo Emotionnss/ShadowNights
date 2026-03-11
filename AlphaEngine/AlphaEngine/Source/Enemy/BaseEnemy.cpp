@@ -39,8 +39,12 @@ void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     moveSpeed = originalSpeed;
     velocity = { moveSpeed, 0.0f };
     isGrounded = false;
+    
+    // Initialize Death Variables
     isDying = false;
+    oriDeathTimer = 1.0f;
     deathTimer = 0.0f;
+
     currentAnimState = "";
     origAnimSpeed = 1.f;
     animSpeed = origAnimSpeed;
@@ -52,67 +56,23 @@ void BaseEnemy::TakeDamage()
     {
         isDying = true;
         velocity = { 0.0f, 0.0f };
-        //deathTimer = 1.0f;
-        PlayAnim(deathAnimName); // Use the variable instead of the hardcoded string!
+        
+        deathTimer = oriDeathTimer; 
+
+        PlayAnim(deathAnimName); 
     }
 }
 
-bool BaseEnemy::IsReadyToDelete()
+bool BaseEnemy::IsReadyToDelete() const
 {
     return isDying && (deathTimer <= 0.0f);
-}
-
-bool BaseEnemy::Slowed() const
-{
-    return slowed;
-}
-
-void BaseEnemy::Slowed(bool active)
-{
-    slowed = active;
-    switch (slowed)
-    {
-    case true:
-        if(!isDying)
-            deathTimer = oriDeathTimer * 10.f;
-        animSpeed = animSpeed * 10.f;
-        moveSpeed = originalSpeed / 10.f;
-        break;
-    case false:
-        if (!isDying)
-            deathTimer = oriDeathTimer;
-        moveSpeed = originalSpeed;
-        animSpeed = origAnimSpeed;
-        break;
-    }
-}
-
-bool BaseEnemy::isStopped() const
-{
-    return stopped;
-}
-
-void BaseEnemy::isStopped(bool active)
-{
-    stopped = active;
-}
-
-void BaseEnemy::Shoot()
-{
-    float dirX = (transform.GetScale().x > 0) ? 1.0f : -1.0f;
-    AEVec2 spawnPos = transform.GetPosition();
-    spawnPos.y += 10.0f;
-
-    EnemyProjectile* newProj = new EnemyProjectile(spawnPos, { dirX, 0.0f });
-
-    newProj->slowed = this->slowed;
-    enemyProjectiles.push_back(newProj);
 }
 
 void BaseEnemy::Update(float deltaTime)
 {
     if (!stopped)
     {
+        // Update Projectiles
         for (auto it = enemyProjectiles.begin(); it != enemyProjectiles.end(); )
         {
             (*it)->Speed(slowed ? (*it)->OriginalSpeed() / 20.f : (*it)->OriginalSpeed());
@@ -129,25 +89,38 @@ void BaseEnemy::Update(float deltaTime)
             } 
         }
 
-        // DEATH TIMER
         if (isDying)
         {
             deathTimer -= deltaTime;
-            if (sprite) sprite->Update();
+            
+            // Continue ticking the animation frames while dying
+            if (sprite) sprite->Update(); 
         }
     }
 }
 
 void BaseEnemy::Draw()
 {
-    if (sprite) sprite->Render(transform);
+    float alpha = 1.0f;
+
+    if (isDying)
+    {
+        alpha = deathTimer / oriDeathTimer;
+        
+        // Safety clamp to ensure alpha stays within 0.0 to 1.0
+        if (alpha < 0.0f) alpha = 0.0f;
+        if (alpha > 1.0f) alpha = 1.0f;
+    }
+
+    // Pass the calculated transparency to the Render function
+    if (sprite) sprite->Render(transform, alpha);
 
     for (EnemyProjectile* p : enemyProjectiles)
     {
         p->Draw();
     }
 
-    // debug lines
+    // Debug lines
     if (path.size() > 1)
     {
         if (settingsManager->GetTilesDebug())
@@ -167,6 +140,40 @@ void BaseEnemy::PlayAnim(std::string name)
     if (currentAnimState != name)
     {
         currentAnimState = name;
-        if (sprite) sprite->PlayAnimation(name, -1, animSpeed);
+
+        s32 loopCount = (name == deathAnimName) ? 1 : -1;
+
+        if (sprite) sprite->PlayAnimation(name, loopCount, animSpeed);
     }
+}
+
+// Slow/Stop logic remains the same
+bool BaseEnemy::Slowed() const { return slowed; }
+void BaseEnemy::Slowed(bool active)
+{
+    slowed = active;
+    switch (slowed)
+    {
+    case true:
+        animSpeed = origAnimSpeed * 10.f;
+        moveSpeed = originalSpeed / 10.f;
+        break;
+    case false:
+        moveSpeed = originalSpeed;
+        animSpeed = origAnimSpeed;
+        break;
+    }
+}
+
+bool BaseEnemy::isStopped() const { return stopped; }
+void BaseEnemy::isStopped(bool active) { stopped = active; }
+
+void BaseEnemy::Shoot()
+{
+    float dirX = (transform.GetScale().x > 0) ? 1.0f : -1.0f;
+    AEVec2 spawnPos = transform.GetPosition();
+    spawnPos.y += 10.0f;
+    EnemyProjectile* newProj = new EnemyProjectile(spawnPos, { dirX, 0.0f });
+    newProj->slowed = this->slowed;
+    enemyProjectiles.push_back(newProj);
 }

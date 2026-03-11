@@ -7,6 +7,8 @@
 #include "../Enemy/ShadowEnemy.h"
 #include "../Enemy/BatEnemy.h"
 #include "../Enemy/ArcherEnemy.h"
+#include "../particle/ParticleManager.h"
+#include "WinScene.h"
 
 
 void BossScene::Load() {
@@ -42,6 +44,8 @@ void BossScene::Update() {
     }
 
     boss->Update(dt);
+
+    ParticleManager::GetInstance()->Update(dt);
 
     //Go back to main menu
     /*if (player->GetCollidedTile().tileType == TILE_TYPE::BACKGROUND && enemyList.size() == 0)
@@ -114,20 +118,24 @@ void BossScene::Update() {
             }
         }
 
-        Transform2D bossWeakpointTransform = boss->GetWeakpoint().transform;
-        AEVec2 bossWeakpointHalf = { fabs(bossWeakpointTransform.GetScale().x) / 2.0f, bossWeakpointTransform.GetScale().y / 2.0f };
-
-        if (AABBOverlap(projPos, projHalf, bossWeakpointTransform.GetPosition(), bossWeakpointHalf))
+        //Only update if its active
+        if (boss->GetWeakpoint().active)
         {
-            if (!boss->IsReadyToDelete())
-            {
-                boss->TakeDamage();
+            Transform2D bossWeakpointTransform = boss->GetWeakpoint().transform;
+            AEVec2 bossWeakpointHalf = { fabs(bossWeakpointTransform.GetScale().x) / 2.0f, bossWeakpointTransform.GetScale().y / 2.0f };
 
-                SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
-                if (!swordProj)
+            if (AABBOverlap(projPos, projHalf, bossWeakpointTransform.GetPosition(), bossWeakpointHalf))
+            {
+                if (!boss->IsReadyToDelete())
                 {
-                    destroyProjectile = true;
-                    break;
+                    boss->TakeDamage();
+
+                    SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
+                    if (!swordProj)
+                    {
+                        destroyProjectile = true;
+                        break;
+                    }
                 }
             }
         }
@@ -158,6 +166,13 @@ void BossScene::Update() {
             ++it;
         }
     }
+
+    if (boss && boss->IsReadyToDelete())
+    {
+        SceneManager::ChangeScene(new WinScene());
+        return;
+    }
+
 }
 
 void BossScene::Draw() {
@@ -178,6 +193,10 @@ void BossScene::Draw() {
    /* for (BaseEnemy* enemy : enemyList) {
         enemy->Draw();
     }*/
+
+    ParticleManager::GetInstance()->Draw(meshManager->GetMesh(SQUARE));
+
+    player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 }
 
 void BossScene::Free() {
@@ -191,6 +210,7 @@ void BossScene::Free() {
     enemyList.clear();
     delete boss;
     delete bg;
+    ParticleManager::GetInstance()->ClearAll();
 }
 
 void BossScene::Unload()

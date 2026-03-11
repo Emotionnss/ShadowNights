@@ -73,7 +73,7 @@ private:
     bool isSurprised = false;
     f32 surpriseTimer = 0.0f;
 
-    u32 stateCounter;
+    u32 stateCounter = 0;
     u32 maxStateCounter = 3;
 };
 

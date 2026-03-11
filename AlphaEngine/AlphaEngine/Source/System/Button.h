@@ -5,20 +5,20 @@ class Button {
 public:
     Button(float x, float y, float w, float h, const char* text);
 
-    void Draw();        // Draw the button
-    bool IsHovered();   // Check if mouse is over the button
-    bool IsClicked();   // Check if button is clicked
+    void Draw();        
+    bool IsHovered();   
+    bool IsClicked();   
     void SetPosition(float x, float y);
+    void SetLabel(const char* text);
 
-    static void LoadResources();   // Load texture/mesh once
-    static void FreeResources();   // Free texture/mesh once
+    static void LoadResources();   
+    static void FreeResources();  
+    static s8 fontId;
 
 private:
-    float x, y, w, h;       // Position and size
-    const char* label;      // Button label text
+    float x, y, w, h;       
+    char label[64];
 
-    // Static shared resources
     static AEGfxTexture* sprite;
-    static AEGfxVertexList* pMesh; 
-    static s8 fontId;
+    static AEGfxVertexList* pMesh;
 };

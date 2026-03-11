@@ -30,8 +30,8 @@ void ShadowEnemy::Init(float x, float y, float w, float h, std::string spriteNam
 void ShadowEnemy::Update(float deltaTime)
 {
     BaseEnemy::Update(deltaTime);
-    
-    if (stopped || isDying) return;
+
+    if (isDying || stopped) return;
 
     // SHADOW ENEMY AI & COLLISION
     float colliderWidth = 40.0f;
@@ -47,13 +47,13 @@ void ShadowEnemy::Update(float deltaTime)
     float dy = playerPos.y - myPos.y;
     float dist = sqrt(dx * dx + dy * dy);
 
-    float attackRadius = 150.0f;
-    float aggroRadius = 450.0f;
+    float attackRadius = 300.0f;
+    float aggroRadius = 300.0f;
 
     float visualWidth = fabs(transform.GetScale().x);
     float visualHeight = transform.GetScale().y;
 
-	//attack state has highest priority, then aggroed state, then patrol state
+    //attack state has highest priority, then aggroed state, then patrol state
     if (isAttacking)
     {
         velocity.x = 0.0f;
@@ -92,68 +92,30 @@ void ShadowEnemy::Update(float deltaTime)
     }
     else
     {
+        // Since both ranges are the same, we only need to check if the player is within range
         if (dist < attackRadius)
-        {
-            isAttacking = true;
-            attackTimer = slowed ? originalTimer * 2.0f : originalTimer;
-            //attackTimer = 1.0f;
-            PlayAnim("attack1");
-        }
-        else if (dist < aggroRadius)
         {
             if (!isAggroed)
             {
+                // Trigger the surprise reaction the moment they enter the radius
                 isAggroed = true;
                 isSurprised = true;
                 surpriseTimer = 0.5f;
             }
             else
             {
-                // CHASE STATE
-                path.clear();
+                // Once the surprise timer finishes, begin attacking immediately!
+                isAttacking = true;
 
-                AEVec2 myTile = map->GetTilePos(myPos.x, myPos.y);
-                AEVec2 playerTile = map->GetTilePos(playerPos.x, playerPos.y);
-
-                if (myTile.x >= 0 && myTile.x < map->GetNumCol() &&
-                    myTile.y >= 0 && myTile.y < map->GetNumRow() &&
-                    playerTile.x >= 0 && playerTile.x < map->GetNumCol() &&
-                    playerTile.y >= 0 && playerTile.y < map->GetNumRow())
-                {
-                    AEVec2 maxBounds = { (float)map->GetNumCol() - 1.0f, (float)map->GetNumRow() - 1.0f };
-                    Node node;
-
-                    if (map->GeneratePath(myPos, playerPos, { 0, 0 }, maxBounds, node))
-                    {
-                        path = map->BuildPath(path, node);
-                    }
-                }
-
-                float targetX = playerPos.x;
-
-                if (targetX > myPos.x + 5.0f)
-                {
-                    velocity.x = fabs(moveSpeed);
-                    transform.SetScale(visualWidth, visualHeight);
-                }
-                else if (targetX < myPos.x - 5.0f)
-                {
-                    velocity.x = -fabs(moveSpeed);
-                    transform.SetScale(-visualWidth, visualHeight);
-                }
-                else
-                {
-                    velocity.x = 0.0f;
-                }
-
-                PlayAnim("walkright");
+                // If you have a slow effect implemented, keep this, otherwise just use originalTimer
+                attackTimer = originalTimer;
+                PlayAnim("attack1");
             }
         }
         else
         {
             // PATROL STATE
             isAggroed = false;
-            path.clear();
 
             velocity.x = moveSpeed;
             PlayAnim("walkright");

@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseEnemy.h"
+#include "../System/MeshManager.h"
 
 class BatEnemy : public BaseEnemy
 {
@@ -19,4 +20,8 @@ private:
 
     float startX = 0.0f;
     float startY = 0.0f;
+
+    int pathIndex = 0;
+    float pathTimer = 0.0f;
+    bool showDebugPath = false;
 };

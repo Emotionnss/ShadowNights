@@ -17,7 +17,7 @@ public:
     virtual void Update(float deltaTime);
     virtual void Draw();
 
-    virtual void TakeDamage();
+    virtual void TakeDamage(int damage);
     bool IsReadyToDelete() const;
     std::vector<EnemyProjectile*>& GetProjectiles() { return enemyProjectiles; }
     bool Slowed() const;
@@ -42,6 +42,10 @@ protected:
     bool isDying = false;
     float deathTimer = 0.0f;
     float oriDeathTimer = 1.0f;
+
+    Transform2D healthbarTransform;
+    int health = 10;
+    int maxHealth = 10;
 
     // Projectile Logic
     std::vector<EnemyProjectile*> enemyProjectiles;

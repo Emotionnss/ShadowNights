@@ -106,7 +106,7 @@ void BossScene::Update() {
             {
                 if (!enemy->IsReadyToDelete())
                 {
-                    enemy->TakeDamage();
+                    enemy->TakeDamage(8);
 
                     SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
                     if (!swordProj)
@@ -128,7 +128,7 @@ void BossScene::Update() {
             {
                 if (!boss->IsReadyToDelete())
                 {
-                    boss->TakeDamage();
+                    boss->TakeDamage(5);
 
                     SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
                     if (!swordProj)

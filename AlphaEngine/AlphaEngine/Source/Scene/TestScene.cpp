@@ -216,13 +216,18 @@ void TestScene::Update() {
                 AEVec2 enemyHalf = { fabs(enemy->transform.GetScale().x) / 2.0f, enemy->transform.GetScale().y / 2.0f };
 
                 if (AABBOverlap(projPos, projHalf, enemyPos, enemyHalf)) {
-                    enemy->TakeDamage();
 
                     // Check for piercing
                     SwordProjectile* swordProj = dynamic_cast<SwordProjectile*>(pProj);
                     if (!swordProj) {
+                        // if not sword projectile
+                        enemy->TakeDamage(3);
                         destroyProjectile = true;
                         break;
+                    }
+                    else
+                    {
+                        enemy->TakeDamage(5);
                     }
                 }
             }

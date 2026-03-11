@@ -12,8 +12,12 @@ TemporalAnchor::TemporalAnchor() ://default constructor
 {
 	zoneTfm.SetScale(1000, 1000);
 	anchorTfm.SetScale(100, 100);
+	anchorSpawnTfm.SetScale(100, 100);
 	anchorSprite = new Sprite(CSVManager::ReadInfo("anchor"));//create new sprite for the anchor
 	anchorSprite->PlayAnimation("spawn", -1, 0.5f);//make it play an animation on enter
+
+	anchorSpawnSprite = new Sprite(CSVManager::ReadInfo("anchorSpawn"));
+	anchorSpawnSprite->PlayAnimation("spawn", 1, spawnTime);
 
 	ghostTfm.SetScale(player->GetTransform().GetScale().x, player->GetTransform().GetScale().y);//initialize the ghost's scale to match the player
 }
@@ -31,15 +35,36 @@ TemporalAnchor::~TemporalAnchor()//default destructor
 		delete anchorSprite;
 		anchorSprite = nullptr;
 	}
+	if (anchorSpawnSprite)
+	{
+		delete anchorSpawnSprite;
+		anchorSpawnSprite = nullptr;
+	}
 	ghostVect.clear();//clear the vector
 }
 
 void TemporalAnchor::Update(f32 dt)//update function based on dt
 {
-	if (active && !reversing)//if the abilitiy is active AND not reversing the player back to the anchor position
+	if (spawning)
 	{
-		activeTimer += -1 * dt;//countdown for how long the ability can be active for ;; default is 3 seconds
-		saveTimer += -1 * dt;//a countdown for how many times per second the position should save into the vector
+		std::cout << "in2\n";
+		anchorSpawnTfm.SetPosition(player->GetTransform().GetPosition());
+		spawnTimer += -1 * dt;
+		if (spawnTimer <= 0)
+		{
+			std::cout << "in2\n";
+			spawnTimer = spawnTime;
+			spawning = false;
+			active = true;
+
+			anchorTfm.SetPosition(anchorSpawnTfm.GetPosition());
+			zoneTfm.SetPosition(anchorSpawnTfm.GetPosition());
+		}
+	}
+	if (active && !reversing && !spawning)//if the abilitiy is active AND not reversing the player back to the anchor position
+	{
+		activeTimer += -1 * dt;//countdown for how long the ability can be active for ;; default is 3
+		saveTimer += -1 * dt;//a countdown for how many times per second the position should save into the vector;; default counter is 0.1
 		if (saveTimer <= 0)
 		{
 			AEVec2 UV = player->GetSprite()->GetCurrentUVCoords();//get the UV coords of the current sprite
@@ -75,14 +100,17 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 			reversing = false;//stop reversing
 			active = false;//stop activity
 			player->SetHealth(savedHealth);//reset the health to what it had before
+			player->GetTransform().SetPosition(anchorTfm.GetPosition());
 		}
 	}
-	else if (!active && !reversing)//once its not active nor reversing
+	else if (!active && !reversing && !spawning)//once its not active nor reversing
 	{
 		activeTimer = activeTime;//reset timer
 		saveTimer = saveTime;//reset save timer
+		spawnTimer = spawnTime;
 	}
 	anchorSprite->Update();//update the sprite for the anchor
+	anchorSpawnSprite->Update();//update sprite for the anchor spawning
 }
 
 bool TemporalAnchor::Anchor(AEVec2 anchPos)
@@ -90,6 +118,7 @@ bool TemporalAnchor::Anchor(AEVec2 anchPos)
 	if (active)
 	{
 		active = false;
+		spawning = false;
 		reversing = true;
 		iter = ghostVect.size() - 1;
 		//player->GetTransform().SetPosition(anchorTfm.GetPosition());
@@ -97,11 +126,11 @@ bool TemporalAnchor::Anchor(AEVec2 anchPos)
 	}
 	else
 	{
-		active = true;
+		//active = true;
+		spawning = true;
 		savedHealth = player->GetHealth();
-		anchorTfm.SetPosition(anchPos);
-		zoneTfm.SetPosition(anchPos);
-		anchorSprite->PlayAnimation("spawn", -1, 0.5f);
+
+		anchorSpawnSprite->PlayAnimation("spawn", 1, spawnTime);
 	}
 	return active;
 }
@@ -116,6 +145,8 @@ void TemporalAnchor::Draw()
 	//zone for timestop
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	if(spawning)
+		anchorSpawnSprite->Render(anchorSpawnTfm);
 	if (active)
 	{
 		AEGfxSetTransparency(0.25f);
@@ -125,7 +156,6 @@ void TemporalAnchor::Draw()
 		AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
 
 		anchorSprite->Render(anchorTfm);
-
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetTransparency(0.25f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);

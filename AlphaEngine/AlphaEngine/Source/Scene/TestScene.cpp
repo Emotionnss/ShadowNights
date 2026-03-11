@@ -58,28 +58,61 @@ void TestScene::Init() {
     popupTimer = 0.0f;
 
     // ENEMY LIST SPAWN
-    int numberOfEnemies = 3;
-    float startX = 600.0f;
-    float spacing = 300.0f;
-
-    for (int e = 0; e < numberOfEnemies; e++) {
-        BaseEnemy* newEnemy = new ShadowEnemy();
-        BaseEnemy* myBat = new BatEnemy();
-        BaseEnemy* myArcher = new ArcherEnemy();
-
-        float spawnX = startX + (e * spacing);
-
-        newEnemy->Init(spawnX, 300.0f, 85.0f, 60.0f, "shadow1");
-        newEnemy->SetVelocity(0.0f, 0.0f);
-        enemyList.push_back(newEnemy);
-
-        myBat->Init(spawnX, 700.0f, 85.0f, 60.0f, "batenemy");
-        enemyList.push_back(myBat);
-
-        myArcher->Init(spawnX + 150.0f, 300.0f, 85.0f, 60.0f, "sniperenemy");
-        enemyList.push_back(myArcher);
+    //int numberOfEnemies = 3;
+    //float startX = 600.0f;
+    //float spacing = 300.0f;
+    //
+    //for (int e = 0; e < numberOfEnemies; e++) {
+    //    BaseEnemy* newEnemy = new ShadowEnemy();
+    //    BaseEnemy* myBat = new BatEnemy();
+    //    BaseEnemy* myArcher = new ArcherEnemy();
+    //
+    //    float spawnX = startX + (e * spacing);
+    //
+    //    newEnemy->Init(spawnX, 300.0f, 85.0f, 60.0f, "shadow1");
+    //    newEnemy->SetVelocity(0.0f, 0.0f);
+    //    enemyList.push_back(newEnemy);
+    //
+    //    myBat->Init(spawnX, 700.0f, 85.0f, 60.0f, "batenemy");
+    //    enemyList.push_back(myBat);
+    //
+    //    myArcher->Init(spawnX + 150.0f, 300.0f, 85.0f, 60.0f, "sniperenemy");
+    //    enemyList.push_back(myArcher);
+    //}
+    for (s32 i{}; i < map->GetNumRow(); ++i)
+    {
+        for (s32 j{}; j < map->GetNumCol(); ++j)
+        {
+            AEVec2 pos = map->GetTileWorldPos(map->GetTilePos(map->GetMap()[i][j].transform.GetPosition().x, map->GetMap()[i][j].transform.GetPosition().y));
+            if (map->GetMap()[i][j].tileType == TILE_TYPE::BAT_ENEMY)
+            {
+                BaseEnemy* batEnemy = new BatEnemy();
+                batEnemy->Init(pos.x, pos.y, 85.f, 60.f, "batenemy");
+                batEnemy->SetVelocity(0, 0);
+                enemyList.push_back(batEnemy);
+                map->GetMap()[i][j].tileType = TILE_TYPE::NONE;
+                continue;
+            }
+            else if (map->GetMap()[i][j].tileType == TILE_TYPE::ARCHER_ENEMY)
+            {
+                BaseEnemy* archerEnemy = new ArcherEnemy();
+                archerEnemy->Init(pos.x, pos.y, 85.f, 60.f, "sniperenemy");
+                archerEnemy->SetVelocity(0, 0);
+                enemyList.push_back(archerEnemy);
+                map->GetMap()[i][j].tileType = TILE_TYPE::NONE;
+                continue;
+            }
+            else if (map->GetMap()[i][j].tileType == TILE_TYPE::SHADOW_ENEMY)
+            {
+                BaseEnemy* shadowEnemy = new ShadowEnemy();
+                shadowEnemy->Init(pos.x, pos.y, 85.f, 60.f, "shadow1");
+                shadowEnemy->SetVelocity(0, 0);
+                enemyList.push_back(shadowEnemy);
+                map->GetMap()[i][j].tileType = TILE_TYPE::NONE;
+                continue;
+            }
+        }
     }
-
     if (loadFromSlot > 0) {
         LoadGame(loadFromSlot);
         loadFromSlot = 0; //reset

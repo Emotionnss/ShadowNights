@@ -13,14 +13,17 @@ private:
     bool active{};
     f32 activeTime{};
     f32 activeTimer{ activeTime };
-
+    bool spawning{};
+    f32 spawnTime{0.5f};
+    f32 spawnTimer{spawnTime};
     Player* player{};
     Transform2D zoneTfm{};
     Transform2D anchorTfm{};
+    Transform2D anchorSpawnTfm{};
 
     Sprite* zoneSprite{ nullptr };
     Sprite* anchorSprite{ nullptr };
-
+    Sprite* anchorSpawnSprite{ nullptr };
     bool reversing{};
     size_t iter{ 0 };
     f32 savedHealth{};

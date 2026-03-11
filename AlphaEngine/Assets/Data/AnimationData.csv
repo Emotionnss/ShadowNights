@@ -25,3 +25,4 @@ tempPlayer,idle,5,6
 tempPlayer,walk,0,8
 tempPlayer,jump,6,4
 tempPlayer,fall,3,4
+anchorSpawn,spawn,0,8

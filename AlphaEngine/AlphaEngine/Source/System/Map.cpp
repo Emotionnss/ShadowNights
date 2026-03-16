@@ -397,16 +397,6 @@ f32 Map::GetTileSize(void) const
 	return settingsManager->TILE_WIDTH;
 }
 
-AEVec2 Map::GetSpawnpoint(void) const
-{
-	return spawnpoint;
-}
-
-void Map::SetSpawnpoint(AEVec2 spawnpoint)
-{
-	this->spawnpoint = spawnpoint;
-}
-
 void Map::CleanAStarLists()
 {
 	for (Node* node : openList)
@@ -476,14 +466,14 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 		//Get surrounding nodes that are valid
 		std::vector<Node*> nodes = GetSurroundingNodes(currentPos, minLimits, maxLimits);
 
-		for (Node* node : nodes)
+		for (Node* neighbourNode : nodes)
 		{
 			bool proceed{ true };
 
 			//Check if current node has already been evaluated
 			for (Node* closedNode : closedList)
 			{
-				if (node->position == closedNode->position)
+				if (neighbourNode->position == closedNode->position)
 				{
 					proceed = false;
 					break;
@@ -493,8 +483,8 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 			//If already evaluated, skip to next node
 			if (!proceed)
 			{
-				delete node;
-				node = nullptr;
+				delete neighbourNode;
+				neighbourNode = nullptr;
 				continue;
 			}
 
@@ -506,7 +496,7 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 
 			for (Node* openNode : openList)
 			{
-				if (node->position == openNode->position)
+				if (neighbourNode->position == openNode->position)
 				{
 					proceed = false;
 					break;
@@ -516,22 +506,22 @@ bool Map::GeneratePath(AEVec2 startPos, AEVec2 targetPos, AEVec2 minLimits, AEVe
 			if (proceed)
 			{
 				//If not in open list, add it
-				openList.push_back(node);
+				openList.push_back(neighbourNode);
 			}
 
 			//If tentative g value is not better, skip to next node
-			else if (tempGValue >= node->g)
+			else if (tempGValue >= neighbourNode->g)
 			{
-				delete node;
-				node = nullptr;
+				delete neighbourNode;
+				neighbourNode = nullptr;
 				continue;
 			}
 
 			//Set node values since this node is valid
-			node->parent = currentNode;
-			node->g = tempGValue;
-			node->h = CalculateHeuristic(node->position, currentPos);
-			node->f = node->g + node->h;
+			neighbourNode->parent = currentNode;
+			neighbourNode->g = tempGValue;
+			neighbourNode->h = CalculateHeuristic(neighbourNode->position, currentPos);
+			neighbourNode->f = neighbourNode->g + neighbourNode->h;
 		}
 	}
 
@@ -631,8 +621,11 @@ void Map::RenderPathDebug(std::vector<AEVec2>& path)
 		//Get magnitude from one edge of the square to the other based on the rotation
 		float magnitude = AEVec2Distance(&path[i + 1], &path[i]);
 
+		AEVec2 scale{50.f, 10.f};
+		AEVec2Normalize(&scale, &scale);
+
 		//Create transform
-		Transform2D transform{ path[i], {50.0f, 10.0f}, angle};
+		Transform2D transform{ path[i], {magnitude * scale.x, magnitude * scale.y}, angle};
 
 		AEGfxSetTransform(transform.GetMatrix().m);
 		AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);

@@ -94,7 +94,7 @@ bool operator!=(Node const& lhs, Node const& rhs);
 struct Tile
 {
 	Transform2D transform;
-	TILE_TYPE tileType;
+	TILE_TYPE tileType = TILE_TYPE::NONE;
 };
 
 class Map : public SingletonTemplate<Map>
@@ -119,8 +119,6 @@ private:
 
 	//Stores nodes that have already been checked
 	std::vector<Node*> closedList;
-
-	AEVec2 spawnpoint;
 
 	//ADT's to store tile and texture info
 	std::vector<TILE_TYPE> tileTypesVector;
@@ -269,20 +267,6 @@ public:
 	@return f32 - size of tile
 	*/
 	f32 GetTileSize() const;
-
-	/*!
-	@brief	Get spawnpoint of the enemies
-	@param	void
-	@return AEVec2 - vector of spawnpoint
-	*/
-	AEVec2 GetSpawnpoint() const;
-
-	/*!
-	@brief	Set spawnpos32 of the enemies
-	@param	AEVec2 - vector of spawnpos32
-	@return void
-	*/
-	void SetSpawnpoint(AEVec2 spawnpoint);
 
 	/*!
 	@brief	Clean all lists used for A* pathfinding

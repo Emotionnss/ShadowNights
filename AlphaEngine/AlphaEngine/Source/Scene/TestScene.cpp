@@ -52,7 +52,8 @@ void TestScene::Load() {
 
 void TestScene::Init() {
     player->GetTransform().SetPosition(300.0f, 900.0f);
-    audio->PlayMusic("bgm_level1");
+    audio->PlayMusic("bgm_level1", 1.f);
+
 
     abilityHandler = new AbilityHandler();
 

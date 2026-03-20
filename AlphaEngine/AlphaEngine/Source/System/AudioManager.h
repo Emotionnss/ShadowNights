@@ -4,6 +4,9 @@
 #include "SettingsManager.h"
 #include "SingletonTemplate.h"
 #include <string>
+#include <vector>
+#include <fstream>
+#include <sstream>
 
 struct AudioClip
 {
@@ -14,15 +17,11 @@ struct AudioClip
 };
 
 /*!
-Add new audio here
-Refer to struct if unsure
+Reads audio clips from audio data
+A - name of clip to play
+B - audio file name with file type like .wav or .mp3
+C - If it's a music BGM, false if it isn't
 */
-static AudioClip AudioClipList[] =
-{
-	{ "bgm_level1", "Assets/Audio/Night Ambient 5.mp3", true},
-	{ "player_attack", "Assets/Audio/ANIMAL-LION_GEN-HDF-01134.wav", false},
-};
-
 class AudioManager : public SingletonTemplate<AudioManager>
 {
 	friend class SingletonTemplate<AudioManager>;
@@ -35,8 +34,12 @@ private:
 	AEAudioGroup SFX_;
 	int ClipCount;
 
+	std::vector<AudioClip> AudioClipList;
+
 	SettingsManager* settings = nullptr;
 
+	void Trim(std::string& str); // Used to parse CSV
+	void ParseCSV(const std::string& csvPath);
 	void LoadAll();
 	const AudioClip* GetAudioClip(const std::string& name) const;
 
@@ -45,10 +48,13 @@ public:
 	~AudioManager();
 
 	/*!
-	@brief	Plays audio clip one shot
+	@brief	Plays audio clip one shot (No loop)
 	*/
-	void PlaySFX(const std::string& name, float volume = 1.0f, float pitch = 1.0f);
-	void PlayMusic(const std::string& name, float volume = 1.0f, float pitch = 1.0f);
+	void PlaySFX(const std::string& name, float pitch = 1.0f);
+	/*!
+	@brief	Plays audio with loop
+	*/
+	void PlayMusic(const std::string& name, float pitch = 1.0f);
 	void PauseMusic();
 	void ResumeMusic();
 	void StopMusic();

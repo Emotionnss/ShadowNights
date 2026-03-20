@@ -7,12 +7,6 @@ AudioManager::AudioManager()
 	, SFX_{}
 	, ClipCount{ 0 }
 {
-	// Count the amount of clips that has been defined
-	for (const AudioClip& clip : AudioClipList)
-	{
-		++ClipCount;
-	}
-
 	settings = SettingsManager::GetInstance();
 	if (settings != nullptr)
 	{
@@ -30,6 +24,7 @@ AudioManager::AudioManager()
 	AEAudioSetGroupVolume(BGM_, localBGMVolume);
 	AEAudioSetGroupVolume(SFX_, localSFXVolume);
 
+	ParseCSV("Assets/Data/AudioData.csv");
 	LoadAll();
 }
 
@@ -44,9 +39,73 @@ AudioManager::~AudioManager()
 	AEAudioUnloadAudioGroup(SFX_);
 }
 
+void AudioManager::Trim(std::string& str)
+{
+	const std::string whitespace = " \t\r\n";
+	size_t start = str.find_first_not_of(whitespace);
+	size_t end = str.find_last_not_of(whitespace);
+	if (start == std::string::npos)
+	{
+		str = "";
+	}
+	else
+	{
+		str = str.substr(start, end - start + 1);
+	}
+}
+
+void AudioManager::ParseCSV(const std::string& csvPath)
+{
+	std::ifstream file(csvPath);
+	if (!file.is_open())
+	{
+		printf("AudioManager: Failed to open CSV '%s'.\n", csvPath.c_str());
+		return;
+	}
+
+	std::string line;
+	while (std::getline(file, line))
+	{
+		if (line.empty())
+		{
+			continue;
+		}
+
+		std::stringstream ss(line);
+		std::string name, filename, isMusicStr;
+
+		// Column A — clip name
+		if (!std::getline(ss, name, ',')) continue;
+		// Column B — audio filename
+		if (!std::getline(ss, filename, ',')) continue;
+		// Column C — is music (true/false)
+		if (!std::getline(ss, isMusicStr, ',')) continue;
+
+		Trim(name);
+		Trim(filename);
+		Trim(isMusicStr);
+
+		if (name.empty() || filename.empty() || isMusicStr.empty())
+		{
+			printf("AudioManager: Skipping malformed row '%s'.\n", line.c_str());
+			continue;
+		}
+
+		AudioClip clip{};
+		clip.name = name;
+		clip.filepath = "Assets/Audio/" + filename;
+		clip.isMusic = (isMusicStr == "TRUE");
+		clip.audio = {};
+
+		AudioClipList.push_back(clip);
+		++ClipCount;
+	}
+
+	file.close();
+}
+
 void AudioManager::LoadAll()
 {
-	// I didn't really do any checks for the list :P
 	for (int i = 0; i < ClipCount; ++i)
 	{
 		if (AudioClipList[i].isMusic)
@@ -73,48 +132,46 @@ const AudioClip* AudioManager::GetAudioClip(const std::string& name) const
 			}
 			else
 			{
-				printf("AudioClip is found but has invalid audio.\n");
+				printf("AudioClip '%s' is found but has invalid audio.\n", name.c_str());
 				return nullptr;
 			}
 		}
 	}
-	printf("Unable to find AudioClip from list.\n");
+	printf("Unable to find AudioClip '%s' from list.\n", name.c_str());
 	return nullptr;
 }
 
-void AudioManager::PlaySFX(const std::string& name, float volume, float pitch)
+void AudioManager::PlaySFX(const std::string& name, float pitch)
 {
 	const AudioClip* index = GetAudioClip(name);
 	if (index != nullptr)
 	{
-		AEAudioPlay(index->audio, SFX_, volume, pitch, 0);
-	}
-	else
-	{
-		printf("Unable to play SFX.\n");
+		AEAudioPlay(index->audio, SFX_, localSFXVolume, pitch, 0);
 	}
 }
 
-void AudioManager::PlayMusic(const std::string& name, float volume, float pitch)
+void AudioManager::PlayMusic(const std::string& name, float pitch)
 {
 	const AudioClip* index = GetAudioClip(name);
 	if (index != nullptr)
 	{
 		AEAudioStopGroup(BGM_);
-		AEAudioPlay(index->audio, BGM_, volume, pitch, 0);
-	}
-	else
-	{
-		printf("Unable to play music.\n");
+		AEAudioPlay(index->audio, BGM_, localBGMVolume, pitch, -1);
 	}
 }
 
 void AudioManager::PauseMusic()
 {
-	AEAudioPauseGroup(BGM_); 
+	AEAudioPauseGroup(BGM_);
 }
-void AudioManager::ResumeMusic() { AEAudioResumeGroup(BGM_); }
-void AudioManager::StopMusic() { AEAudioStopGroup(BGM_); }
+void AudioManager::ResumeMusic()
+{
+	AEAudioResumeGroup(BGM_);
+}
+void AudioManager::StopMusic()
+{
+	AEAudioStopGroup(BGM_);
+}
 
 void AudioManager::SetBGMVolume(float volume)
 {

@@ -15,8 +15,8 @@ private:
 	bool playerCollisionDebug = false;
 
 	// Volume that reads from settings excel
-	s32 bgmVolume;
-	s32 sfxVolume;
+	s32 savedBGMVolume;
+	s32 savedSFXVolume;
 
 public:
 	const f32 TILE_WIDTH;
@@ -26,6 +26,9 @@ public:
 	SettingsManager(std::vector<std::string> settingsInfo);
 
 	void CheckSettingsInputs();
+
+	s32 GetSettingsBGMVolume();
+	s32 GetSettingsSFXVolume();
 
 	bool GetPlayerColDebug() const;
 	void SetPlayerColDebug(bool d);

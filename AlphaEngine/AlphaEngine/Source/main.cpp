@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include "particle/ParticleManager.h"
+#include "System/AudioManager.h"
 
 bool gGameRunning = true;
 
@@ -27,6 +28,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     //Init settings
     std::vector<std::string> settingsInfo = CSVManager::ReadSettingsInfo();
     SettingsManager* sManager = SettingsManager::GetInstance(settingsInfo);
+
+    AudioManager* aManager = AudioManager::GetInstance();
 
     SceneManager::ChangeScene(new MainMenu());
 
@@ -53,6 +56,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     MeshManager::DestroyInstance();
     Map::DestroyInstance();
     Button::FreeResources();
+    AudioManager::DestroyInstance();
+    aManager = nullptr;
     SettingsManager::DestroyInstance();
     sManager = nullptr;
     ParticleManager::DestroyInstance();

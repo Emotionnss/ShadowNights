@@ -11,16 +11,11 @@
 #include "../Projectiles/BaseProjectile.h"
 #include "../Projectiles/SwordProjectile.h"
 
+#include "../System/AudioManager.h"
+
 #include <memory>
 #include <iostream>
 #include <vector>
-
-struct LineSegment
-{
-	AEVec2 P0;      // Start point of directed line segment
-	AEVec2 P1;      // End   point of directed line segment
-	AEVec2 n_hat;   // Normalised outward normal:  n = (ey, -ex)  (rotate e by -90 deg)
-};
 
 class Player : public GameObject, public SingletonTemplate<Player>
 {

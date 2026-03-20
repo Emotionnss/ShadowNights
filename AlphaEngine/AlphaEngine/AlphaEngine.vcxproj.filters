@@ -39,6 +39,7 @@
     <ClCompile Include="Source\particle\ParticleManager.cpp" />
     <ClCompile Include="Source\Scene\LoseScene.cpp" />
     <ClCompile Include="Source\Scene\WinScene.cpp" />
+    <ClCompile Include="Source\System\AudioManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Abilities\BossExplosive.h" />
@@ -73,12 +74,12 @@
     <ClInclude Include="Source\Abilities\TimeSlow.h" />
     <ClInclude Include="Source\Projectiles\SwordProjectile.h" />
     <ClInclude Include="Source\Abilities\TemporalAnchor.h" />
-    <ClInclude Include="Source\System\SoundManager.h" />
     <ClInclude Include="Source\Utils\Slider.h" />
     <ClInclude Include="Source\Utils\utils.h" />
     <ClInclude Include="Source\Scene\Background.h" />
     <ClInclude Include="Source\particle\ParticleManager.h" />
     <ClInclude Include="Source\Scene\LoseScene.h" />
     <ClInclude Include="Source\Scene\WinScene.h" />
+    <ClInclude Include="Source\System\AudioManager.h" />
   </ItemGroup>
 </Project>

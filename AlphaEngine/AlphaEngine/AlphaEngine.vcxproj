@@ -26,6 +26,7 @@
     <ClCompile Include="Source\Scene\BossScene.cpp" />
     <ClCompile Include="Source\Sprite\Animation.cpp" />
     <ClCompile Include="Source\Sprite\Sprite.cpp" />
+    <ClCompile Include="Source\System\AudioManager.cpp" />
     <ClCompile Include="Source\System\Button.cpp" />
     <ClCompile Include="Source\Player\GameObject.cpp" />
     <ClCompile Include="Source\Player\Player.cpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="Source\Scene\BossScene.h" />
     <ClInclude Include="Source\Sprite\Animation.h" />
     <ClInclude Include="Source\Sprite\Sprite.h" />
+    <ClInclude Include="Source\System\AudioManager.h" />
     <ClInclude Include="Source\System\Button.h" />
     <ClInclude Include="Source\Player\GameObject.h" />
     <ClInclude Include="Source\Player\Player.h" />
@@ -86,7 +88,6 @@
     <ClInclude Include="Source\Abilities\TimeSlow.h" />
     <ClInclude Include="Source\Projectiles\SwordProjectile.h" />
     <ClInclude Include="Source\Abilities\TemporalAnchor.h" />
-    <ClInclude Include="Source\System\SoundManager.h" />
     <ClInclude Include="Source\Utils\Slider.h" />
     <ClInclude Include="Source\Utils\utils.h" />
     <ClInclude Include="Source\Scene\WinScene.h" />

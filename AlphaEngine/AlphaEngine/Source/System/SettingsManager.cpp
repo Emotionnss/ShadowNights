@@ -10,10 +10,20 @@ SettingsManager::SettingsManager() :
 SettingsManager::SettingsManager(std::vector<std::string> settingsInfo) :
 	TILE_WIDTH{std::stof(settingsInfo[0])},
 	TILE_HEIGHT{std::stof(settingsInfo[1])},
-	bgmVolume{std::stoi(settingsInfo[2])},
-	sfxVolume{std::stoi(settingsInfo[3])}
+	savedBGMVolume{std::stoi(settingsInfo[2])},
+	savedSFXVolume{std::stoi(settingsInfo[3])}
 {
 
+}
+
+s32 SettingsManager::GetSettingsBGMVolume()
+{
+	return savedBGMVolume;
+}
+
+s32 SettingsManager::GetSettingsSFXVolume()
+{
+	return savedSFXVolume;
 }
 
 void SettingsManager::CheckSettingsInputs()

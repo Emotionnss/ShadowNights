@@ -20,6 +20,7 @@ void TestScene::Load() {
     meshManager = MeshManager::GetInstance();
     map = Map::GetInstance();
     player = Player::GetInstance();
+    audio = AudioManager::GetInstance();
 
     bg = new Background;
 
@@ -51,6 +52,8 @@ void TestScene::Load() {
 
 void TestScene::Init() {
     player->GetTransform().SetPosition(300.0f, 900.0f);
+    audio->PlayMusic("bgm_level1");
+
     abilityHandler = new AbilityHandler();
 
     isPaused = false;

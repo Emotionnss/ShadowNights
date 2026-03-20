@@ -1,6 +1,7 @@
 #pragma once
 #include "../../Source/Scene/BaseScene.h"
 #include "../System/Button.h"
+#include "../System/AudioManager.h"
 
 class MainMenu : public BaseScene {
 public:

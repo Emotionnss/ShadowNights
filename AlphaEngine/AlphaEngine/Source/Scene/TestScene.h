@@ -8,7 +8,8 @@
 #include "../Abilities/AbilityHandler.h"
 #include "../Enemy/BaseEnemy.h"
 #include "background.h"
-#include "../System/Button.h" 
+#include "../System/Button.h"
+#include "../System/AudioManager.h"
 
 class TestScene : public BaseScene {
 public:
@@ -32,6 +33,8 @@ private:
     AbilityHandler* abilityHandler = nullptr;
     MeshManager* meshManager = nullptr;
     Map* map = nullptr;
+    AudioManager* audio = nullptr;
+
     AEVec2 DoorTilePosition = { 0.0f, 0.0f };
     Background* bg = nullptr;
 

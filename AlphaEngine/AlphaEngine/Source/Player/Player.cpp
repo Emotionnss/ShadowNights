@@ -119,7 +119,7 @@ void Player::HandleInput()
 	// Attacking
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
-		AudioManager::GetInstance()->PlaySFX("player_attack");
+		AudioManager::GetInstance()->PlaySFXOneShot("player_attack");
 		s32 xDir, yDir;
 		AEInputGetCursorPosition(&xDir, &yDir);
 		AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };

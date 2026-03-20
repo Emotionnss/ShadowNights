@@ -3,8 +3,9 @@
 AudioManager::AudioManager()
 	: localBGMVolume{ 1.0f }
 	, localSFXVolume{ 1.0f }
-	, BGM_{}
-	, SFX_{}
+	, BGM_LOOP{}
+	, SFX_LOOP{}
+	, SFX_SINGLE{}
 	, ClipCount{ 0 }
 {
 	settings = SettingsManager::GetInstance();
@@ -18,11 +19,13 @@ AudioManager::AudioManager()
 		printf("SoundManager: Unable to retrieve volume settings.\n");
 	}
 
-	BGM_ = AEAudioCreateGroup();
-	SFX_ = AEAudioCreateGroup();
+	BGM_LOOP = AEAudioCreateGroup();
+	SFX_LOOP = AEAudioCreateGroup();
+	SFX_SINGLE = AEAudioCreateGroup();
 
-	AEAudioSetGroupVolume(BGM_, localBGMVolume);
-	AEAudioSetGroupVolume(SFX_, localSFXVolume);
+	AEAudioSetGroupVolume(BGM_LOOP, localBGMVolume);
+	AEAudioSetGroupVolume(SFX_LOOP, localSFXVolume);
+	AEAudioSetGroupVolume(SFX_SINGLE, localSFXVolume);
 
 	ParseCSV("Assets/Data/AudioData.csv");
 	LoadAll();
@@ -35,8 +38,9 @@ AudioManager::~AudioManager()
 		AEAudioUnloadAudio(AudioClipList[i].audio);
 	}
 
-	AEAudioUnloadAudioGroup(BGM_);
-	AEAudioUnloadAudioGroup(SFX_);
+	AEAudioUnloadAudioGroup(BGM_LOOP);
+	AEAudioUnloadAudioGroup(SFX_LOOP);
+	AEAudioUnloadAudioGroup(SFX_SINGLE);
 }
 
 void AudioManager::Trim(std::string& str)
@@ -137,52 +141,79 @@ const AudioClip* AudioManager::GetAudioClip(const std::string& name) const
 			}
 		}
 	}
+
 	printf("Unable to find AudioClip '%s' from list.\n", name.c_str());
 	return nullptr;
 }
 
-void AudioManager::PlaySFX(const std::string& name, float pitch)
+void AudioManager::PlaySFXOneShot(const std::string& name, f32 volume, f32 pitch)
 {
 	const AudioClip* index = GetAudioClip(name);
 	if (index != nullptr)
 	{
-		AEAudioPlay(index->audio, SFX_, localSFXVolume, pitch, 0);
+		AEAudioPlay(index->audio, SFX_SINGLE, volume, pitch, 0);
 	}
 }
 
-void AudioManager::PlayMusic(const std::string& name, float pitch)
+void AudioManager::PlayEffect(const std::string& name, f32 volume, f32 pitch)
 {
 	const AudioClip* index = GetAudioClip(name);
 	if (index != nullptr)
 	{
-		AEAudioStopGroup(BGM_);
-		AEAudioPlay(index->audio, BGM_, localBGMVolume, pitch, -1);
+		AEAudioStopGroup(SFX_LOOP);
+		AEAudioPlay(index->audio, SFX_LOOP, volume, pitch, -1);
+	}
+}
+
+void AudioManager::PauseEffect()
+{
+	AEAudioPauseGroup(SFX_LOOP);
+}
+
+void AudioManager::ResumeEffect()
+{
+	AEAudioResumeGroup(SFX_LOOP);
+}
+
+void AudioManager::StopEffect()
+{
+	AEAudioStopGroup(SFX_LOOP);
+}
+
+void AudioManager::PlayMusic(const std::string& name, f32 volume, f32 pitch)
+{
+	const AudioClip* index = GetAudioClip(name);
+	if (index != nullptr)
+	{
+		AEAudioStopGroup(BGM_LOOP);
+		AEAudioPlay(index->audio, BGM_LOOP, volume, pitch, -1);
 	}
 }
 
 void AudioManager::PauseMusic()
 {
-	AEAudioPauseGroup(BGM_);
+	AEAudioPauseGroup(BGM_LOOP);
 }
 void AudioManager::ResumeMusic()
 {
-	AEAudioResumeGroup(BGM_);
+	AEAudioResumeGroup(BGM_LOOP);
 }
 void AudioManager::StopMusic()
 {
-	AEAudioStopGroup(BGM_);
+	AEAudioStopGroup(BGM_LOOP);
 }
 
 void AudioManager::SetBGMVolume(float volume)
 {
 	localBGMVolume = volume;
-	AEAudioSetGroupVolume(BGM_, localBGMVolume);
+	AEAudioSetGroupVolume(BGM_LOOP, localBGMVolume);
 }
 
 void AudioManager::SetSFXVolume(float volume)
 {
 	localSFXVolume = volume;
-	AEAudioSetGroupVolume(SFX_, localSFXVolume);
+	AEAudioSetGroupVolume(SFX_LOOP, localSFXVolume);
+	AEAudioSetGroupVolume(SFX_SINGLE, localSFXVolume);
 }
 
 float AudioManager::GetBGMVolume() const { return localBGMVolume; }

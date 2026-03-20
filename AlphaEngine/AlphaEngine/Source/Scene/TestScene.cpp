@@ -131,6 +131,7 @@ void TestScene::Update() {
     f32 dt = (f32)AEFrameRateControllerGetFrameTime();
 
     if (!isPaused) {
+        audio->ResumeMusic();
         player->Update(dt);
 
         ParticleManager::GetInstance()->Update(dt);
@@ -259,6 +260,7 @@ void TestScene::Update() {
 
     }
     else{
+        audio->PauseMusic();
         AEVec2 CamPos = { 0.0f, 0.0f };;
         AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
 

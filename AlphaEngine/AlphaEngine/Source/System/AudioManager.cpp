@@ -101,7 +101,7 @@ void AudioManager::PlayMusic(const std::string& name, float volume, float pitch)
 	if (index != nullptr)
 	{
 		AEAudioStopGroup(BGM_);
-		AEAudioPlay(index->audio, SFX_, volume, pitch, 0);
+		AEAudioPlay(index->audio, BGM_, volume, pitch, 0);
 	}
 	else
 	{
@@ -109,7 +109,10 @@ void AudioManager::PlayMusic(const std::string& name, float volume, float pitch)
 	}
 }
 
-void AudioManager::PauseMusic() { AEAudioPauseGroup(BGM_); }
+void AudioManager::PauseMusic()
+{
+	AEAudioPauseGroup(BGM_); 
+}
 void AudioManager::ResumeMusic() { AEAudioResumeGroup(BGM_); }
 void AudioManager::StopMusic() { AEAudioStopGroup(BGM_); }
 

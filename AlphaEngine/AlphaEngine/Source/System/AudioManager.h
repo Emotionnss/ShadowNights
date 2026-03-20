@@ -13,6 +13,10 @@ struct AudioClip
 	AEAudio audio;
 };
 
+/*!
+Add new audio here
+Refer to struct if unsure
+*/
 static AudioClip AudioClipList[] =
 {
 	{ "bgm_level1", "Assets/Audio/Night Ambient 5.mp3", true},
@@ -40,6 +44,9 @@ public:
 	AudioManager();
 	~AudioManager();
 
+	/*!
+	@brief	Plays audio clip one shot
+	*/
 	void PlaySFX(const std::string& name, float volume = 1.0f, float pitch = 1.0f);
 	void PlayMusic(const std::string& name, float volume = 1.0f, float pitch = 1.0f);
 	void PauseMusic();

@@ -50,9 +50,11 @@ void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     animSpeed = origAnimSpeed;
 }
 
-void BaseEnemy::TakeDamage()
+void BaseEnemy::TakeDamage(int damage)
 {
-    if (!isDying)
+    health -= damage;
+
+    if (health <= 0)
     {
         isDying = true;
         velocity = { 0.0f, 0.0f };
@@ -114,6 +116,25 @@ void BaseEnemy::Draw()
 
     // Pass the calculated transparency to the Render function
     if (sprite) sprite->Render(transform, alpha);
+
+    if (!isDying)
+    {
+        AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+        AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f);
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+        AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+        AEGfxSetTransparency(1.0f);
+
+        healthbarTransform = transform;
+
+        healthbarTransform.SetPosition({healthbarTransform.GetPosition().x - fabs(0.5f * transform.GetScale().x),
+            healthbarTransform.GetPosition().y + (0.5f * transform.GetScale().y)});
+        healthbarTransform.SetScale((static_cast<float>(health)/static_cast<float>(maxHealth)) * 100.f, 10.f);
+
+        AEGfxSetTransform(healthbarTransform.GetMatrix().m);
+        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
+    }
 
     for (EnemyProjectile* p : enemyProjectiles)
     {

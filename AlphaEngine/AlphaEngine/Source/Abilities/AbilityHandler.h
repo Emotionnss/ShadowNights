@@ -10,6 +10,8 @@
 #include "../System/MeshManager.h"
 #include "../Sprite/Sprite.h"
 
+#include "../System/AudioManager.h"
+
 #include <vector>
 class AbilityHandler
 {
@@ -39,7 +41,10 @@ private:
 	bool anchored{};
 
 	bool lasered{};
+	bool showBar{};
 	f32 a1Alpha{}, a2Alpha{}, a3Alpha{};
+
+	AudioManager* audioManager{};
 public:
 	void TriggerAnchor();
 	AbilityHandler();

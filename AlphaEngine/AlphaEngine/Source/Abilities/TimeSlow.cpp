@@ -31,7 +31,7 @@ void TimeSlow::Update(float dt)//update
 		if (!startDespawn)//not despawning yet
 			despawningTimer = despawningTime;//dont let it tick down
 
-
+		AEGfxSetBackgroundColor(0,255, 10);
 		timeSlowTransform.SetPosition(player->GetTransform().GetPosition());//set the slow sprite onto our player
 
 	}

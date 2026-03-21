@@ -1,6 +1,7 @@
 #pragma once
 #include "../Player/Player.h"
 #include "../Sprite/Sprite.h"
+#include "../System/AudioManager.h"
 #include <vector>
 class TemporalAnchor
 {
@@ -32,6 +33,8 @@ private:
     std::vector<Ghosts> ghostVect{};
 
     Transform2D ghostTfm;
+
+    AudioManager* audioManager{};
 public:
     TemporalAnchor();
     ~TemporalAnchor();

@@ -389,6 +389,7 @@ void Player::Update(float deltaTime)
 	if (input.x != 0 && isGrounded)
 	{
 		this->PlayAnim("walk");
+		//AudioManager::GetInstance()->PlaySFX("player_move");
 		
 	}
 	else if (!isGrounded && velocity.y > 0.f)
@@ -453,7 +454,7 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
 
 	matrix.SetRotation(0);
-	matrix.SetPosition(CamPos.x - 55.f, CamPos.y + 350.f);
+	matrix.SetPosition(CamPos.x - 250.f, CamPos.y + 350.f);
 	float safeValue = AEClamp(value, 0.f, maxHP);
 	matrix.SetScale(safeValue * 5.f, 55.f);
 

@@ -8,9 +8,11 @@ AbilityHandler::AbilityHandler()
 	meshManager{ MeshManager::GetInstance() },
 	stopCost{ 15 },
 	slowCost{ 15 },
-	temporalCost{ 50 }
+	temporalCost{ 50 },
+	audioManager{ AudioManager::GetInstance()}
 {
 	AEGfxGetCamPosition(&camPos.x, &camPos.y);
+	resourceBarTfm.SetRotation(-90 * PI/180);
 	a1Tfm.SetScale(100, 100);
 	a2Tfm.SetScale(a1Tfm.GetScale().x, a1Tfm.GetScale().y);
 	a3Tfm.SetScale(a1Tfm.GetScale().x, a1Tfm.GetScale().y);
@@ -30,6 +32,7 @@ AbilityHandler::~AbilityHandler()
 
 	player = nullptr;
 	meshManager = nullptr;
+	audioManager = nullptr;
 	delete timeStop;
 	delete timeSlow;
 	delete tempAnch;
@@ -115,17 +118,24 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList, float dt)
 	{
 		resource += 100 * dt;
 	}
-
+	if (resource >= maxResource)
+	{
+		showBar = false;
+	}
+	else
+	{
+		showBar= true;
+	}
 	a1Alpha = timeStopped ? 0.5f : 1.f;
 	a2Alpha = timeSlowed ? 0.5f : 1.f;
 	a3Alpha = anchored ? 0.5f : resource < temporalCost ? 0.5f : 1.f;
 
 	resource = AEClamp(resource, 0, maxResource);
 	resourceBarTfm.SetScale(20, (resource / maxResource * 100.f));
-	resourceBarTfm.SetPosition(camPos.x + 450.f, camPos.y - 200.f);
-	a1Tfm.SetPosition(camPos.x - a1Tfm.GetScale().x, camPos.y - AEGfxGetWindowHeight() / 2.f);
-	a2Tfm.SetPosition(camPos.x, camPos.y - AEGfxGetWindowHeight() / 2.f);
-	a3Tfm.SetPosition(camPos.x + a3Tfm.GetScale().x, camPos.y - AEGfxGetWindowHeight() / 2.f);
+	resourceBarTfm.SetPosition(camPos.x + resourceBarTfm.GetScale().x, camPos.y);
+	a1Tfm.SetPosition(camPos.x - a1Tfm.GetScale().x * 1.5f, camPos.y - AEGfxGetWindowHeight() / 2.f);
+	a2Tfm.SetPosition(camPos.x- a2Tfm.GetScale().x * 0.5f, camPos.y - AEGfxGetWindowHeight() / 2.f);
+	a3Tfm.SetPosition(camPos.x + a3Tfm.GetScale().x*0.5f, camPos.y - AEGfxGetWindowHeight() / 2.f);
 }
 
 void AbilityHandler::Draw()
@@ -140,15 +150,17 @@ void AbilityHandler::Draw()
 
 	for (BossExplosive* e : bossExplosives)
 		e->Draw();
-
-	//resource bar for the abilties
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(1.f);
-	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-	//AEGfxSetColorToAdd(1.f, 1.f, 255.f, 0.f);
-	AEGfxSetTransform(resourceBarTfm.GetMatrix().m);
-	AEGfxMeshDraw(meshManager->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
+	if(showBar)
+	{
+		//resource bar for the abilties
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		//AEGfxSetColorToAdd(1.f, 1.f, 255.f, 0.f);
+		AEGfxSetTransform(resourceBarTfm.GetMatrix().m);
+		AEGfxMeshDraw(meshManager->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
+	}
 
 	//for ability 1 UI
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);

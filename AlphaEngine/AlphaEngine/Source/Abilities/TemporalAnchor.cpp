@@ -2,13 +2,15 @@
 #include <iostream>
 #include "../Utils/utils.h"
 #include "../Sprite/Sprite.h"
+
 TemporalAnchor::TemporalAnchor() ://default constructor
 	active{ false },
 	activeTime{ 3.f },
 	activeTimer{ activeTime },
 	player{ Player::GetInstance() },
 	zoneSprite{},
-	anchorSprite{}
+	anchorSprite{},
+	audioManager{AudioManager::GetInstance()}
 {
 	zoneTfm.SetScale(1000, 1000);
 	anchorTfm.SetScale(100, 100);
@@ -73,7 +75,7 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 
 
 		}
-		if (!AreCirclesIntersecting(player->GetTransform().GetPosition().x, player->GetTransform().GetPosition().y, player->GetTransform().GetScale().x,
+		if (!AreCirclesIntersecting(player->GetTransform().GetPosition().x, player->GetTransform().GetPosition().y, 0.1f,
 			anchorTfm.GetPosition().x, anchorTfm.GetPosition().y, zoneTfm.GetScale().x))//if player goes out of zone
 		{
 			active = false;//deactivate
@@ -83,6 +85,7 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 		{
 			if (activeTimer <= 0 && !reversing)//if active timer is up and not yet reversing
 			{
+				audioManager->PlaySFXOneShot("time_reverse");
 				reversing = true;//start reversing
 				iter = ghostVect.size() - 1;//start from the BACK of the vector to simulate reversing time
 			}

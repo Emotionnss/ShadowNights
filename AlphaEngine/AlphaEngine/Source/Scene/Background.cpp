@@ -38,5 +38,8 @@ void Background::Draw(AEGfxVertexList* mesh)
 	AEGfxGetCamPosition(&pos.x, &pos.y);
 	transform.SetPosition(pos);
 	AEGfxSetTransform(transform.GetMatrix().m);
-	AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	AEGfxTextureSet(nullptr, 0, 0);
 }

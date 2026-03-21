@@ -1,7 +1,7 @@
 #include "SceneManager.h"
 #include "AEEngine.h"
+#include "../Scene/BaseScene.h"
 
-// Initialize static members
 BaseScene* SceneManager::pCurrentScene = nullptr;
 BaseScene* SceneManager::pNextScene = nullptr;
 

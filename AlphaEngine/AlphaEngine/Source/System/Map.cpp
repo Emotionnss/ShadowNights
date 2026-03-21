@@ -23,10 +23,9 @@ bool operator!=(Node const& lhs, Node const& rhs)
 	return !(lhs == rhs);
 }
 
-Map::Map()
+Map::Map() : NUM_ROW(0), NUM_COLUMN(0), map(nullptr)
 {
 	LoadMapTileImages();
-
 	meshManager = MeshManager::GetInstance();
 	settingsManager = SettingsManager::GetInstance();
 }
@@ -348,7 +347,6 @@ void Map::RenderMap()
 
 void Map::ResetMap()
 {
-	//Resets the map with new blank data
 	map = new Tile*[NUM_ROW];
 
 	for (s32 i = 0; i < NUM_ROW; i++)

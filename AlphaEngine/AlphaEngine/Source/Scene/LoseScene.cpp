@@ -1,15 +1,10 @@
 #include "LoseScene.h"
 #include "../System/Scenemanager.h"
-#include "TestScene.h"
+#include "TutorialScene.h"
 #include "MainMenu.h"
 #include "AEEngine.h"
 #include <fstream>
 #include <string>
-
-bool LoseScene::FileExists(int slot) {
-    std::ifstream f("save_slot_" + std::to_string(slot) + ".txt");
-    return f.good();
-}
 
 void LoseScene::Load() {
     AEGfxReset();
@@ -25,17 +20,17 @@ void LoseScene::Load() {
     btnBack = new Button(0.0f, -170.0f, 200.0f, 50.0f, "Back");
 }
 
-void LoseScene::Init() {
+void LoseScene::Init() {    
     menuPage = 0;
 }
 
 void LoseScene::Update() {
     if (menuPage == 0) {
         if (btnRestart->IsClicked()) {
-            SceneManager::ChangeScene(new TestScene(0));
+            SceneManager::ChangeScene(new TutorialScene());
         }
         if (btnLoad->IsClicked()) {
-            menuPage = 1; // Swap to the slot menu
+            menuPage = 2;
             btnSlot1->SetLabel(FileExists(1) ? "Load Slot 1" : "Empty");
             btnSlot2->SetLabel(FileExists(2) ? "Load Slot 2" : "Empty");
             btnSlot3->SetLabel(FileExists(3) ? "Load Slot 3" : "Empty");
@@ -47,15 +42,14 @@ void LoseScene::Update() {
     else {
         if (btnBack->IsClicked()) menuPage = 0;
 
-        if (btnSlot1->IsClicked() && FileExists(1)) SceneManager::ChangeScene(new TestScene(1));
-        if (btnSlot2->IsClicked() && FileExists(2)) SceneManager::ChangeScene(new TestScene(2));
-        if (btnSlot3->IsClicked() && FileExists(3)) SceneManager::ChangeScene(new TestScene(3));
+        if (btnSlot1->IsClicked() && FileExists(1)) SceneManager::ChangeScene(new TutorialScene(1));
+        if (btnSlot2->IsClicked() && FileExists(2)) SceneManager::ChangeScene(new TutorialScene(2));
+        if (btnSlot3->IsClicked() && FileExists(3)) SceneManager::ChangeScene(new TutorialScene(3));
     }
 }
 
 void LoseScene::Draw() {
     AEGfxSetCamPosition(0.0f, 0.0f);
-
     AEGfxSetBackgroundColor(0.3f, 0.0f, 0.0f);
 
     if (menuPage == 0) {
@@ -71,25 +65,15 @@ void LoseScene::Draw() {
     }
 
     if (Button::fontId != -1) {
-        float textX = -0.15f;
-        float textY = 0.35f;
-
-        AEGfxPrint(Button::fontId, "YOU DIED", textX, textY, 1.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+        AEGfxPrint(Button::fontId, "YOU DIED!", -0.1f, 0.3f, 1.5f, 1.0f, 1.0f, 1.0f, 1.0f);
     }
 }
 
 void LoseScene::Free() {
-    delete btnRestart;
-    delete btnLoad;
-    delete btnMenu;
-
-    delete btnSlot1;
-    delete btnSlot2;
-    delete btnSlot3;
-    delete btnBack;
-
+    delete btnRestart; delete btnLoad; delete btnMenu;
+    delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
     Button::FreeResources();
+    BaseScene::Free();
 }
 
-void LoseScene::Unload() {
-}
+void LoseScene::Unload() {}

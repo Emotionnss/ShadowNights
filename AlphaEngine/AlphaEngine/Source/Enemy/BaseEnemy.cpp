@@ -39,8 +39,7 @@ void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     moveSpeed = originalSpeed;
     velocity = { moveSpeed, 0.0f };
     isGrounded = false;
-    
-    // Initialize Death Variables
+
     isDying = false;
     oriDeathTimer = 1.0f;
     deathTimer = 0.0f;
@@ -58,10 +57,8 @@ void BaseEnemy::TakeDamage(int damage)
     {
         isDying = true;
         velocity = { 0.0f, 0.0f };
-        
-        deathTimer = oriDeathTimer; 
-
-        PlayAnim(deathAnimName); 
+        deathTimer = oriDeathTimer;
+        PlayAnim(deathAnimName);
     }
 }
 
@@ -74,7 +71,6 @@ void BaseEnemy::Update(float deltaTime)
 {
     if (!stopped)
     {
-        // Update Projectiles
         for (auto it = enemyProjectiles.begin(); it != enemyProjectiles.end(); )
         {
             (*it)->Speed(slowed ? (*it)->OriginalSpeed() / 20.f : (*it)->OriginalSpeed());
@@ -88,15 +84,13 @@ void BaseEnemy::Update(float deltaTime)
             else
             {
                 ++it;
-            } 
+            }
         }
 
         if (isDying)
         {
             deathTimer -= deltaTime;
-            
-            // Continue ticking the animation frames while dying
-            if (sprite) sprite->Update(); 
+            if (sprite) sprite->Update();
         }
     }
 }
@@ -108,40 +102,41 @@ void BaseEnemy::Draw()
     if (isDying)
     {
         alpha = deathTimer / oriDeathTimer;
-        
-        // Safety clamp to ensure alpha stays within 0.0 to 1.0
         if (alpha < 0.0f) alpha = 0.0f;
         if (alpha > 1.0f) alpha = 1.0f;
     }
 
-    // Pass the calculated transparency to the Render function
     if (sprite) sprite->Render(transform, alpha);
 
     if (!isDying)
     {
+        // Safely wipe the paintbrush
+        AEGfxTextureSet(nullptr, 0, 0);
+
         AEGfxSetRenderMode(AE_GFX_RM_COLOR);
         AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f);
         AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
-
         AEGfxSetBlendMode(AE_GFX_BM_BLEND);
         AEGfxSetTransparency(1.0f);
 
         healthbarTransform = transform;
 
-        healthbarTransform.SetPosition({healthbarTransform.GetPosition().x - fabs(0.5f * transform.GetScale().x),
-            healthbarTransform.GetPosition().y + (0.5f * transform.GetScale().y)});
-        healthbarTransform.SetScale((static_cast<float>(health)/static_cast<float>(maxHealth)) * 100.f, 10.f);
+        healthbarTransform.SetPosition(
+            transform.GetPosition().x,
+            transform.GetPosition().y + (0.5f * transform.GetScale().y) + 15.f
+        );
+        healthbarTransform.SetScale((static_cast<float>(health) / static_cast<float>(maxHealth)) * 100.f, 10.f);
 
         AEGfxSetTransform(healthbarTransform.GetMatrix().m);
-        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
+        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);
+        AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     for (EnemyProjectile* p : enemyProjectiles)
     {
-        p->Draw();
+        p->Draw(nullptr);
     }
 
-    // Debug lines
     if (path.size() > 1)
     {
         if (settingsManager->GetTilesDebug())
@@ -154,6 +149,17 @@ void BaseEnemy::Draw()
             map->RenderPathDebug(path);
         }
     }
+
+    AEGfxTextureSet(nullptr, 0, 0);
+    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+    AEGfxSetTransparency(1.0f);
+    AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+    AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+    // This specifically stops the Giant Red Bars!
+    AEMtx33 identity;
+    AEMtx33Identity(&identity);
+    AEGfxSetTransform(identity.m);
 }
 
 void BaseEnemy::PlayAnim(std::string name)
@@ -161,14 +167,11 @@ void BaseEnemy::PlayAnim(std::string name)
     if (currentAnimState != name)
     {
         currentAnimState = name;
-
         s32 loopCount = (name == deathAnimName) ? 1 : -1;
-
         if (sprite) sprite->PlayAnimation(name, loopCount, animSpeed);
     }
 }
 
-// Slow/Stop logic remains the same
 bool BaseEnemy::Slowed() const { return slowed; }
 void BaseEnemy::Slowed(bool active)
 {

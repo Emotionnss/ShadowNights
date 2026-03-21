@@ -2,7 +2,7 @@
 #include "System/SceneManager.h"
 #include "System/MeshManager.h"
 #include "System/Map.h"
-#include "Scene/TestScene.h"
+#include "Scene/TutorialScene.h"
 #include "Scene/MainMenu.h"
 #include "System/SettingsManager.h"
 #include <iostream>
@@ -50,18 +50,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
         AESysFrameEnd();
     }
-
-    // 4. Cleanup
     SceneManager::Exit();
+
+    Player::GetInstance()->DestroyInstance();
     MeshManager::DestroyInstance();
-    Map::DestroyInstance();
-    Button::FreeResources();
+    Map::GetInstance()->DestroyInstance();
+
     AudioManager::DestroyInstance();
     aManager = nullptr;
     SettingsManager::DestroyInstance();
     sManager = nullptr;
     ParticleManager::DestroyInstance();
+
+    Button::FreeResources();
+
     AESysExit();
 
-    return 1;
+    return 0;
 }

@@ -139,7 +139,7 @@ void Sprite::Render(Transform2D& transform, float alpha, float r, float g, float
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(alpha);
 
-	
+	//to clean the paintbrush before drawing
 	AEGfxTextureSet(tex, currentUVWidth, currentUVHeight);
 	AEGfxSetTransform(transform.GetMatrix().m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);

@@ -36,7 +36,7 @@ public:
 	void DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matrix);
 
 	void TakeDamage(float damage);
-	void TakeDamage(int value) { currentHP -= value; }
+	void TakeDamage(int value) { AudioManager::GetInstance()->PlaySFXOneShot("player_hurt"); currentHP -= value; }
 
 	void SetHealth(float val);
 	f32 GetHealth();

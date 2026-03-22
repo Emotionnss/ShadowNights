@@ -12,6 +12,7 @@ private:
         AEVec2 position;
     };
     bool active{};
+    bool abilityAnchoring{};
     f32 activeTime{};
     f32 activeTimer{ activeTime };
     bool spawning{};

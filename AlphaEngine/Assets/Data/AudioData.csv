@@ -2,3 +2,7 @@ bgm_level1,Night Ambient 5.mp3,TRUE
 player_attack,ANIMAL-LION_GEN-HDF-01134.wav,FALSE
 player_move,playerMovement.wav,FALSE
 time_reverse,reversing2.wav,FALSE
+player_hurt,hurt.wav,FALSE
+boss_laser_spawning,laserSpawn.wav,FALSE
+player_slash,swordSlash.wav,FALSE
+door_open,door_opening.wav,FALSE

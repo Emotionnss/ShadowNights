@@ -75,9 +75,10 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList, float dt)
 		player->SetHealth(100);
 	}
 
-	if (AEInputCheckTriggered(AEVK_F) && resource >= temporalCost)
+	if (AEInputCheckTriggered(AEVK_F))
 	{
-		TriggerAnchor();
+		if(resource >= temporalCost || anchored)
+			TriggerAnchor();
 
 		resource = anchored ? resource - temporalCost : resource;
 	}
@@ -98,7 +99,7 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList, float dt)
 	}
 
 
-
+	//separated into 2 if statements so that the cost is additive
 	if (timeStopped)
 	{
 		resource -= 15 * dt;
@@ -116,7 +117,7 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList, float dt)
 
 	if (!timeStopped && !timeSlowed && !anchored)
 	{
-		resource += 100 * dt;
+		resource += 10 * dt;
 	}
 	if (resource >= maxResource)
 	{
@@ -202,4 +203,5 @@ bool AbilityHandler::Reverse() const
 void AbilityHandler::TriggerAnchor()
 {
 	anchored = tempAnch->Anchor(player->GetTransform().GetPosition());
+
 }

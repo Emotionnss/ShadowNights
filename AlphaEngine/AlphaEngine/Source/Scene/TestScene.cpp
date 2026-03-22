@@ -143,7 +143,9 @@ void TestScene::Update() {
             enemy->Update(dt);
         }
 
-        if (enemyList.size() == 0) {
+        if (enemyList.size() == 0 && map->GetMap()[(int)DoorTilePosition.x][(int)DoorTilePosition.y].tileType == TILE_TYPE::CLOSED_DOOR) {
+            std::cout << (int) map->GetTile(DoorTilePosition.y, DoorTilePosition.x).tileType << '\n';
+            AudioManager::GetInstance()->PlaySFXOneShot("door_open");
             map->SetTile(TILE_TYPE::OPEN_DOOR, DoorTilePosition.y, DoorTilePosition.x);
         }
 

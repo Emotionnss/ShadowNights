@@ -26,6 +26,8 @@ Player::Player()
 	sprite = new Sprite(CSVManager::ReadInfo("tempPlayer"));
 	sprite->SetDefaultAnimation("idle");
 	sprite->PlayDefaultAnimation(-1, 1.f);
+
+	AudioManager::GetInstance()->PlayEffect("player_move",0.98f,0.5f);
 }
 
 Player::~Player()
@@ -137,7 +139,7 @@ void Player::HandleInput()
 
 		AEVec2 playerDir = ScreenToWorldPos(mousePos);
 		AEVec2Normalize(&playerDir, &playerDir);
-
+		AudioManager::GetInstance()->PlaySFXOneShot("player_slash");
 		projectileList.push_back(new SwordProjectile(GetTransform().GetPosition(), playerDir));
 	}
 }
@@ -389,23 +391,26 @@ void Player::Update(float deltaTime)
 	if (input.x != 0 && isGrounded)
 	{
 		this->PlayAnim("walk");
-		//AudioManager::GetInstance()->PlaySFX("player_move");
+		AudioManager::GetInstance()->ResumeEffect();//continue walking sound
+		//AudioManager::GetInstance()->PlaySFXOneShot("player_move");
 		
 	}
 	else if (!isGrounded && velocity.y > 0.f)
 	{
 		this->PlayAnim("jump");
-
+		AudioManager::GetInstance()->PauseEffect();//pause walking sound
 		// Spawns a trail at the player's position matching the player size
 		ParticleManager::GetInstance()->SpawnTrail(GetTransform().GetPosition(), GetTransform().GetScale(), 0.3f);
 	}
 	else if (!isGrounded && velocity.y < 0.f)
 	{
+		AudioManager::GetInstance()->PauseEffect();//pause walking sound
 		this->PlayAnim("fall");
 	}
 	else
 	{
 		this->PlayAnim("idle");
+		AudioManager::GetInstance()->PauseEffect();//pause walking sound
 	}
 
 	// Update projectiles and remove dead ones
@@ -465,7 +470,7 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 void Player::TakeDamage(float damage)
 {
 	currentHP -= damage;
-
+	AudioManager::GetInstance()->PlaySFXOneShot("player_hurt");
 	if (currentHP < 0) {
 		currentHP = 0;
 	}

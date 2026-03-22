@@ -49,12 +49,12 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 {
 	if (spawning)
 	{
-		std::cout << "in2\n";
+
 		anchorSpawnTfm.SetPosition(player->GetTransform().GetPosition());
 		spawnTimer += -1 * dt;
 		if (spawnTimer <= 0)
 		{
-			std::cout << "in2\n";
+
 			spawnTimer = spawnTime;
 			spawning = false;
 			active = true;
@@ -104,6 +104,7 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 			active = false;//stop activity
 			player->SetHealth(savedHealth);//reset the health to what it had before
 			player->GetTransform().SetPosition(anchorTfm.GetPosition());
+			abilityAnchoring = false;
 		}
 	}
 	else if (!active && !reversing && !spawning)//once its not active nor reversing
@@ -118,24 +119,27 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 
 bool TemporalAnchor::Anchor(AEVec2 anchPos)
 {
-	if (active)
+	if (abilityAnchoring)
 	{
 		active = false;
+		abilityAnchoring = false;
 		spawning = false;
 		reversing = true;
 		iter = ghostVect.size() - 1;
+		audioManager->PlaySFXOneShot("time_reverse");
 		//player->GetTransform().SetPosition(anchorTfm.GetPosition());
 
 	}
 	else
 	{
 		//active = true;
+		abilityAnchoring = true;
 		spawning = true;
 		savedHealth = player->GetHealth();
 
 		anchorSpawnSprite->PlayAnimation("spawn", 1, spawnTime);
 	}
-	return active;
+	return abilityAnchoring;
 }
 
 bool TemporalAnchor::Anchor() const

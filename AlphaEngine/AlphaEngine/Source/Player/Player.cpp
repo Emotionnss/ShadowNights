@@ -15,6 +15,7 @@ Player::Player()
 	, jumpForce{ 1000.f }
 	, gravity{ -1400.f }
 	, isGrounded{ false }
+	, damagedTimer{ 0.f }
 {
 	SetStatic(false);
 	GetTransform().SetScale(size, size); // Set Scale of transform
@@ -27,7 +28,7 @@ Player::Player()
 	sprite->SetDefaultAnimation("idle");
 	sprite->PlayDefaultAnimation(-1, 1.f);
 
-	AudioManager::GetInstance()->PlayEffect("player_move",0.98f,0.5f);
+	AudioManager::GetInstance()->PlayEffect("player_move", 0.98f, 0.5f);
 }
 
 Player::~Player()
@@ -76,12 +77,15 @@ Sprite* Player::GetSprite() const
 	return this->sprite;
 }
 
-void Player::PlayAnim(std::string name)
+void Player::PlayAnim(std::string name, s32 count)
 {
 	if (currentAnimState != name)
 	{
 		currentAnimState = name;
-		if (sprite) sprite->PlayAnimation(name, -1, 1.f);
+		if (sprite)
+		{
+			sprite->PlayAnimation(name, count, 1.f);
+		}
 	}
 }
 
@@ -339,6 +343,10 @@ void Player::AimRotation()
 
 void Player::Update(float deltaTime)
 {
+	if (damagedTimer > 0.f)
+	{
+		damagedTimer -= deltaTime;
+	}
 	HandleInput(); // Handle Input Internally
 	AimRotation();
 	AEVec2 currentForces{ 0.f, gravity }; // Acceleration
@@ -384,33 +392,9 @@ void Player::Update(float deltaTime)
 	{
 		bool isFacingInputDirection = (input.x > 0) == (playerDirection == Direction::RIGHT);
 		this->PlayAnim(isFacingInputDirection ? "walk_forward" : "walk_backward");
-		/*
-		if (input.x > 0)
-		{
-			if (playerDirection == Direction::RIGHT)
-			{
-				this->PlayAnim("walk_forward");
-			}
-			else
-			{
-				this->PlayAnim("walk_backward");
-			}
-		}
-		else
-		{
-			if (playerDirection == Direction::RIGHT)
-			{
-				this->PlayAnim("walk_backward");
-			}
-			else
-			{
-				this->PlayAnim("walk_forward");
-			}
-		}
-		*/
 		AudioManager::GetInstance()->ResumeEffect();//continue walking sound
 		//AudioManager::GetInstance()->PlaySFXOneShot("player_move");
-		
+
 	}
 	else if (!isGrounded && velocity.y > 0.f)
 	{
@@ -433,6 +417,11 @@ void Player::Update(float deltaTime)
 		AudioManager::GetInstance()->PauseEffect();//pause walking sound
 	}
 
+	if (sprite)
+	{
+		sprite->Update();
+	}
+
 	// Update projectiles and remove dead ones
 	for (auto it = projectileList.begin(); it != projectileList.end(); )
 	{
@@ -446,11 +435,6 @@ void Player::Update(float deltaTime)
 		}
 		else
 			++it;
-	}
-
-	if (sprite)
-	{
-		sprite->Update();
 	}
 }
 
@@ -480,13 +464,14 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 }
 
-void Player::TakeDamage(float damage)
+template <typename T>
+void Player::TakeDamage(T damage)
 {
-	currentHP -= damage;
 	AudioManager::GetInstance()->PlaySFXOneShot("player_hurt");
-	if (currentHP < 0) {
-		currentHP = 0;
-	}
+
+	int x = (currentHP - damage < 0) ? 0 : (currentHP - damage);
+	SetHealth(x);
+	damagedTimer = 0.5f;
 }
 
 void Player::ClearProjectileList()
@@ -554,17 +539,31 @@ void Player::Draw(AEGfxVertexList* mesh)
 
 	DrawHealthBar(mesh, currentHP, healthbar);
 
-	// Draw player sprite/transform via GameObject::Draw
-	GameObject::Draw();
+	// Change to draw in player.cpp
+	if (sprite != nullptr)
+	{
+		if (damagedTimer > 0.f)
+		{
+			sprite->Render(transform, 255.f, 1.f, 1.f, 1.f);
+		}
+		else
+		{
+			sprite->Render(transform);
 
+		}
+	}
+
+	/*
 	AEGfxTextureSet(nullptr, 0, 0);
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+	AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
+
 
 	AEMtx33 identity;
 	AEMtx33Identity(&identity);
 	AEGfxSetTransform(identity.m);
+	*/
 }

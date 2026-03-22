@@ -35,8 +35,9 @@ public:
 	void Draw(AEGfxVertexList* mesh);
 	void DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matrix);
 
-	void TakeDamage(float damage);
-	void TakeDamage(int value) { AudioManager::GetInstance()->PlaySFXOneShot("player_hurt"); currentHP -= value; }
+	// I hate whoever forced me to do this
+	template <typename T>
+	void TakeDamage(T damage);
 
 	void SetHealth(float val);
 	f32 GetHealth();
@@ -68,6 +69,8 @@ private:
 
 	f32 maxHP, currentHP;
 
+	f32 damagedTimer;
+
 	AEVec2 cameraPosition, cameraOffset;
 
 	Map* map;
@@ -75,5 +78,5 @@ private:
 	Tile collidedXTile, collidedYTile;
 protected:
 	std::string currentAnimState = "";
-	void PlayAnim(std::string name);
+	void PlayAnim(std::string name, s32 count = -1);
 };

@@ -7,6 +7,8 @@ AudioManager::AudioManager()
 	, SFX_LOOP{}
 	, SFX_SINGLE{}
 	, ClipCount{ 0 }
+	, BGMplaying{ false }
+	, SFXplaying{ false }
 {
 	settings = SettingsManager::GetInstance();
 	if (settings != nullptr)
@@ -162,6 +164,7 @@ void AudioManager::PlayEffect(const std::string& name, f32 volume, f32 pitch)
 	{
 		AEAudioStopGroup(SFX_LOOP);
 		AEAudioPlay(index->audio, SFX_LOOP, volume, pitch, -1);
+		SFXplaying = true;
 	}
 }
 
@@ -178,6 +181,12 @@ void AudioManager::ResumeEffect()
 void AudioManager::StopEffect()
 {
 	AEAudioStopGroup(SFX_LOOP);
+	SFXplaying = false;
+}
+
+bool AudioManager::GetEffectGroup() const
+{
+	return SFXplaying;
 }
 
 void AudioManager::PlayMusic(const std::string& name, f32 volume, f32 pitch)
@@ -187,6 +196,7 @@ void AudioManager::PlayMusic(const std::string& name, f32 volume, f32 pitch)
 	{
 		AEAudioStopGroup(BGM_LOOP);
 		AEAudioPlay(index->audio, BGM_LOOP, volume, pitch, -1);
+		BGMplaying = true;
 	}
 }
 
@@ -201,6 +211,12 @@ void AudioManager::ResumeMusic()
 void AudioManager::StopMusic()
 {
 	AEAudioStopGroup(BGM_LOOP);
+	BGMplaying = false;
+}
+
+bool AudioManager::GetMusicGroup() const
+{
+	return BGMplaying;
 }
 
 void AudioManager::SetBGMVolume(float volume)

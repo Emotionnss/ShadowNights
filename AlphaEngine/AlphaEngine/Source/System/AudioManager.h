@@ -34,6 +34,7 @@ private:
 	AEAudioGroup SFX_LOOP;
 	AEAudioGroup SFX_SINGLE;
 	int ClipCount;
+	bool SFXplaying, BGMplaying;
 
 	std::vector<AudioClip> AudioClipList;
 
@@ -61,6 +62,8 @@ public:
 	void ResumeEffect();
 	void StopEffect();
 
+	bool GetEffectGroup() const;
+
 	/*!
 	@brief	Plays audio with loop
 	*/
@@ -68,6 +71,8 @@ public:
 	void PauseMusic();
 	void ResumeMusic();
 	void StopMusic();
+
+	bool GetMusicGroup() const;
 
 	void  SetBGMVolume(float volume);
 	void  SetSFXVolume(float volume);

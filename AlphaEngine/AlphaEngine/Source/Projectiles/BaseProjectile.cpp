@@ -115,7 +115,7 @@ void BaseProjectile::Exit()
 
 float BaseProjectile::GetLifespan() { return currLifespan; }
 void BaseProjectile::SetLifespan(float time) { currLifespan = time; }
-void BaseProjectile::SetSpeed(float speed) { this->speed = speed; }
+void BaseProjectile::SetSpeed(float newSpeed) { this->speed = newSpeed; }
 AEVec2 BaseProjectile::GetDirection() { return direction; }
 void BaseProjectile::SetDirection(AEVec2 newDir) { direction = newDir; }
 

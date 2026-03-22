@@ -17,9 +17,9 @@ enum class BOSS_STATE
 
 enum class PendingAttack
 {
-    NONE,
     LASER,
-    EXPLOSIVE
+    EXPLOSIVE,
+    NONE
 };
 
 struct Weakpoint
@@ -90,13 +90,12 @@ private:
     u32 maxStateCounter = 3;
 
     // Boss Ability Logic
-    bool isCasting;
-    float castProgress;
-    float castDuration;
-    PendingAttack pendingAttack;
+    float attackCooldown = 0.f;
+    bool isCasting = false;
+    float castProgress = 0.f;
+    float castDuration = 0.f;
+    PendingAttack pendingAttack = PendingAttack::NONE;
     Transform2D castbarTransform;
-
-    float attackCooldown;
 
     std::vector<BossLaser*> bossLasers;
     std::vector<BossExplosive*> bossExplosives;

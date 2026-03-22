@@ -1,5 +1,4 @@
 #include "BossEnemy.h"
-#include "../System/Map.h"
 #include "../Player/Player.h"
 #include "../System/MeshManager.h"
 #include <cmath>
@@ -61,9 +60,7 @@ void BossEnemy::Update(f32 deltaTime)
     //Update Enemy FSM
     EnemyFSM(deltaTime);
 
-    Map* map = Map::GetInstance();
     Player* player = Player::GetInstance();
-
     AEVec2 myPos = transform.GetPosition();
     AEVec2 playerPos = player->GetTransform().GetPosition();
 
@@ -335,7 +332,6 @@ void BossEnemy::StartCast(PendingAttack attackType)
     castProgress = 0.0f;
     pendingAttack = attackType;
 
-    // Optional: change castDuration per attack
     if (attackType == PendingAttack::LASER) castDuration = 1.5f;
     else if (attackType == PendingAttack::EXPLOSIVE) castDuration = 3.f;
 }
@@ -350,10 +346,9 @@ void BossEnemy::FireLaser()
 
 void BossEnemy::FireExplosive()
 {
-    Player* player = Player::GetInstance();
     BossExplosive* newExplosive = new BossExplosive();
     float dirX = transform.GetScale().x > 0.f ? 1.f : -1.f;
-    AEVec2 dir = { dirX, AERandFloat() }; // or compute toward player
+    AEVec2 dir = { dirX, AERandFloat() };
     newExplosive->Triggered(transform.GetPosition(), dir);
     bossExplosives.push_back(newExplosive);
 }

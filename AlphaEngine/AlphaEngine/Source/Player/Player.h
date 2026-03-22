@@ -56,6 +56,7 @@ public:
 	Sprite* GetSprite() const;
 private:
 	void AimRotation();
+	AEVec2 ShootDirection(AEVec2 mousePosition) const;
 
 	Transform2D healthbar;
 

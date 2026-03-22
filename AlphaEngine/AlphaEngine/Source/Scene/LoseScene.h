@@ -12,16 +12,7 @@ public:
     void Unload() override;
 
 private:
-    bool FileExists(int slot); // Checks if a save exists
-
-    int menuPage = 0;
-
     Button* btnRestart = nullptr;
     Button* btnLoad = nullptr;
     Button* btnMenu = nullptr;
-
-    Button* btnSlot1 = nullptr;
-    Button* btnSlot2 = nullptr;
-    Button* btnSlot3 = nullptr;
-    Button* btnBack = nullptr;
 };

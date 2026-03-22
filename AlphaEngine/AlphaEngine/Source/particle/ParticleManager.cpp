@@ -1,4 +1,5 @@
 #include "ParticleManager.h"
+#include "../System/MeshManager.h"
 
 ParticleManager* ParticleManager::instance = nullptr;
 
@@ -15,7 +16,7 @@ void ParticleManager::DestroyInstance() {
 }
 
 void ParticleManager::SpawnParticle(AEVec2 pos, AEVec2 vel, AEVec2 scale, float life, float r, float g, float b, float a) {
-    Particle p;
+    Particle p = {};
     p.position = pos;
     p.velocity = vel;
     p.scale = scale;
@@ -23,13 +24,24 @@ void ParticleManager::SpawnParticle(AEVec2 pos, AEVec2 vel, AEVec2 scale, float 
     p.life = life;
     p.maxLife = life;
     p.r = r; p.g = g; p.b = b; p.a = a;
+    p.texture = nullptr;
 
     particles.push_back(p);
 }
 
-void ParticleManager::SpawnTrail(AEVec2 pos, AEVec2 scale, float life, float r, float g, float b) {
-    // Trails have no velocity, spawn and fade out
-    SpawnParticle(pos, { 0.0f, 0.0f }, scale, life, r, g, b, 0.5f);
+void ParticleManager::SpawnTrail(AEVec2 pos, AEVec2 scale, float life, float r, float g, float b, float rotation, AEGfxTexture* tex) {
+    Particle p = {};
+    p.position = pos;
+    p.velocity = { 0.0f, 0.0f };
+    p.scale = scale;
+    p.life = life;
+    p.maxLife = life;
+    p.r = r; p.g = g; p.b = b; p.a = 0.5f;
+
+    p.rotation = rotation;
+    p.texture = tex;
+
+    particles.push_back(p);
 }
 
 void ParticleManager::Update(float dt) {
@@ -37,15 +49,16 @@ void ParticleManager::Update(float dt) {
         it->life -= dt;
 
         if (it->life <= 0.0f) {
-            it = particles.erase(it); // Remove dead particles
+            it = particles.erase(it);
         }
         else {
-            // Move particle
             it->position.x += it->velocity.x * dt;
             it->position.y += it->velocity.y * dt;
 
-            // Fade out smoothly over its lifespan
-            it->a = (it->life / it->maxLife) * 0.5f; 
+            // --- THE TAPER EFFECT ---
+            it->a = (it->life / it->maxLife) * 0.8f;
+            it->scale.x -= it->scale.x * 5.0f * dt;
+            it->scale.y -= it->scale.y * 5.0f * dt;
 
             ++it;
         }
@@ -55,29 +68,60 @@ void ParticleManager::Update(float dt) {
 void ParticleManager::Draw(AEGfxVertexList* mesh) {
     if (!mesh || particles.empty()) return;
 
+    AEGfxTextureSet(nullptr, 0, 0);
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);
     AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 
     for (const auto& p : particles) {
-        AEGfxSetTransparency(p.a);
-        AEGfxSetColorToMultiply(p.r, p.g, p.b, 1.0f);
-        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f); // Reset additive color
+        if (p.texture != nullptr) continue; // Skip textures for now
 
         AEMtx33 scale, rot, trans, finalMtx;
         AEMtx33Scale(&scale, p.scale.x, p.scale.y);
         AEMtx33Rot(&rot, p.rotation);
         AEMtx33Trans(&trans, p.position.x, p.position.y);
-
         AEMtx33Concat(&finalMtx, &rot, &scale);
         AEMtx33Concat(&finalMtx, &trans, &finalMtx);
-
         AEGfxSetTransform(finalMtx.m);
-        AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+        AEGfxSetTransparency(p.a);
+        AEGfxSetColorToMultiply(p.r, p.g, p.b, 1.0f);
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
     }
 
-    // Clean up graphics state after drawing all particles
+    AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+    AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
+    for (const auto& p : particles) {
+        if (p.texture == nullptr) continue; // Skip shape
+
+        AEMtx33 scale, rot, trans, finalMtx;
+        AEMtx33Scale(&scale, p.scale.x, p.scale.y);
+        AEMtx33Rot(&rot, p.rotation);
+        AEMtx33Trans(&trans, p.position.x, p.position.y);
+        AEMtx33Concat(&finalMtx, &rot, &scale);
+        AEMtx33Concat(&finalMtx, &trans, &finalMtx);
+        AEGfxSetTransform(finalMtx.m);
+
+        AEGfxSetTransparency(p.a);
+        AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+        AEGfxTextureSet(p.texture, 0, 0);
+        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+    }
+
+	//universal cleanup brush
+    AEGfxTextureSet(nullptr, 0, 0);
+    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+    AEGfxSetBlendMode(AE_GFX_BM_BLEND);
     AEGfxSetTransparency(1.0f);
     AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+    AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+    AEMtx33 identity;
+    AEMtx33Identity(&identity);
+    AEGfxSetTransform(identity.m);
 }
 
 void ParticleManager::ClearAll() {

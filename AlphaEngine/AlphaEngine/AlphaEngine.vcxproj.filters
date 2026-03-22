@@ -27,7 +27,6 @@
     <ClCompile Include="Source\System\CSVManager.cpp" />
     <ClCompile Include="Source\System\Map.cpp" />
     <ClCompile Include="Source\System\SettingsManager.cpp" />
-    <ClCompile Include="Source\Scene\TestScene.cpp" />
     <ClCompile Include="Source\Scene\TestScene2.cpp" />
     <ClCompile Include="Source\Abilities\TimeStop.cpp" />
     <ClCompile Include="Source\Abilities\TimeSlow.cpp" />
@@ -40,6 +39,8 @@
     <ClCompile Include="Source\Scene\LoseScene.cpp" />
     <ClCompile Include="Source\Scene\WinScene.cpp" />
     <ClCompile Include="Source\System\AudioManager.cpp" />
+    <ClCompile Include="Source\Scene\TutorialScene.cpp" />
+    <ClCompile Include="Source\Scene\Level1Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Abilities\BossExplosive.h" />
@@ -68,7 +69,6 @@
     <ClInclude Include="Source\System\Map.h" />
     <ClInclude Include="Source\System\SettingsManager.h" />
     <ClInclude Include="Source\System\SingletonTemplate.h" />
-    <ClInclude Include="Source\Scene\TestScene.h" />
     <ClInclude Include="Source\Scene\TestScene2.h" />
     <ClInclude Include="Source\Abilities\TimeStop.h" />
     <ClInclude Include="Source\Abilities\TimeSlow.h" />
@@ -81,5 +81,7 @@
     <ClInclude Include="Source\Scene\LoseScene.h" />
     <ClInclude Include="Source\Scene\WinScene.h" />
     <ClInclude Include="Source\System\AudioManager.h" />
+    <ClInclude Include="Source\Scene\TutorialScene.h" />
+    <ClInclude Include="Source\Scene\Level1Scene.h" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
 #pragma once
 #include "../Player/Transform2D.h"
 
+void ShutdownKnifeResources();
+
 class BaseProjectile
 {
 protected:
@@ -17,17 +19,17 @@ public:
     bool slowed{};
 
     BaseProjectile(AEVec2 pos, AEVec2 dir, bool skipTextureLoad = false);
-
-    ~BaseProjectile();
+    virtual ~BaseProjectile();
 
     virtual void Update(float deltaTime);
-    void Draw(AEGfxVertexList* mesh);
+
+    virtual void Draw(AEGfxVertexList* mesh);
+
     void Exit();
 
     float GetLifespan();
     void SetLifespan(float time);
     void SetDirection(AEVec2 newDir);
-
     void SetSpeed(float speed);
     AEVec2 GetDirection();
 };

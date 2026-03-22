@@ -1,6 +1,6 @@
 #include "TestScene2.h"
 #include "../System/Scenemanager.h"
-#include "TestScene.h"
+#include "TutorialScene.h"
 #include <iostream>
 
 void TestScene2::Load() {
@@ -40,7 +40,7 @@ void TestScene2::Update() {
 
 
 	if (AEInputCheckTriggered(AEVK_9)) {
-		SceneManager::ChangeScene(new TestScene());
+		SceneManager::ChangeScene(new TutorialScene());
 		return;
 	}
 }

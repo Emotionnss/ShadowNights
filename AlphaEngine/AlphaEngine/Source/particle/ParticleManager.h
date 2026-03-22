@@ -10,11 +10,12 @@ struct Particle {
     float life;
     float maxLife;
     float r, g, b, a;
+
+    AEGfxTexture* texture = nullptr;
 };
 
 class ParticleManager {
 public:
-    // Singleton access
     static ParticleManager* GetInstance();
     static void DestroyInstance();
 
@@ -23,7 +24,7 @@ public:
 
     void SpawnParticle(AEVec2 pos, AEVec2 vel, AEVec2 scale, float life, float r, float g, float b, float a);
 
-    void SpawnTrail(AEVec2 pos, AEVec2 scale, float life = 0.4f, float r = 1.0f, float g = 1.0f, float b = 1.0f);
+    void SpawnTrail(AEVec2 pos, AEVec2 scale, float life = 0.4f, float r = 1.0f, float g = 1.0f, float b = 1.0f, float rotation = 0.0f, AEGfxTexture* tex = nullptr);
 
     void ClearAll();
 

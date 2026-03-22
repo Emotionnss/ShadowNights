@@ -427,8 +427,8 @@ void Player::Update(float deltaTime)
 		// --- FIX 3: Smaller, Grey jump dust so it doesn't blind the screen! ---
 		ParticleManager::GetInstance()->SpawnTrail(
 			GetTransform().GetPosition(), { 30.f, 30.f }, 0.2f, 0.5f, 0.5f, 0.5f
-			AudioManager::GetInstance()->PauseEffect();//pause walking sound	
 		);
+		AudioManager::GetInstance()->PauseEffect();//pause walking sound	
 	}
 	else if (!isGrounded && velocity.y < 0.f)
 	{

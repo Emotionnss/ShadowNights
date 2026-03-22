@@ -388,8 +388,32 @@ void Player::Update(float deltaTime)
 	// Update Animation FSM
 	if (input.x != 0 && isGrounded)
 	{
-		this->PlayAnim("walk");
-		
+		bool isFacingInputDirection = (input.x > 0) == (playerDirection == Direction::RIGHT);
+		this->PlayAnim(isFacingInputDirection ? "walk_forward" : "walk_backward");
+		/*
+		if (input.x > 0)
+		{
+			if (playerDirection == Direction::RIGHT)
+			{
+				this->PlayAnim("walk_forward");
+			}
+			else
+			{
+				this->PlayAnim("walk_backward");
+			}
+		}
+		else
+		{
+			if (playerDirection == Direction::RIGHT)
+			{
+				this->PlayAnim("walk_backward");
+			}
+			else
+			{
+				this->PlayAnim("walk_forward");
+			}
+		}
+		*/
 	}
 	else if (!isGrounded && velocity.y > 0.f)
 	{

@@ -20,12 +20,16 @@ BossExplosive::~BossExplosive()
 	// cleanup
 	if (bigProjectile)
 	{
+		if (bigProjectile->projTex)
+			AEGfxTextureUnload(bigProjectile->projTex);
 		delete bigProjectile;
 		bigProjectile = nullptr;
 	}
 
 	for (BaseProjectile* proj : smallProjectiles)
 	{
+		if (proj->projTex)
+			AEGfxTextureUnload(proj->projTex);
 		delete proj;
 	}
 	smallProjectiles.clear();
@@ -43,6 +47,8 @@ void BossExplosive::Update(float deltaTime)
 		if (bigProjectile->GetLifespan() <= 0.f)
 		{
 			Explode(bigProjectile->transform.GetPosition());
+			if (bigProjectile->projTex)
+				AEGfxTextureUnload(bigProjectile->projTex);
 			delete bigProjectile;
 			bigProjectile = nullptr;
 		}
@@ -69,6 +75,8 @@ void BossExplosive::Update(float deltaTime)
 	{
 		if (smallProjectiles[i]->GetLifespan() <= 0.f)
 		{
+			if (smallProjectiles[i]->projTex)
+				AEGfxTextureUnload(smallProjectiles[i]->projTex);
 			delete smallProjectiles[i];
 			smallProjectiles.erase(smallProjectiles.begin() + i);
 		}

@@ -3,7 +3,9 @@
 
 SettingsManager::SettingsManager() :
 	TILE_WIDTH{ 0.f },
-	TILE_HEIGHT{ 0.f }
+	TILE_HEIGHT{ 0.f },
+	savedBGMVolume{ 0 },
+	savedSFXVolume{ 0 }
 {
 }
 

@@ -260,6 +260,40 @@ std::vector<std::vector<std::string>> CSVManager::ReadAnimationInfo(std::string 
 	return animInfo;
 }
 
+std::vector<std::vector<std::string>> CSVManager::ReadTutorialInfo()
+{
+	//Get info in string
+	std::vector<std::vector<std::string>> tutorialInfo;
+
+	//Creates an output filestream and opens the file
+	std::ifstream file{ "Assets/Data/TutorialData.csv", std::ios::in };
+
+	// Make sure the file is open
+	try
+	{
+		if (!file.is_open())
+		{
+			throw std::runtime_error("Could not open file");
+		}
+	}
+	catch (std::runtime_error e)
+	{
+		//std::cout << "Runtime error: " << e.what();
+		return tutorialInfo;
+	}
+
+	std::string line;
+
+	//Gets line by line until end of file
+	while (getline(file, line))
+	{
+		std::vector<std::string> info{ Tokenise(line, ',') };
+		tutorialInfo.push_back(info);
+	}
+
+	return tutorialInfo;
+}
+
 std::vector<std::string> CSVManager::Tokenise(std::string line, char separator)
 {
 	//List of separated tokens

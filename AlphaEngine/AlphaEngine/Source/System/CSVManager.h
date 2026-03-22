@@ -31,14 +31,14 @@ public:
 	/**
 	 @brief Read information from a CSV file
 	 @param std::string headerName - header name to check against
-	 @return std::vector<std::string> - spritesheet data
+	 @return std::vector<std::string>
 	 */
 	static std::vector<std::string> ReadInfo(std::string headerName);
 
 	/**
-	 @brief Read information from a CSV file
+	 @brief Read settings information from a CSV file
 	 @param std::string headerName - header name to check against
-	 @return std::vector<std::string> - spritesheet data
+	 @return std::vector<std::string>
 	 */
 	static std::vector<std::string> ReadSettingsInfo();
 	
@@ -48,6 +48,13 @@ public:
 	 @return sstd::vector<std::vector<std::string>> - animation data
 	 */
 	static std::vector<std::vector<std::string>> ReadAnimationInfo(std::string animationName);
+
+	/**
+	 @brief Read tutorial information from a CSV file
+	 @param void
+	 @return sstd::vector<std::vector<std::string>> - animation data
+	 */
+	static std::vector<std::vector<std::string>> ReadTutorialInfo();
 
 	/**
 	 @brief Separate a given string by using the given separator and stores all the information into a string vector

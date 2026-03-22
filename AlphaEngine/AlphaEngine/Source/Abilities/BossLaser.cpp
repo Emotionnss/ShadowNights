@@ -57,7 +57,7 @@ void BossLaser::Update(float deltaTime)
         if (startupDelay <= 0.f)
         {
             charging = false;
-            laserSprite->PlayAnimation("attack", 1, 1.f);
+            laserSprite->PlayAnimation("attack", -1, 1.f);
         }
         return;
     }
@@ -92,15 +92,15 @@ void BossLaser::Update(float deltaTime)
 }
 void BossLaser::Draw()
 {
-    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-    AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+    AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+    //AEGfxSetBlendMode(AE_GFX_BM_BLEND);
     if (active)
     {
-        AEGfxSetTransparency(1.f);
-        AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-        AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
-        AEGfxSetTransform(transform.GetMatrix().m);
-        AEGfxMeshDraw(meshManager->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);
+        //AEGfxSetTransparency(1.f);
+        //AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+        //AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
+        //AEGfxSetTransform(transform.GetMatrix().m);
+        //AEGfxMeshDraw(meshManager->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);
 
         laserSprite->Render(transform, 1.f);
     }

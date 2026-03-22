@@ -6,7 +6,6 @@
 void WinScene::Load() {
     AEGfxReset();
     Button::LoadResources();
-
     btnMenu = new Button(0.0f, -100.0f, 200.0f, 50.0f, "Main Menu");
 }
 
@@ -20,7 +19,6 @@ void WinScene::Update() {
 
 void WinScene::Draw() {
     AEGfxSetCamPosition(0.0f, 0.0f);
-
     AEGfxSetBackgroundColor(0.8f, 0.6f, 0.1f);
 
     btnMenu->Draw();

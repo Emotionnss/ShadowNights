@@ -1,5 +1,4 @@
 #pragma once
-
 #include "../Player/GameObject.h"
 #include "../System/MeshManager.h"
 
@@ -14,4 +13,3 @@ public:
 
 	void Draw(AEGfxVertexList* mesh);
 };
-

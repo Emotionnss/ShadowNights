@@ -5,13 +5,12 @@
 class EnemyProjectile : public BaseProjectile
 {
 public:
-
     EnemyProjectile(AEVec2 pos, AEVec2 dir);
     ~EnemyProjectile();
 
     void Update(float deltaTime) override;
 
-    void Draw();
+    void Draw(AEGfxVertexList* mesh) override;
 
     bool IsDead();
     void Speed(float newSpeed);

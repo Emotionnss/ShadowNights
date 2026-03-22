@@ -2,17 +2,19 @@
 #include "../System/CSVManager.h"
 #include <cmath>
 #include "../Player/Player.h"
+#include "../particle/ParticleManager.h"
 
 EnemyProjectile::EnemyProjectile(AEVec2 pos, AEVec2 dir)
     : BaseProjectile(pos, dir, true)
 {
     oriSpeed = 400.0f;
     speed = oriSpeed;
-    
+
     transform.SetScale(40.0f, 40.0f);
     transform.SetPosition(pos.x, pos.y);
     SetLifespan(3.0f);
 
+    // Initialize your animated sprite
     sprite = new Sprite(CSVManager::ReadInfo("shadoworb"));
     sprite->PlayDefaultAnimation(-1, 1.0f);
 }
@@ -35,6 +37,7 @@ void EnemyProjectile::Update(float deltaTime)
         {
             SetLifespan(GetLifespan() - 1.f * deltaTime);
 
+            // Homing AI Logic
             if (isHoming)
             {
                 Player* player = Player::GetInstance();
@@ -60,8 +63,7 @@ void EnemyProjectile::Update(float deltaTime)
                     SetDirection({ newDirX / newMag, newDirY / newMag });
                 }
             }
-            //float currentSpeed = slowed ? (oriSpeed * 0.5f) : oriSpeed;
-            //speed = currentSpeed;
+
             speed = slowed ? (oriSpeed * 0.5f) : oriSpeed;
 
             AEVec2 position = transform.GetPosition();
@@ -72,31 +74,53 @@ void EnemyProjectile::Update(float deltaTime)
             transform.SetPosition(position.x, position.y);
 
             if (sprite) sprite->Update();
+
+            // Spawn an Ominous Dark Purple Particle Trail
+            AEVec2 trailScale = { transform.GetScale().x * 0.7f, transform.GetScale().y * 0.7f };
+            ParticleManager::GetInstance()->SpawnTrail(
+                transform.GetPosition(),
+                trailScale,
+                0.25f,
+                0.5f, 0.0f, 0.8f
+            );
         }
     }
 }
 
-void EnemyProjectile::Draw()
+void EnemyProjectile::Draw(AEGfxVertexList* mesh)
 {
-    if (sprite) sprite->Render(transform);
+    if (sprite != nullptr && sprite->GetSpriteTexture() != nullptr)
+    {
+        AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+        sprite->Render(transform);
+    }
+    else
+    {
+        AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+        AEGfxTextureSet(nullptr, 0, 0);
+
+        AEGfxSetBlendMode(AE_GFX_BM_ADD);
+        AEGfxSetColorToMultiply(0.8f, 0.0f, 1.0f, 1.0f);
+        AEGfxSetColorToAdd(0.4f, 0.0f, 0.6f, 1.0f);
+
+        AEGfxSetTransform(transform.GetMatrix().m);
+        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
+    }
+
+    // --- THE UNIVERSAL CLEANUP BRUSH ---
+    AEGfxTextureSet(nullptr, 0, 0);
+    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+    AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+    AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+    AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f); 
+
+    AEMtx33 identity;
+    AEMtx33Identity(&identity);
+    AEGfxSetTransform(identity.m);
 }
 
-bool EnemyProjectile::IsDead()
-{
-    return currLifespan <= 0.0f;
-}
-
-void EnemyProjectile::Speed(float newSpeed)
-{
-    this->speed = newSpeed;
-}
-
-float EnemyProjectile::Speed() const
-{
-    return this->speed;
-}
-
-float EnemyProjectile::OriginalSpeed() const
-{
-    return this->oriSpeed;
-}
+// Getters and Setters
+bool EnemyProjectile::IsDead() { return currLifespan <= 0.0f; }
+void EnemyProjectile::Speed(float newSpeed) { this->speed = newSpeed; }
+float EnemyProjectile::Speed() const { return this->speed; }
+float EnemyProjectile::OriginalSpeed() const { return this->oriSpeed; }

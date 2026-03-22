@@ -390,7 +390,32 @@ void Player::Update(float deltaTime)
 	// Update Animation FSM
 	if (input.x != 0 && isGrounded)
 	{
-		this->PlayAnim("walk");
+		bool isFacingInputDirection = (input.x > 0) == (playerDirection == Direction::RIGHT);
+		this->PlayAnim(isFacingInputDirection ? "walk_forward" : "walk_backward");
+		/*
+		if (input.x > 0)
+		{
+			if (playerDirection == Direction::RIGHT)
+			{
+				this->PlayAnim("walk_forward");
+			}
+			else
+			{
+				this->PlayAnim("walk_backward");
+			}
+		}
+		else
+		{
+			if (playerDirection == Direction::RIGHT)
+			{
+				this->PlayAnim("walk_backward");
+			}
+			else
+			{
+				this->PlayAnim("walk_forward");
+			}
+		}
+		*/
 		AudioManager::GetInstance()->ResumeEffect();//continue walking sound
 		//AudioManager::GetInstance()->PlaySFXOneShot("player_move");
 		
@@ -398,9 +423,12 @@ void Player::Update(float deltaTime)
 	else if (!isGrounded && velocity.y > 0.f)
 	{
 		this->PlayAnim("jump");
-		AudioManager::GetInstance()->PauseEffect();//pause walking sound
-		// Spawns a trail at the player's position matching the player size
-		ParticleManager::GetInstance()->SpawnTrail(GetTransform().GetPosition(), GetTransform().GetScale(), 0.3f);
+
+		// --- FIX 3: Smaller, Grey jump dust so it doesn't blind the screen! ---
+		ParticleManager::GetInstance()->SpawnTrail(
+			GetTransform().GetPosition(), { 30.f, 30.f }, 0.2f, 0.5f, 0.5f, 0.5f
+			AudioManager::GetInstance()->PauseEffect();//pause walking sound	
+		);
 	}
 	else if (!isGrounded && velocity.y < 0.f)
 	{
@@ -418,13 +446,6 @@ void Player::Update(float deltaTime)
 	{
 		(*it)->Update(deltaTime);
 
-		// Spawns a cyan-colored trail that follows the projectile
-		ParticleManager::GetInstance()->SpawnTrail(
-			(*it)->transform.GetPosition(),
-			(*it)->transform.GetScale(),
-			0.15f,              
-			0.0f, 1.0f, 1.0f 
-		);
 
 		if ((*it)->GetLifespan() <= 0.f)
 		{
@@ -522,10 +543,23 @@ void Player::Draw(AEGfxVertexList* mesh)
 			AEGfxSetTransform(tileYTransform.GetMatrix().m);
 			AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
 		}
+
+
 	}
 
 	DrawHealthBar(mesh, currentHP, healthbar);
 
 	// Draw player sprite/transform via GameObject::Draw
 	GameObject::Draw();
+
+	AEGfxTextureSet(nullptr, 0, 0);
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1.0f);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+	AEMtx33 identity;
+	AEMtx33Identity(&identity);
+	AEGfxSetTransform(identity.m);
 }

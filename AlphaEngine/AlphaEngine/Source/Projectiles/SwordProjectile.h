@@ -1,6 +1,8 @@
 #pragma once
 #include "BaseProjectile.h"
 
+void ShutdownSwordResources();
+
 class SwordProjectile : public BaseProjectile
 {
 public:

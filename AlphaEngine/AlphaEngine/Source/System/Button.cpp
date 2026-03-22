@@ -95,17 +95,19 @@ bool Button::IsClicked()
 }
 
 void Button::LoadResources() {
-    sprite = AEGfxTextureLoad("Assets/Button/Default/TransParent center/panel-transparent-center-023.png");
-    if (!sprite) std::cout << "CRITICAL ERROR: Texture Not Found! Check path." << std::endl;
+    if (sprite == nullptr) {
+        sprite = AEGfxTextureLoad("Assets/Button/Default/TransParent center/panel-transparent-center-023.png");
+        if (!sprite) std::cout << "CRITICAL ERROR: Texture Not Found! Check path." << std::endl;
+    }
 
-    fontId = AEGfxCreateFont("Assets/Fonts/ttf/monogram.ttf", 25);
-    if (fontId == -1) std::cout << "CRITICAL ERROR: Font Not Found! Check path." << std::endl;
+    if (fontId == -1) {
+        fontId = AEGfxCreateFont("Assets/Fonts/ttf/monogram.ttf", 25);
+        if (fontId == -1) std::cout << "CRITICAL ERROR: Font Not Found! Check path." << std::endl;
+    }
 
     if (!pMesh) {
         pMesh = MeshManager::GetInstance()->GetMesh(TEXTURE_SQUARE);
     }
-
-
 }
 
 void Button::FreeResources() {
@@ -113,8 +115,13 @@ void Button::FreeResources() {
         AEGfxTextureUnload(sprite);
         sprite = nullptr;
     }
+
+    if (fontId != -1) {
+        AEGfxDestroyFont(fontId);
+        fontId = -1;
+    }
+
     pMesh = nullptr;
-    fontId = -1; // Reset to prevent dangling pointers
 }
 
 void Button::SetPosition(float newX, float newY) {

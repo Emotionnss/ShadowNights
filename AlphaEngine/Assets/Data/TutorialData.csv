@@ -3,5 +3,5 @@ Jump,8,5,Press SPACEBAR to jump,Hold SPACEBAR to jump higher
 Attack,23,9,Methods to attack enemies:,Left Click to throw a knife,Right Click to shoot a wave
 Timestop,35,5,Press E to use Timestop,It stops enemies and projectiles,in an area (including yours)
 Timeslow,51,3.5,Press Q to use Timeslow,It slows down projectiles around you
-Anchor,51,9,Press F to use Rewind Anchor,Press F again to rewind back in,time to your original position,and restore your hp back to full
+Anchor,51,9,Press F to use Rewind Anchor,Press F again to rewind back in,time to your original position,and revert back to your original,HP at the time of casting
 Goal,55,14.5,Defeat all enemies to open the door,Beat the boss at the last level to win

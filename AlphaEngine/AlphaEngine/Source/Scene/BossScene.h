@@ -16,4 +16,6 @@ public:
 
 private:
     BossEnemy* boss = nullptr;
+
+    float cutsceneDuration = 3.f;
 };

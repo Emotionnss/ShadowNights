@@ -12,6 +12,14 @@ BossEnemy::BossEnemy() : BaseEnemy()
 BossEnemy::~BossEnemy()
 {
     AEGfxTextureUnload(weakpoint.tex);
+
+    for (BossLaser* l : bossLasers)
+        delete l;
+    bossLasers.clear();
+
+    for (BossExplosive* e : bossExplosives)
+        delete e;
+    bossExplosives.clear();
 }
 
 void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
@@ -33,6 +41,13 @@ void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
     
     weakpoint.tex = AEGfxTextureLoad("Assets/Sprites/pearl_01c.png");
     weakpoint.transform.SetScale(100.f, 100.f);
+
+    isCasting = false;
+    castProgress = 0.f;
+    castDuration = 3.f;
+    pendingAttack = PendingAttack::NONE;
+
+    attackCooldown = 3.f;
 }
 
 void BossEnemy::Update(f32 deltaTime)
@@ -62,6 +77,51 @@ void BossEnemy::Update(f32 deltaTime)
     else        transform.SetScale(-visualWidth, visualHeight);
 
     if (sprite) sprite->Update();
+
+    if (isCasting)
+    {
+        castProgress += deltaTime;
+
+        if (castProgress >= castDuration)
+        {
+            castProgress = 0.f;
+            isCasting = false;
+
+            if (pendingAttack == PendingAttack::LASER)
+            {
+                FireLaser();
+            }
+            else if (pendingAttack == PendingAttack::EXPLOSIVE)
+            {
+                FireExplosive();
+            }
+            pendingAttack = PendingAttack::NONE;
+        }
+    }
+
+    attackCooldown -= deltaTime;
+    if (attackCooldown <= 0.f)
+    {
+        int choice = rand() % 2;
+        if (choice == 0)
+        {
+            StartCast(PendingAttack::LASER);
+        }
+        else
+        {
+            StartCast(PendingAttack::EXPLOSIVE);
+        }
+        attackCooldown = 3.f;
+    }
+
+    for (BossLaser* l : bossLasers)
+    {
+        l->Update(deltaTime);
+    }
+    for (BossExplosive* e : bossExplosives)
+    {
+        e->Update(deltaTime);
+    }
 }
 
 void BossEnemy::Draw()
@@ -82,6 +142,26 @@ void BossEnemy::Draw()
         AEGfxSetTransform(weakpoint.transform.GetMatrix().m);
         AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
     }
+
+    if (isCasting)
+    {
+        castbarTransform = transform;
+        castbarTransform.SetPosition(
+            transform.GetPosition().x - 100.f,
+            transform.GetPosition().y + (0.5f * transform.GetScale().y) + 15.f
+        );
+        castbarTransform.SetScale((castProgress / castDuration) * 200.f, 10.f);
+
+        AEGfxSetColorToMultiply(1.0f, 1.0f, 0.0f, 1.0f);
+        AEGfxSetTransform(castbarTransform.GetMatrix().m);
+        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
+    }
+
+    for (BossLaser* l : bossLasers)
+        l->Draw();
+    for (BossExplosive* e : bossExplosives)
+        e->Draw();
+
 }
 
 void BossEnemy::EnemyFSM(f32 deltaTime)
@@ -247,4 +327,33 @@ void BossEnemy::UpdateWeakpoint(f32 deltaTime)
 Weakpoint BossEnemy::GetWeakpoint() const
 {
     return weakpoint;
+}
+
+void BossEnemy::StartCast(PendingAttack attackType)
+{
+    isCasting = true;
+    castProgress = 0.0f;
+    pendingAttack = attackType;
+
+    // Optional: change castDuration per attack
+    if (attackType == PendingAttack::LASER) castDuration = 1.5f;
+    else if (attackType == PendingAttack::EXPLOSIVE) castDuration = 3.f;
+}
+
+void BossEnemy::FireLaser()
+{
+    Player* player = Player::GetInstance();
+    BossLaser* newLaser = new BossLaser();
+    newLaser->Triggered(player->GetTransform().GetPosition());
+    bossLasers.push_back(newLaser);
+}
+
+void BossEnemy::FireExplosive()
+{
+    Player* player = Player::GetInstance();
+    BossExplosive* newExplosive = new BossExplosive();
+    float dirX = transform.GetScale().x > 0.f ? 1.f : -1.f;
+    AEVec2 dir = { dirX, AERandFloat() }; // or compute toward player
+    newExplosive->Triggered(transform.GetPosition(), dir);
+    bossExplosives.push_back(newExplosive);
 }

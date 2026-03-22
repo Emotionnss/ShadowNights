@@ -26,6 +26,8 @@ public:
     void isStopped(bool active);
     bool IsDying() const { return isDying; }
 
+    bool isBoss = false;
+
 protected:
     Sprite* sprite = nullptr;
 

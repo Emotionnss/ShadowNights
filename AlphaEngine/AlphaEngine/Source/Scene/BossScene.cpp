@@ -9,10 +9,18 @@ void BossScene::Init() {
     boss = new BossEnemy();
     boss->Init(1400.f, 300.0f, 85.0f, 60.0f, "boss");
     enemyList.push_back(boss);
+    boss->isBoss = true;
 }
 
 void BossScene::Update() {
     BaseScene::Update();
+
+    f32 dt = (f32)AEFrameRateControllerGetFrameTime();
+    if (cutsceneDuration >= 0.f)
+    {
+        AEGfxSetCamPosition(boss->transform.GetPosition().x, boss->transform.GetPosition().y);
+        cutsceneDuration -= 1 * dt;
+    }
 
     if (boss && boss->IsReadyToDelete()) {
         SceneManager::ChangeScene(new WinScene());

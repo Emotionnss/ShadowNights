@@ -1,5 +1,7 @@
 #pragma once
 #include "BaseEnemy.h"
+#include "../Abilities/BossLaser.h"
+#include "../Abilities/BossExplosive.h"
 
 enum class BOSS_STATE
 {
@@ -11,6 +13,13 @@ enum class BOSS_STATE
     ABILITY2,
     ABILITY3,
     DEATH
+};
+
+enum class PendingAttack
+{
+    NONE,
+    LASER,
+    EXPLOSIVE
 };
 
 struct Weakpoint
@@ -35,6 +44,10 @@ public:
     void Draw() override;
 
     Weakpoint GetWeakpoint() const;
+
+    void StartCast(PendingAttack attackType);
+    void FireLaser();
+    void FireExplosive();
 
 private:
     Weakpoint weakpoint;
@@ -75,5 +88,17 @@ private:
 
     u32 stateCounter = 0;
     u32 maxStateCounter = 3;
+
+    // Boss Ability Logic
+    bool isCasting;
+    float castProgress;
+    float castDuration;
+    PendingAttack pendingAttack;
+    Transform2D castbarTransform;
+
+    float attackCooldown;
+
+    std::vector<BossLaser*> bossLasers;
+    std::vector<BossExplosive*> bossExplosives;
 };
 

@@ -119,13 +119,27 @@ void BaseEnemy::Draw()
         AEGfxSetBlendMode(AE_GFX_BM_BLEND);
         AEGfxSetTransparency(1.0f);
 
-        healthbarTransform = transform;
+        if (!isBoss)
+        {
+            healthbarTransform = transform;
 
-        healthbarTransform.SetPosition(
-            transform.GetPosition().x,
-            transform.GetPosition().y + (0.5f * transform.GetScale().y) + 15.f
-        );
-        healthbarTransform.SetScale((static_cast<float>(health) / static_cast<float>(maxHealth)) * 100.f, 10.f);
+            healthbarTransform.SetPosition(
+                transform.GetPosition().x,
+                transform.GetPosition().y + (0.5f * transform.GetScale().y) + 15.f
+            );
+            healthbarTransform.SetScale((static_cast<float>(health) / static_cast<float>(maxHealth)) * 100.f, 10.f);
+        }
+        else
+        {
+            AEVec2 camPos = {0.f, 0.f};
+            AEGfxGetCamPosition(&camPos.x, &camPos.y);
+
+            healthbarTransform.SetPosition(
+                camPos.x,
+                camPos.y - 300.f
+            );
+            healthbarTransform.SetScale((static_cast<float>(health) / static_cast<float>(maxHealth)) * 1000.f, 50.f);
+        }
 
         AEGfxSetTransform(healthbarTransform.GetMatrix().m);
         AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);

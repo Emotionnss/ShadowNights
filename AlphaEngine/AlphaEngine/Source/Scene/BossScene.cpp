@@ -13,10 +13,20 @@ void BossScene::Init() {
 }
 
 void BossScene::Update() {
+    // drain pending enemy spawns into enemylist of scene BEFORE scene update
+    if (boss)
+    {
+        for (BaseEnemy* e : boss->GetPendingSpawns())
+            enemyList.push_back(e);
+        boss->GetPendingSpawns().clear();
+    }
+
     BaseScene::Update();
 
     f32 dt = (f32)AEFrameRateControllerGetFrameTime();
-    if (cutsceneDuration >= 0.f)
+
+
+    if (cutsceneDuration >= 0.f && boss)
     {
         AEGfxSetCamPosition(boss->transform.GetPosition().x, boss->transform.GetPosition().y);
         cutsceneDuration -= 1 * dt;

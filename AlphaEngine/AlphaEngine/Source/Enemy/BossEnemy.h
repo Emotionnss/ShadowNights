@@ -19,6 +19,7 @@ enum class PendingAttack
 {
     LASER,
     EXPLOSIVE,
+    SPAWN_RANDOM_ENEMY,
     NONE
 };
 
@@ -48,6 +49,8 @@ public:
     void StartCast(PendingAttack attackType);
     void FireLaser();
     void FireExplosive();
+    
+    std::vector<BaseEnemy*>& GetPendingSpawns();
 
 private:
     Weakpoint weakpoint;
@@ -99,5 +102,9 @@ private:
 
     std::vector<BossLaser*> bossLasers;
     std::vector<BossExplosive*> bossExplosives;
+
+    std::vector<BaseEnemy*> pendingSpawns;
+
+    void SpawnRandomEnemy();
 };
 

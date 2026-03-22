@@ -1,6 +1,11 @@
 #include "BossEnemy.h"
 #include "../Player/Player.h"
 #include "../System/MeshManager.h"
+
+#include "ArcherEnemy.h"
+#include "BatEnemy.h"
+#include "ShadowEnemy.h"
+
 #include <cmath>
 #include <algorithm>
 
@@ -19,6 +24,10 @@ BossEnemy::~BossEnemy()
     for (BossExplosive* e : bossExplosives)
         delete e;
     bossExplosives.clear();
+
+    for (BaseEnemy* e : pendingSpawns)
+        delete e;
+    pendingSpawns.clear();
 }
 
 void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
@@ -92,6 +101,10 @@ void BossEnemy::Update(f32 deltaTime)
             {
                 FireExplosive();
             }
+            else if (pendingAttack == PendingAttack::SPAWN_RANDOM_ENEMY)
+            {
+                SpawnRandomEnemy();
+            }
             pendingAttack = PendingAttack::NONE;
         }
     }
@@ -99,14 +112,18 @@ void BossEnemy::Update(f32 deltaTime)
     attackCooldown -= deltaTime;
     if (attackCooldown <= 0.f)
     {
-        int choice = rand() % 2;
+        int choice = rand() % 3;
         if (choice == 0)
         {
             StartCast(PendingAttack::LASER);
         }
-        else
+        else if (choice == 1)
         {
             StartCast(PendingAttack::EXPLOSIVE);
+        }
+        else
+        {
+            StartCast(PendingAttack::SPAWN_RANDOM_ENEMY);
         }
         attackCooldown = 3.f;
     }
@@ -334,6 +351,7 @@ void BossEnemy::StartCast(PendingAttack attackType)
 
     if (attackType == PendingAttack::LASER) castDuration = 1.5f;
     else if (attackType == PendingAttack::EXPLOSIVE) castDuration = 3.f;
+    else if (attackType == PendingAttack::SPAWN_RANDOM_ENEMY) castDuration = 2.f;
 }
 
 void BossEnemy::FireLaser()
@@ -351,4 +369,40 @@ void BossEnemy::FireExplosive()
     AEVec2 dir = { dirX, AERandFloat() };
     newExplosive->Triggered(transform.GetPosition(), dir);
     bossExplosives.push_back(newExplosive);
+}
+
+std::vector<BaseEnemy*>& BossEnemy::GetPendingSpawns()
+{
+    return pendingSpawns;
+}
+
+void BossEnemy::SpawnRandomEnemy()
+{
+    BaseEnemy* randEnemy = nullptr;
+
+    int choice = rand() % 3;
+    if (choice == 0)
+    {
+        // spawn archer somehow lol
+        randEnemy = new ArcherEnemy();
+        randEnemy->Init(transform.GetPosition().x, transform.GetPosition().y, 85.f, 60.f, "sniperenemy");
+    }
+    else if (choice == 1)
+    {
+        // spawn bat somehow
+        randEnemy = new BatEnemy();
+        randEnemy->Init(transform.GetPosition().x, transform.GetPosition().y, 85.f, 60.f, "batenemy");
+    }
+    else
+    {
+        // spawn shadow
+        randEnemy = new ShadowEnemy();
+        randEnemy->Init(transform.GetPosition().x, transform.GetPosition().y, 85.f, 60.f, "shadow1");
+    }
+
+    if (randEnemy)
+    {
+        randEnemy->SetVelocity(0, 0);
+        pendingSpawns.push_back(randEnemy);
+    }
 }

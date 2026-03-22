@@ -48,6 +48,7 @@ public:
 	Tile GetCollidedYTile();
 
 	std::vector<BaseProjectile*> GetProjectileList() { return projectileList; }
+	void ClearProjectileList();
 
 	std::vector<BaseProjectile*> projectileList;
 

@@ -30,15 +30,7 @@ Player::Player()
 
 Player::~Player()
 {
-	// Deleting of protectiles
-	for (BaseProjectile* pProj : projectileList)
-	{
-		if (pProj)
-		{
-			delete pProj;
-		}
-	}
-	projectileList.clear();
+	ClearProjectileList();
 
 	// Clear Sprite
 	if (sprite)
@@ -487,6 +479,19 @@ void Player::TakeDamage(float damage)
 	if (currentHP < 0) {
 		currentHP = 0;
 	}
+}
+
+void Player::ClearProjectileList()
+{
+	for (BaseProjectile* pProj : projectileList)
+	{
+		if (pProj)
+		{
+			delete pProj;
+		}
+	}
+
+	projectileList.clear();
 }
 
 void Player::Draw(AEGfxVertexList* mesh)

@@ -131,6 +131,7 @@ void BaseScene::Update() {
                 BaseScene* pNext = nextScene;
                 nextScene = nullptr;
                 SceneManager::ChangeScene(pNext);
+                //ParticleManager::GetInstance()->ClearAll();
             }
             else {
                 SceneManager::ChangeScene(new MainMenu());
@@ -338,6 +339,8 @@ bool BaseScene::FileExists(int slot) const {
 
 void BaseScene::Free() {
     if (abilityHandler) delete abilityHandler;
+
+    player->ClearProjectileList();
 
     delete btnResume; delete btnSaveMenu; delete btnLoadMenu; delete btnExit;
     delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;

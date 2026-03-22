@@ -62,7 +62,6 @@ public:
         }
 
         AEGfxDestroyFont(fontId);
-        int a;
     }
 
     void Draw()
@@ -88,8 +87,6 @@ public:
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
         AEGfxSetBlendMode(AE_GFX_BM_BLEND);
         AEGfxSetTransparency(1.0f);
-        AEGfxSetColorToAdd(1.0f, 1.0f, 1.0f, 1.0f);
-        AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 
         for (TutorialText* tut : tutTexts)
         {

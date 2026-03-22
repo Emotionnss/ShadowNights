@@ -2,7 +2,7 @@
 #include <iostream>
 #include "../Utils/utils.h"
 #include "../System/CSVManager.h"
-
+#include "../System/AudioManager.h"
 TimeStop::TimeStop()//constructor
     :meshManager{ MeshManager::GetInstance() }, //mesh manager
     player{ Player::GetInstance() }, //player instance

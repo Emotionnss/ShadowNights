@@ -1,6 +1,7 @@
 #pragma once
 #include "../Player/Player.h"
 #include "../Sprite/Sprite.h"
+#include "../System/AudioManager.h"
 #include <vector>
 class TemporalAnchor
 {
@@ -11,6 +12,7 @@ private:
         AEVec2 position;
     };
     bool active{};
+    bool abilityAnchoring{};
     f32 activeTime{};
     f32 activeTimer{ activeTime };
     bool spawning{};
@@ -32,6 +34,8 @@ private:
     std::vector<Ghosts> ghostVect{};
 
     Transform2D ghostTfm;
+
+    AudioManager* audioManager{};
 public:
     TemporalAnchor();
     ~TemporalAnchor();

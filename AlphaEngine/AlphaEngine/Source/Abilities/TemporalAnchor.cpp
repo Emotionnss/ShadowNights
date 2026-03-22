@@ -2,13 +2,15 @@
 #include <iostream>
 #include "../Utils/utils.h"
 #include "../Sprite/Sprite.h"
+
 TemporalAnchor::TemporalAnchor() ://default constructor
 	active{ false },
 	activeTime{ 3.f },
 	activeTimer{ activeTime },
 	player{ Player::GetInstance() },
 	zoneSprite{},
-	anchorSprite{}
+	anchorSprite{},
+	audioManager{AudioManager::GetInstance()}
 {
 	zoneTfm.SetScale(1000, 1000);
 	anchorTfm.SetScale(100, 100);
@@ -47,12 +49,12 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 {
 	if (spawning)
 	{
-		std::cout << "in2\n";
+
 		anchorSpawnTfm.SetPosition(player->GetTransform().GetPosition());
 		spawnTimer += -1 * dt;
 		if (spawnTimer <= 0)
 		{
-			std::cout << "in2\n";
+
 			spawnTimer = spawnTime;
 			spawning = false;
 			active = true;
@@ -73,7 +75,7 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 
 
 		}
-		if (!AreCirclesIntersecting(player->GetTransform().GetPosition().x, player->GetTransform().GetPosition().y, player->GetTransform().GetScale().x,
+		if (!AreCirclesIntersecting(player->GetTransform().GetPosition().x, player->GetTransform().GetPosition().y, 0.1f,
 			anchorTfm.GetPosition().x, anchorTfm.GetPosition().y, zoneTfm.GetScale().x))//if player goes out of zone
 		{
 			active = false;//deactivate
@@ -83,6 +85,7 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 		{
 			if (activeTimer <= 0 && !reversing)//if active timer is up and not yet reversing
 			{
+				audioManager->PlaySFXOneShot("time_reverse");
 				reversing = true;//start reversing
 				iter = ghostVect.size() - 1;//start from the BACK of the vector to simulate reversing time
 			}
@@ -101,6 +104,7 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 			active = false;//stop activity
 			player->SetHealth(savedHealth);//reset the health to what it had before
 			player->GetTransform().SetPosition(anchorTfm.GetPosition());
+			abilityAnchoring = false;
 		}
 	}
 	else if (!active && !reversing && !spawning)//once its not active nor reversing
@@ -115,24 +119,27 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 
 bool TemporalAnchor::Anchor(AEVec2 anchPos)
 {
-	if (active)
+	if (abilityAnchoring)
 	{
 		active = false;
+		abilityAnchoring = false;
 		spawning = false;
 		reversing = true;
 		iter = ghostVect.size() - 1;
+		audioManager->PlaySFXOneShot("time_reverse");
 		//player->GetTransform().SetPosition(anchorTfm.GetPosition());
 
 	}
 	else
 	{
 		//active = true;
+		abilityAnchoring = true;
 		spawning = true;
 		savedHealth = player->GetHealth();
 
 		anchorSpawnSprite->PlayAnimation("spawn", 1, spawnTime);
 	}
-	return active;
+	return abilityAnchoring;
 }
 
 bool TemporalAnchor::Anchor() const

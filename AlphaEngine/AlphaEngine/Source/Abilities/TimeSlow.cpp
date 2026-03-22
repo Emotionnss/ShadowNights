@@ -4,7 +4,7 @@ TimeSlow::TimeSlow()//default constructor
 	:player{ Player::GetInstance() },
 	active{ false },//bool on if the ability is active
 	startDespawn{ false },//despawning boolean
-	timeSlow{ "timeslow" },//name of the sprite in the spritesheet
+	timeSlow{ "timeslow2test" },//name of the sprite in the spritesheet
 	despawningTime{ 1.f },//the timer for how long the despawning animation plays
 	despawningTimer{ despawningTime }//the original amount of time it takes for the animation to play
 {
@@ -31,7 +31,7 @@ void TimeSlow::Update(float dt)//update
 		if (!startDespawn)//not despawning yet
 			despawningTimer = despawningTime;//dont let it tick down
 
-
+		AEGfxSetBackgroundColor(0,255, 10);
 		timeSlowTransform.SetPosition(player->GetTransform().GetPosition());//set the slow sprite onto our player
 
 	}

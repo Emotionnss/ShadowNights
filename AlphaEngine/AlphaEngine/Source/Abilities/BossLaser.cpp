@@ -12,7 +12,7 @@ BossLaser::BossLaser()
 {
     laserSprite = new Sprite(CSVManager::ReadInfo(spriteName));
     laserSprite->PlayAnimation("spawn", 1, 1.f);
-
+    AudioManager::GetInstance()->PlaySFXOneShot("boss_laser_spawning");
     transform.SetScale(250, 1000);
 }
 
@@ -27,7 +27,7 @@ BossLaser::BossLaser(float baseLifespan, float startupTime)
 
     laserSprite = new Sprite(CSVManager::ReadInfo(spriteName));
     laserSprite->PlayAnimation("spawn", 1, 1.f);
-
+    AudioManager::GetInstance()->PlaySFXOneShot("boss_laser_spawning");
     transform.SetScale(250, 1000);
 }
 

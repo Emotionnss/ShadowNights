@@ -26,6 +26,8 @@ Player::Player()
 	sprite = new Sprite(CSVManager::ReadInfo("tempPlayer"));
 	sprite->SetDefaultAnimation("idle");
 	sprite->PlayDefaultAnimation(-1, 1.f);
+
+	AudioManager::GetInstance()->PlayEffect("player_move",0.98f,0.5f);
 }
 
 Player::~Player()
@@ -129,7 +131,7 @@ void Player::HandleInput()
 
 		AEVec2 playerDir = ScreenToWorldPos(mousePos);
 		AEVec2Normalize(&playerDir, &playerDir);
-
+		AudioManager::GetInstance()->PlaySFXOneShot("player_slash");
 		projectileList.push_back(new SwordProjectile(GetTransform().GetPosition(), playerDir));
 	}
 }
@@ -406,6 +408,9 @@ void Player::Update(float deltaTime)
 			}
 		}
 		*/
+		AudioManager::GetInstance()->ResumeEffect();//continue walking sound
+		//AudioManager::GetInstance()->PlaySFXOneShot("player_move");
+		
 	}
 	else if (!isGrounded && velocity.y > 0.f)
 	{
@@ -415,14 +420,17 @@ void Player::Update(float deltaTime)
 		ParticleManager::GetInstance()->SpawnTrail(
 			GetTransform().GetPosition(), { 30.f, 30.f }, 0.2f, 0.5f, 0.5f, 0.5f
 		);
+		AudioManager::GetInstance()->PauseEffect();//pause walking sound	
 	}
 	else if (!isGrounded && velocity.y < 0.f)
 	{
+		AudioManager::GetInstance()->PauseEffect();//pause walking sound
 		this->PlayAnim("fall");
 	}
 	else
 	{
 		this->PlayAnim("idle");
+		AudioManager::GetInstance()->PauseEffect();//pause walking sound
 	}
 
 	// Update projectiles and remove dead ones
@@ -464,7 +472,7 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
 
 	matrix.SetRotation(0);
-	matrix.SetPosition(CamPos.x - 55.f, CamPos.y + 350.f);
+	matrix.SetPosition(CamPos.x - 250.f, CamPos.y + 350.f);
 	float safeValue = AEClamp(value, 0.f, maxHP);
 	matrix.SetScale(safeValue * 5.f, 55.f);
 
@@ -475,7 +483,7 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 void Player::TakeDamage(float damage)
 {
 	currentHP -= damage;
-
+	AudioManager::GetInstance()->PlaySFXOneShot("player_hurt");
 	if (currentHP < 0) {
 		currentHP = 0;
 	}

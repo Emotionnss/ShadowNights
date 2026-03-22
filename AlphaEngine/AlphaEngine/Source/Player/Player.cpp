@@ -118,26 +118,48 @@ void Player::HandleInput()
 	if (AEInputCheckTriggered(AEVK_LBUTTON))
 	{
 		AudioManager::GetInstance()->PlaySFXOneShot("player_attack");
+
 		s32 xDir, yDir;
 		AEInputGetCursorPosition(&xDir, &yDir);
 		AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
-
-		AEVec2 playerDir = ScreenToWorldPos(mousePos);
-		AEVec2Normalize(&playerDir, &playerDir);
-
+		AEVec2 playerDir = ShootDirection(mousePos);
+		
 		projectileList.push_back(new BaseProjectile(GetTransform().GetPosition(), playerDir));
 	}
 	else if (AEInputCheckTriggered(AEVK_RBUTTON))
 	{
+		AudioManager::GetInstance()->PlaySFXOneShot("player_slash");
+
 		s32 xDir, yDir;
 		AEInputGetCursorPosition(&xDir, &yDir);
 		AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
+		AEVec2 playerDir = ShootDirection(mousePos);
 
-		AEVec2 playerDir = ScreenToWorldPos(mousePos);
-		AEVec2Normalize(&playerDir, &playerDir);
-		AudioManager::GetInstance()->PlaySFXOneShot("player_slash");
 		projectileList.push_back(new SwordProjectile(GetTransform().GetPosition(), playerDir));
 	}
+}
+
+AEVec2 Player::ShootDirection(AEVec2 mousePosition) const
+{
+	// Convert mouse to world space
+	AEVec2 mouseWorld = ScreenToWorldPos(mousePosition);
+
+	float camX, camY;
+	AEGfxGetCamPosition(&camX, &camY);
+
+	// Offset by camera position
+	mouseWorld.x += camX;
+	mouseWorld.y += camY;
+
+	// Get direction from player to mouse
+	AEVec2 playerPos = transform.GetPosition();
+	AEVec2 playerDir;
+	playerDir.x = mouseWorld.x - playerPos.x;
+	playerDir.y = mouseWorld.y - playerPos.y;
+
+	AEVec2Normalize(&playerDir, &playerDir);
+
+	return playerDir;
 }
 
 void Player::ResolveX(AEVec2& position)
@@ -318,9 +340,7 @@ void Player::AimRotation()
 	s32 xDir, yDir;
 	AEInputGetCursorPosition(&xDir, &yDir);
 	AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
-
-	AEVec2 playerDir = ScreenToWorldPos(mousePos);
-	AEVec2Normalize(&playerDir, &playerDir);
+	AEVec2 playerDir = ShootDirection(mousePos);
 
 	switch (playerDirection)
 	{

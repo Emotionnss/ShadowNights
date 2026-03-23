@@ -78,25 +78,9 @@ void BaseEnemy::Update(float deltaTime)
             (*it)->Speed(slowed ? (*it)->OriginalSpeed() / 20.f : (*it)->OriginalSpeed());
             (*it)->Update(deltaTime);
 
-            for (s32 i = 0; i < map->GetNumCol(); ++i)
-            {
-                for (s32 j = 0; j < map->GetNumRow(); ++j)
-                {
-                    Tile const& tmp = map->GetTileFromTilePos(i, j);
+            if (CheckProjectileCollision(*it, map))
+                (*it)->SetLifespan(-1.f);
 
-                    AEVec2 projHalf = { transform.GetScale().x * 0.5f, transform.GetScale().y * 0.5f };
-                    AEVec2 tileHalf = { tmp.transform.GetScale().x * 0.5f, tmp.transform.GetScale().y * 0.5f };
-
-                    if (AABBOverlap(transform.GetPosition(), projHalf, tmp.transform.GetPosition(), tileHalf))
-                    {
-                        if (map->CheckTile(tmp.tileType))
-                        {
-                            (*it)->SetLifespan(-1.f);
-                            break;
-                        }
-                    }
-                }
-            }
 
             if ((*it)->IsDead())
             {
@@ -287,4 +271,19 @@ bool BaseEnemy::HasLineOfSight(AEVec2 targetPos)
 
     //if the loop finishes without hitting a wall the enemy can see the player
     return true;
+}
+
+bool BaseEnemy::CheckProjectileCollision(BaseProjectile* proj, Map* map)
+{
+    for (s32 i = 0; i < map->GetNumCol(); ++i)
+        for (s32 j = 0; j < map->GetNumRow(); ++j)
+        {
+            Tile const& tmp = map->GetTileFromTilePos(i, j);
+            AEVec2 projHalf = { proj->transform.GetScale().x * 0.5f, proj->transform.GetScale().y * 0.5f };
+            AEVec2 tileHalf = { tmp.transform.GetScale().x * 0.5f, tmp.transform.GetScale().y * 0.5f };
+
+            if (AABBOverlap(proj->transform.GetPosition(), projHalf, tmp.transform.GetPosition(), tileHalf))
+                return map->CheckTile(tmp.tileType);
+        }
+    return false;
 }

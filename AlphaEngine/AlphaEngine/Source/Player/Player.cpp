@@ -637,7 +637,7 @@ bool Player::CheckProjectileCollision(BaseProjectile* proj, Map* map)
 			AEVec2 projHalf = { proj->transform.GetScale().x * 0.5f, proj->transform.GetScale().y * 0.5f };
 			AEVec2 tileHalf = { tmp.transform.GetScale().x * 0.5f, tmp.transform.GetScale().y * 0.5f };
 
-			if (AABBOverlap(proj->transform.GetPosition(), projHalf, tmp.transform.GetPosition(), tileHalf))
+			if (AABBOverlap(proj->transform.GetPosition(), projHalf, tmp.transform.GetPosition(), tileHalf) && proj->collidesWithTiles)
 				return map->CheckTile(tmp.tileType);
 		}
 	return false;

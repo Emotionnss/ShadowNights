@@ -25,6 +25,8 @@ public:
     bool isStopped() const;
     void isStopped(bool active);
     bool IsDying() const { return isDying; }
+    bool HasLineOfSight(AEVec2 targetPos);
+
 
     bool isBoss = false;
 

@@ -1,5 +1,6 @@
 #include "BaseEnemy.h"
 #include "../System/CSVManager.h"
+#include "../System/Map.h"
 
 BaseEnemy::BaseEnemy()
 {
@@ -214,4 +215,55 @@ void BaseEnemy::Shoot()
     EnemyProjectile* newProj = new EnemyProjectile(spawnPos, { dirX, 0.0f });
     newProj->slowed = this->slowed;
     enemyProjectiles.push_back(newProj);
+}
+
+bool BaseEnemy::HasLineOfSight(AEVec2 targetPos)
+{
+    AEVec2 startPos = transform.GetPosition();
+
+    //Get the distance and direction to the target
+    float dx = targetPos.x - startPos.x;
+    float dy = targetPos.y - startPos.y;
+    float distance = sqrtf(dx * dx + dy * dy);
+
+    if (distance == 0.0f) return true;
+
+    AEVec2 dir = { dx / distance, dy / distance };
+
+    //check the map in increments of half-a-tile to make sure we don't skip over any thin walls
+    float stepSize = map->GetTileSize() * 0.5f;
+    int steps = static_cast<int>(distance / stepSize);
+
+    for (int i = 0; i <= steps; ++i)
+    {
+        float currentX = startPos.x + dir.x * (stepSize * i);
+        float currentY = startPos.y + dir.y * (stepSize * i);
+
+        // Convert world position to grid coordinates
+        AEVec2 tileCoord = map->GetTilePos(currentX, currentY);
+        int tx = static_cast<int>(tileCoord.x);
+        int ty = static_cast<int>(tileCoord.y);
+
+        //inside the map boundaries
+        if (tx >= 0 && tx < map->GetNumCol() && ty >= 0 && ty < map->GetNumRow())
+        {
+            Tile& tile = map->GetMap()[ty][tx];
+            TILE_TYPE type = tile.tileType;
+
+            // Check if the tile is a solid wall
+            // We ignore backgrounds and platforms
+            if (map->CheckTile(type) &&
+                type != TILE_TYPE::BACKGROUND &&
+                type != TILE_TYPE::LEFT_PLATFORM &&
+                type != TILE_TYPE::PLATFORM &&
+                type != TILE_TYPE::RIGHT_PLATFORM)
+            {
+                //wall is hit
+                return false;
+            }
+        }
+    }
+
+    //if the loop finishes without hitting a wall the enemy can see the player
+    return true;
 }

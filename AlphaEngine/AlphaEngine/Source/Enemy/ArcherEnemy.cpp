@@ -45,7 +45,7 @@ void ArcherEnemy::Update(float deltaTime)
     if (dx > 0) transform.SetScale(visualWidth, visualHeight);
     else        transform.SetScale(-visualWidth, visualHeight);
 
-    if (dist < aggroRadius)
+    if (HasLineOfSight(playerPos))
     {
         shootTimer -= deltaTime;
 

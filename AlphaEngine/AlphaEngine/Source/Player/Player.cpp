@@ -466,9 +466,9 @@ void Player::Update(float deltaTime)
 	{
 		(*it)->Update(deltaTime);
 
-		for (s32 i = 0; i < map->GetNumRow(); ++i)
+		for (s32 i = 0; i < map->GetNumCol(); ++i)
 		{
-			for (s32 j = 0; j < map->GetNumCol(); ++j)
+			for (s32 j = 0; j < map->GetNumRow(); ++j)
 			{
 				Tile const& tmp = map->GetTileFromTilePos(i, j);
 
@@ -479,6 +479,7 @@ void Player::Update(float deltaTime)
 				{
 					if (map->CheckTile(tmp.tileType))
 					{
+						std::cout << "EEEEE" << std::endl;
 						(*it)->SetLifespan(-1.f);
 						break;
 					}

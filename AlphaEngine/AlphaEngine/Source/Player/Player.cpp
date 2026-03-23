@@ -466,26 +466,8 @@ void Player::Update(float deltaTime)
 	{
 		(*it)->Update(deltaTime);
 
-		for (s32 i = 0; i < map->GetNumCol(); ++i)
-		{
-			for (s32 j = 0; j < map->GetNumRow(); ++j)
-			{
-				Tile const& tmp = map->GetTileFromTilePos(i, j);
-
-				AEVec2 projHalf = { transform.GetScale().x * 0.5f, transform.GetScale().y * 0.5f };
-				AEVec2 tileHalf = { tmp.transform.GetScale().x * 0.5f, tmp.transform.GetScale().y * 0.5f };
-
-				if (AABBOverlap(transform.GetPosition(), projHalf, tmp.transform.GetPosition(), tileHalf))
-				{
-					if (map->CheckTile(tmp.tileType))
-					{
-						std::cout << "EEEEE" << std::endl;
-						(*it)->SetLifespan(-1.f);
-						break;
-					}
-				}
-			}
-		}
+		if (CheckProjectileCollision(*it, map))
+			(*it)->SetLifespan(-1.f);
 
 		if ((*it)->GetLifespan() <= 0.f)
 		{
@@ -645,3 +627,19 @@ void Player::Draw(AEGfxVertexList* mesh)
 	AEGfxSetTransform(identity.m);
 	*/
 }
+
+bool Player::CheckProjectileCollision(BaseProjectile* proj, Map* map)
+{
+	for (s32 i = 0; i < map->GetNumCol(); ++i)
+		for (s32 j = 0; j < map->GetNumRow(); ++j)
+		{
+			Tile const& tmp = map->GetTileFromTilePos(i, j);
+			AEVec2 projHalf = { proj->transform.GetScale().x * 0.5f, proj->transform.GetScale().y * 0.5f };
+			AEVec2 tileHalf = { tmp.transform.GetScale().x * 0.5f, tmp.transform.GetScale().y * 0.5f };
+
+			if (AABBOverlap(proj->transform.GetPosition(), projHalf, tmp.transform.GetPosition(), tileHalf) && proj->collidesWithTiles)
+				return map->CheckTile(tmp.tileType);
+		}
+	return false;
+}
+

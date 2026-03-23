@@ -54,6 +54,8 @@ public:
 	std::vector<BaseProjectile*> projectileList;
 
 	Sprite* GetSprite() const;
+
+	bool CheckProjectileCollision(BaseProjectile* proj, Map* map);
 private:
 	void AimRotation();
 	AEVec2 ShootDirection(AEVec2 mousePosition) const;

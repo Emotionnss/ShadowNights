@@ -27,6 +27,7 @@ public:
     bool IsDying() const { return isDying; }
     bool HasLineOfSight(AEVec2 targetPos);
 
+    bool CheckProjectileCollision(BaseProjectile* proj, Map* map);
 
     bool isBoss = false;
 

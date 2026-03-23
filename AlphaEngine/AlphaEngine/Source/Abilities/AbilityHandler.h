@@ -33,8 +33,8 @@ private:
 	MeshManager* meshManager = nullptr;//mesh manager
 	AEVec2 camPos;//position of camera for resource bar
 
-	AEGfxTexture* a1Tex , *a2Tex , *a3Tex;
-	Transform2D a1Tfm{},a2Tfm,a3Tfm;
+	AEGfxTexture* a1Tex , *a2Tex , *a3Tex,*resourceBar;
+	Transform2D a1Tfm{},a2Tfm,a3Tfm,barBgTfm;
 	bool timeStopped{};
 	bool timeSlowed{};
 

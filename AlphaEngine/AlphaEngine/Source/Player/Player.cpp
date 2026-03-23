@@ -22,13 +22,14 @@ Player::Player()
 
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y); // Get Camera Position
 	AEVec2Set(&cameraOffset, 200.f, -50.f); // Set Camera Offset Position
-
+	healthbarBorder = AEGfxTextureLoad("Assets/Abilities/hp_border.png");
+	arrowTex = AEGfxTextureLoad("Assets/Weapons/pointer.png");
 	// Sprite Handling
 	sprite = new Sprite(CSVManager::ReadInfo("tempPlayer"));
 	sprite->SetDefaultAnimation("idle");
 	sprite->PlayDefaultAnimation(-1, 1.f);
-
-	AudioManager::GetInstance()->PlayEffect("player_move", 0.98f, 0.5f);
+	AudioManager::GetInstance()->PlayEffect("player_move",0.98f,0.5f);
+	arrowTfm.SetScale(25, 25);
 }
 
 Player::~Player()
@@ -41,6 +42,10 @@ Player::~Player()
 		delete sprite;
 		sprite = nullptr;
 	}
+	if (healthbarBorder)
+		AEGfxTextureUnload(healthbarBorder);
+	if (arrowTex)
+		AEGfxTextureUnload(arrowTex);
 }
 
 void Player::SetHealth(float val)
@@ -160,6 +165,18 @@ AEVec2 Player::ShootDirection(AEVec2 mousePosition) const
 	AEVec2Normalize(&playerDir, &playerDir);
 
 	return playerDir;
+}
+
+void Player::AimArrow()
+{
+	s32 xDir, yDir;
+	AEInputGetCursorPosition(&xDir, &yDir);
+	AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
+	AEVec2 playerDir = ShootDirection(mousePos);
+
+	arrowTfm.SetRotation(atan2f(playerDir.y, playerDir.x));
+	arrowTfm.SetPosition(transform.GetPosition().x + playerDir.x * 50, transform.GetPosition().y + playerDir.y *50);
+	
 }
 
 void Player::ResolveX(AEVec2& position)
@@ -369,6 +386,7 @@ void Player::Update(float deltaTime)
 	}
 	HandleInput(); // Handle Input Internally
 	AimRotation();
+	AimArrow();
 	AEVec2 currentForces{ 0.f, gravity }; // Acceleration
 
 	// Check For X Input
@@ -474,14 +492,23 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 
 	AEVec2 CamPos;
 	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
-
-	matrix.SetRotation(0);
 	matrix.SetPosition(CamPos.x - 250.f, CamPos.y + 350.f);
 	float safeValue = AEClamp(value, 0.f, maxHP);
 	matrix.SetScale(safeValue * 5.f, 55.f);
 
 	AEGfxSetTransform(matrix.GetMatrix().m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
+
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1.f);
+	matrix.SetScale(maxHP * 5.f, 55.f);
+	AEGfxTextureSet(healthbarBorder, 0, 0);
+	AEGfxSetTransform(matrix.GetMatrix().m);
+	AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 }
 
 template <typename T>
@@ -572,7 +599,17 @@ void Player::Draw(AEGfxVertexList* mesh)
 
 		}
 	}
+	//for arrow surrounding player
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
 
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1);
+
+	AEGfxTextureSet(arrowTex, 0, 0);
+	AEGfxSetTransform(arrowTfm.GetMatrix().m);
+	AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 	/*
 	AEGfxTextureSet(nullptr, 0, 0);
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);

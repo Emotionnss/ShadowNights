@@ -57,9 +57,11 @@ public:
 private:
 	void AimRotation();
 	AEVec2 ShootDirection(AEVec2 mousePosition) const;
-
+	void AimArrow();
+	Transform2D arrowTfm{};
+	AEGfxTexture* arrowTex{};
 	Transform2D healthbar;
-
+	AEGfxTexture* healthbarBorder;
 	enum Direction { LEFT = -1, RIGHT = 1, IDLE = 0 };
 	Direction playerDirection = RIGHT;
 

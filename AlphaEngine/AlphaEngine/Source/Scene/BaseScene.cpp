@@ -174,7 +174,7 @@ void BaseScene::Update() {
 				abilityHandler->TriggerAnchor();
 			}
 			else {
-				player->SetHealth(100);
+				SceneManager::ChangeScene(new LoseScene());
 			}
 		}
 

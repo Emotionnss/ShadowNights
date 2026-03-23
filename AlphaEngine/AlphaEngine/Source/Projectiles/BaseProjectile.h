@@ -17,6 +17,7 @@ public:
 
     bool stopped{};
     bool slowed{};
+    bool collidesWithTiles = true;
 
     BaseProjectile(AEVec2 pos, AEVec2 dir, bool skipTextureLoad = false);
     virtual ~BaseProjectile();

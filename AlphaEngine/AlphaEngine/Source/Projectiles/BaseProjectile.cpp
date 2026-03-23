@@ -12,6 +12,7 @@ BaseProjectile::BaseProjectile(AEVec2 pos, AEVec2 dir, bool skipTextureLoad)
     , speed{ oriSpeed }
     , size{ 25.f }
     , projTex{ nullptr }
+    , collidesWithTiles{true}
 {
     transform.SetScale(size, size);
     transform.SetPosition(pos.x, pos.y);

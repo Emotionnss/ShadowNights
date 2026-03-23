@@ -112,6 +112,7 @@ bool BossExplosive::Triggered(AEVec2 pos, AEVec2 dir)
 	bigProjectile->transform.SetScale(100.f, 100.f);
 	bigProjectile->SetLifespan(2.f);
 	bigProjectile->projTex = AEGfxTextureLoad("Assets/Weapons/swordSlash.png");
+	bigProjectile->collidesWithTiles = false;
 	active = true;
 
 	return true;
@@ -127,6 +128,7 @@ void BossExplosive::Explode(AEVec2 origin)
 		BaseProjectile* proj = new BaseProjectile(origin, dir, true);
 		proj->SetLifespan(5.f);
 		proj->projTex = AEGfxTextureLoad("Assets/Weapons/swordSlash.png");
+		proj->collidesWithTiles = false;
 
 		smallProjectiles.push_back(proj);
 	}

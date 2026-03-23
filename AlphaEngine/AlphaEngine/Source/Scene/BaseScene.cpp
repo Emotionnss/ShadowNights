@@ -344,11 +344,16 @@ bool BaseScene::FileExists(int slot) const {
 }
 
 void BaseScene::Free() {
-	if (abilityHandler) delete abilityHandler;
+	if (abilityHandler)
+		delete abilityHandler;
 
-	player->ClearProjectileList();
+	if (player != nullptr)
+	{
+		player->ClearProjectileList();
+	}
 
 	delete btnResume; delete btnSaveMenu; delete btnLoadMenu; delete btnExit;
+
 	delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
 
 	for (BaseEnemy* enemy : enemyList) {

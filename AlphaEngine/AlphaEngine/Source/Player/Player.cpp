@@ -29,7 +29,7 @@ Player::Player()
 	sprite = new Sprite(CSVManager::ReadInfo("tempPlayer"));
 	sprite->SetDefaultAnimation("idle");
 	sprite->PlayDefaultAnimation(-1, 1.f);
-	AudioManager::GetInstance()->PlayEffect("player_move",0.98f,0.5f);
+	AudioManager::GetInstance()->PlayEffect("player_move", 0.98f, 0.5f);
 	arrowTfm.SetScale(25, 25);
 }
 
@@ -129,7 +129,7 @@ void Player::HandleInput()
 		AEInputGetCursorPosition(&xDir, &yDir);
 		AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
 		AEVec2 playerDir = ShootDirection(mousePos);
-		
+
 		projectileList.push_back(new BaseProjectile(GetTransform().GetPosition(), playerDir));
 	}
 	else if (AEInputCheckTriggered(AEVK_RBUTTON))
@@ -176,8 +176,8 @@ void Player::AimArrow()
 	AEVec2 playerDir = ShootDirection(mousePos);
 
 	arrowTfm.SetRotation(atan2f(playerDir.y, playerDir.x));
-	arrowTfm.SetPosition(transform.GetPosition().x + playerDir.x * 50, transform.GetPosition().y + playerDir.y *50);
-	
+	arrowTfm.SetPosition(transform.GetPosition().x + playerDir.x * 50, transform.GetPosition().y + playerDir.y * 50);
+
 }
 
 void Player::ResolveX(AEVec2& position)

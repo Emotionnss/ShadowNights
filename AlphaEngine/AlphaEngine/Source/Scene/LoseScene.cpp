@@ -72,8 +72,8 @@ void LoseScene::Draw() {
 void LoseScene::Free() {
     delete btnRestart; delete btnLoad; delete btnMenu;
     delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
-    Button::FreeResources();
     BaseScene::Free();
+    Button::FreeResources();
 }
 
 void LoseScene::Unload() {}

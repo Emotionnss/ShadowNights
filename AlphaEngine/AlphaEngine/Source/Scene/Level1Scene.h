@@ -9,5 +9,7 @@ public:
         levelBGM = "bgm_level1";
 
         nextScene = new BossScene();
+
+        levelID = 1;
     }
 };

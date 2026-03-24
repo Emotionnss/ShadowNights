@@ -31,6 +31,8 @@ public:
         levelBGM = "bgm_level1";
         nextScene = new Level1Scene();
 
+        levelID = 0;
+
         //Doing this just so i can set scale
         fontId = AEGfxCreateFont("Assets/Fonts/ttf/monogram.ttf", 36);
 

@@ -52,6 +52,8 @@ protected:
     int menuPage = 0;
     float popupTimer = 0.0f;
 
+    int levelID = 1;
+
     Button* btnResume = nullptr;
     Button* btnSaveMenu = nullptr;
     Button* btnLoadMenu = nullptr;

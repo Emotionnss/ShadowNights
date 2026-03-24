@@ -1,10 +1,16 @@
 #include "LoseScene.h"
 #include "../System/Scenemanager.h"
 #include "TutorialScene.h"
+#include "Level1Scene.h"
+#include "BossScene.h"
 #include "MainMenu.h"
 #include "AEEngine.h"
 #include <fstream>
 #include <string>
+
+LoseScene::LoseScene(int idToRestart) {
+    restartLevelID = idToRestart;
+}
 
 void LoseScene::Load() {
     AEGfxReset();
@@ -20,14 +26,23 @@ void LoseScene::Load() {
     btnBack = new Button(0.0f, -170.0f, 200.0f, 50.0f, "Back");
 }
 
-void LoseScene::Init() {    
+void LoseScene::Init() {
     menuPage = 0;
 }
 
 void LoseScene::Update() {
     if (menuPage == 0) {
         if (btnRestart->IsClicked()) {
-            SceneManager::ChangeScene(new TutorialScene());
+            //holds the level and load them accordingly to where player died
+            if (restartLevelID == 0) {
+                SceneManager::ChangeScene(new TutorialScene());
+            }
+            else if (restartLevelID == 1) {
+                SceneManager::ChangeScene(new Level1Scene());
+            }
+            else if (restartLevelID == 2) {
+                SceneManager::ChangeScene(new BossScene());
+            }
         }
         if (btnLoad->IsClicked()) {
             menuPage = 2;

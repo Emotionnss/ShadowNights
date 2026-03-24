@@ -7,7 +7,10 @@ public:
     BossScene(int slot = 0) : BaseScene(slot) {
         levelMapName = "Bossmap";
         levelBGM = "bgm_level1";
+        levelID = 2;
     }
+
+    
 
     void Init() override;
     void Update() override;

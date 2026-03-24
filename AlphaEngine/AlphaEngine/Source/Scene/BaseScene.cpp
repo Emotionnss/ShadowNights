@@ -59,6 +59,8 @@ void BaseScene::Load() {
 void BaseScene::Init() {
 	player->GetTransform().SetPosition(300.0f, 900.0f);
 
+	player->SetHealth(100.f);
+
 	if (!audio->GetMusicGroup())
 	{
 		audio->PlayMusic(levelBGM, 1.f);
@@ -174,7 +176,7 @@ void BaseScene::Update() {
 				abilityHandler->TriggerAnchor();
 			}
 			else {
-				SceneManager::ChangeScene(new LoseScene());
+				SceneManager::ChangeScene(new LoseScene(levelID));
 			}
 		}
 
@@ -344,32 +346,31 @@ bool BaseScene::FileExists(int slot) const {
 }
 
 void BaseScene::Free() {
-	if (abilityHandler)
+	// 1. Only delete things created in Init()!
+	if (abilityHandler) {
 		delete abilityHandler;
-
-	if (player != nullptr)
-	{
-		player->ClearProjectileList();
+		abilityHandler = nullptr; // Always null out after deleting!
 	}
-
-	delete btnResume; delete btnSaveMenu; delete btnLoadMenu; delete btnExit;
-
-	delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
 
 	for (BaseEnemy* enemy : enemyList) {
 		delete enemy;
 	}
 	enemyList.clear();
 
+	ParticleManager::GetInstance()->ClearAll();
+}	
+
+void BaseScene::Unload() {
+	// 1. Delete things created in Load()!
+	delete btnResume; delete btnSaveMenu; delete btnLoadMenu; delete btnExit;
+	delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
+
 	if (bg) {
 		delete bg;
 		bg = nullptr;
 	}
 
-	ParticleManager::GetInstance()->ClearAll();
-}
-
-void BaseScene::Unload() {
+	// 2. Clear out dangling pointers
 	player = nullptr;
 	abilityHandler = nullptr;
 	meshManager = nullptr;

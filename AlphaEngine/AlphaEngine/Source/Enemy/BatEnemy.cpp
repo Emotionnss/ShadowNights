@@ -30,10 +30,6 @@ void BatEnemy::Init(float x, float y, float w, float h, std::string spriteName)
 
 void BatEnemy::Update(float deltaTime)
 {
-    if (AEInputCheckTriggered(AEVK_P)) {
-        showDebugPath = !showDebugPath;
-    }
-
     BaseEnemy::Update(deltaTime);
     if (stopped || isDying) return;
 
@@ -116,7 +112,7 @@ void BatEnemy::Update(float deltaTime)
             }
             else
             {
-                // Fallback: If no path is found, just fly straight at the player
+                // If no path is found, just fly straight at the player
                 float dirX = dx / dist;
                 float dirY = dy / dist;
                 velocity.x = dirX * moveSpeed;
@@ -130,7 +126,14 @@ void BatEnemy::Update(float deltaTime)
             shootTimer -= deltaTime;
             if (shootTimer <= 0.0f)
             {
-                Shoot();
+                //Only shoot if there isn't a wall in the way
+                if (HasLineOfSight(playerPos))
+                {
+                    Shoot();
+                }
+
+                // Always reset the timer
+                // This prevents the bat from machine-gunning player
                 shootTimer = 2.0f;
             }
         }

@@ -287,3 +287,113 @@ bool BaseEnemy::CheckProjectileCollision(BaseProjectile* proj, Map* map)
         }
     return false;
 }
+
+
+void BaseEnemy::ResolveX(AEVec2& position)
+{
+    AEVec2 halfSize = { fabsf(transform.GetScale().x) * 0.3f, fabsf(transform.GetScale().y) * 0.5f };
+    float tileSizeHalf = map->GetTileSize() * 0.5f;
+    AEVec2 tileHalf = { tileSizeHalf, tileSizeHalf };
+
+    AEVec2 minTile = map->GetTilePos(position.x - halfSize.x, position.y - halfSize.y);
+    AEVec2 maxTile = map->GetTilePos(position.x + halfSize.x, position.y + halfSize.y);
+
+    int xMin = static_cast<int>((std::min)(minTile.x, maxTile.x));
+    int xMax = static_cast<int>((std::max)(minTile.x, maxTile.x));
+    int yMin = static_cast<int>((std::min)(minTile.y, maxTile.y));
+    int yMax = static_cast<int>((std::max)(minTile.y, maxTile.y));
+
+    for (int y = yMin; y <= yMax; ++y) {
+        for (int x = xMin; x <= xMax; ++x) {
+            if (x < 0 || y < 0 || y >= map->GetNumRow() || x >= map->GetNumCol()) continue;
+
+            Tile& tile = map->GetMap()[y][x];
+            TILE_TYPE type = tile.tileType;
+            if (!map->CheckTile(type)) continue;
+
+            if (type == TILE_TYPE::BACKGROUND || type == TILE_TYPE::LEFT_PLATFORM ||
+                type == TILE_TYPE::PLATFORM || type == TILE_TYPE::RIGHT_PLATFORM) continue;
+
+            AEVec2 tilePos = tile.transform.GetPosition();
+            float dx = position.x - tilePos.x;
+            float px = (halfSize.x + tileHalf.x) - fabsf(dx);
+            if (px <= 0.f) continue;
+
+            float dy = position.y - tilePos.y;
+            float py = (halfSize.y + tileHalf.y) - fabsf(dy);
+
+            //Increased buffer to 15 pixels
+            if (py <= 15.0f) continue;
+
+            if ((dx > 0.f && velocity.x < 0.f) || (dx < 0.f && velocity.x > 0.f)) {
+                position.x += (dx > 0.f) ? px : -px;
+                velocity.x = -velocity.x;
+                transform.SetScale(-transform.GetScale().x, transform.GetScale().y);
+                return;
+            }
+        }
+    }
+}
+
+void BaseEnemy::ResolveY(AEVec2& position)
+{
+    AEVec2 halfSize = { fabsf(transform.GetScale().x) * 0.3f, fabsf(transform.GetScale().y) * 0.5f };
+    float tileSizeHalf = map->GetTileSize() * 0.5f;
+    AEVec2 tileHalf = { tileSizeHalf, tileSizeHalf };
+
+    isGrounded = false;
+    AEVec2 minTile = map->GetTilePos(position.x - halfSize.x, position.y - halfSize.y);
+    AEVec2 maxTile = map->GetTilePos(position.x + halfSize.x, position.y + halfSize.y);
+
+    int xMin = static_cast<int>((std::min)(minTile.x, maxTile.x));
+    int xMax = static_cast<int>((std::max)(minTile.x, maxTile.x));
+    int yMin = static_cast<int>((std::min)(minTile.y, maxTile.y));
+    int yMax = static_cast<int>((std::max)(minTile.y, maxTile.y));
+
+    for (int y = yMin; y <= yMax; ++y) {
+        for (int x = xMin; x <= xMax; ++x) {
+            if (x < 0 || y < 0 || y >= map->GetNumRow() || x >= map->GetNumCol()) continue;
+
+            Tile& tile = map->GetMap()[y][x];
+            TILE_TYPE type = tile.tileType;
+            if (!map->CheckTile(type) || type == TILE_TYPE::BACKGROUND) continue;
+
+            AEVec2 tilePos = tile.transform.GetPosition();
+
+            if (type == TILE_TYPE::LEFT_PLATFORM || type == TILE_TYPE::PLATFORM || type == TILE_TYPE::RIGHT_PLATFORM) {
+                float surfaceY = tilePos.y + tileSizeHalf;
+                float prevBottom = transform.GetPosition().y - halfSize.y;
+                float newBottom = position.y - halfSize.y;
+
+                float dx = position.x - tilePos.x;
+                float px = (halfSize.x + tileHalf.x) - fabsf(dx);
+
+                // Increased buffer to 15 pixels
+                if (px <= 15.0f) continue;
+
+                if (prevBottom >= surfaceY && velocity.y <= 0.f && newBottom <= surfaceY) {
+                    position.y = surfaceY + halfSize.y;
+                    velocity.y = 0.f;
+                    isGrounded = true;
+                }
+                continue;
+            }
+
+            float dx = position.x - tilePos.x;
+            float px = (halfSize.x + tileHalf.x) - fabsf(dx);
+
+            // Increased buffer to 15 pixels
+            if (px <= 15.0f) continue;
+
+            float dy = position.y - tilePos.y;
+            float py = (halfSize.y + tileHalf.y) - fabsf(dy);
+            if (py <= 0.f) continue;
+
+            if ((dy > 0.f && velocity.y < 0.f) || (dy < 0.f && velocity.y > 0.f)) {
+                position.y += (dy > 0.f) ? py : -py;
+                velocity.y = 0.f;
+                if (dy > 0.f) isGrounded = true;
+            }
+        }
+    }
+}

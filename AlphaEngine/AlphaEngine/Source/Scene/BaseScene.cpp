@@ -135,11 +135,21 @@ void BaseScene::Update() {
 
 		// DOOR COLLISION CHECK
 		if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR) {
+
+			// clear the current scene's resources before changing to the next scene to prevent memory leaks and cross over of resources
+			// Clear the Particle Manager
+			ParticleManager::GetInstance()->ClearAll();
+
+			// Clear the Player's active projectiles so they don't cross over
+			for (auto p : player->projectileList) {
+				delete p;
+			}
+			player->projectileList.clear();
+
 			if (nextScene != nullptr) {
 				BaseScene* pNext = nextScene;
 				nextScene = nullptr;
 				SceneManager::ChangeScene(pNext);
-				//ParticleManager::GetInstance()->ClearAll();
 			}
 			else {
 				SceneManager::ChangeScene(new MainMenu());

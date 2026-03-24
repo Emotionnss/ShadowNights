@@ -53,7 +53,7 @@ void ShadowEnemy::Update(float deltaTime)
     float visualWidth = fabs(transform.GetScale().x);
     float visualHeight = transform.GetScale().y;
 
-    //attack state has highest priority, then aggroed state, then patrol state
+    // attack state has highest priority, then aggroed state, then patrol state
     if (isAttacking)
     {
         velocity.x = 0.0f;
@@ -92,22 +92,18 @@ void ShadowEnemy::Update(float deltaTime)
     }
     else
     {
-        // Since both ranges are the same, we only need to check if the player is within range
-        if (dist < attackRadius)
+		//added line of sight check so that the enemy doesn't aggro through walls
+        if (dist < attackRadius && HasLineOfSight(playerPos))
         {
             if (!isAggroed)
             {
-                // Trigger the surprise reaction the moment they enter the radius
                 isAggroed = true;
                 isSurprised = true;
                 surpriseTimer = 0.5f;
             }
             else
             {
-                // Once the surprise timer finishes, begin attacking immediately!
                 isAttacking = true;
-
-                // If you have a slow effect implemented, keep this, otherwise just use originalTimer
                 attackTimer = originalTimer;
                 PlayAnim("attack1");
             }
@@ -125,7 +121,6 @@ void ShadowEnemy::Update(float deltaTime)
         }
     }
 
-    // PHYSICS & MAP COLLISION
     velocity.y += gravity * deltaTime;
 
     AEVec2 position = transform.GetPosition();
@@ -174,12 +169,27 @@ void ShadowEnemy::Update(float deltaTime)
                 {
                     if (px < py)
                     {
-                        if (colDx > 0) position.x += px;
-                        else           position.x -= px;
+						// floor buffer check to prevent getting stuck on walls when trying to jump up
+                        if (py <= 15.0f)
+                        {
+                            // Treat it as a floor and push the enemy up
+                            if (colDy > 0) position.y += py;
+                            else           position.y -= py;
 
-                        velocity.x = 0.f;
-                        hitWall = true;
+                            velocity.y = 0.f;
+                            if (colDy > 0 && velocity.y <= 0.f) isGrounded = true;
+                        }
+                        else
+                        {
+							//check if the enemy is moving towards the wall, if not we don't want to resolve the collision to prevent getting stuck in walls
+                            if (colDx > 0) position.x += px;
+                            else           position.x -= px;
+
+                            velocity.x = 0.f;
+                            hitWall = true;
+                        }
                     }
+					//hit floor or ceiling
                     else
                     {
                         if (colDy > 0) position.y += py;
@@ -205,6 +215,7 @@ void ShadowEnemy::Update(float deltaTime)
         isGrounded = true;
     }
 
+	//movement and animation updates should only happen after collision resolution to prevent jittery movement when hitting walls
     transform.SetPosition(position.x, position.y);
     if (sprite) sprite->Update();
 }

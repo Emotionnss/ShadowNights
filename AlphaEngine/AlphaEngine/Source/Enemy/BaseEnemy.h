@@ -29,6 +29,9 @@ public:
 
     bool CheckProjectileCollision(BaseProjectile* proj, Map* map);
 
+    void ResolveX(AEVec2& position);
+    void ResolveY(AEVec2& position);
+
     bool isBoss = false;
 
 protected:

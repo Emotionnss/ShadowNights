@@ -172,9 +172,12 @@ Tile& Map::GetTile(f32 xPos, f32 yPos) const
 Tile& Map::GetTileFromTilePos(f32 xPos, f32 yPos) const
 {
 	xPos = xPos >= NUM_COLUMN ? NUM_COLUMN - 1 : xPos;
-	yPos = yPos >= NUM_ROW ? NUM_ROW - 1: yPos;
+	yPos = yPos >= NUM_ROW ? NUM_ROW - 1 : yPos;
 
-	Tile tile = map[static_cast<s32>(yPos)][static_cast<s32>(xPos)];
+	// --- THE FIX: Prevent negative map coordinates! ---
+	xPos = xPos < 0 ? 0 : xPos;
+	yPos = yPos < 0 ? 0 : yPos;
+
 	return map[static_cast<s32>(yPos)][static_cast<s32>(xPos)];
 }
 

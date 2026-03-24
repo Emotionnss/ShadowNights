@@ -202,6 +202,35 @@ void BaseScene::Update() {
 				BaseEnemy* enemy = enemyList[j];
 				if (enemy->IsDying()) continue;
 
+				// WEAKPOINT LOGIC
+				// Check if the enemy is actually the Boss
+				BossEnemy* boss = dynamic_cast<BossEnemy*>(enemy);
+				if (boss) {
+					// Get the weakpoint
+					Weakpoint wp = boss->GetWeakpoint();
+
+					// Only take damage if the weakpoint is active
+					if (wp.active) {
+						AEVec2 wpPos = wp.transform.GetPosition();
+						AEVec2 wpHalf = { fabs(wp.transform.GetScale().x) / 2.0f, wp.transform.GetScale().y / 2.0f };
+
+						// Check collision against the small weakpoint, NOT the giant boss body
+						if (AABBOverlap(projPos, projHalf, wpPos, wpHalf)) {
+							if (dynamic_cast<SwordProjectile*>(pProj) == nullptr) {
+								boss->TakeDamage(3);
+								destroyProjectile = true;
+								break;
+							}
+							else {
+								boss->TakeDamage(5);
+							}
+						}
+					}
+					// Force the loop to skip to the next enemy so the bullet ignores the main boss body
+					continue;
+				}
+
+				// normal enemy collision logic for regular enemies and the boss's main body (which is invulnerable)
 				AEVec2 enemyPos = enemy->transform.GetPosition();
 				AEVec2 enemyHalf = { fabs(enemy->transform.GetScale().x) / 2.0f, enemy->transform.GetScale().y / 2.0f };
 

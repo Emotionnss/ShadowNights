@@ -34,7 +34,24 @@ void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
 {
     BaseEnemy::Init(x, y, w, h, spriteName);
 
+	//override base enemy stats
+    health = 200;
+    maxHealth = 200;
+
     deathAnimName = "death";
+
+    gravity = 0.0f;
+    moveSpeed = 100.0f;
+
+    // Make the AI targets match the physical Hard Clamp
+    float bossHalfWidth = 200.0f;
+    float bossHalfHeight = 200.0f;
+    float tileSize = map->GetTileSize();
+    float ceilingBuffer = tileSize * 2.0f;
+
+    minCoordLimit = { tileSize + bossHalfWidth, tileSize + bossHalfHeight };
+    maxCoordLimit = { (map->GetNumCol() * tileSize) - tileSize - bossHalfWidth,
+                      (map->GetNumRow() * tileSize) - ceilingBuffer - bossHalfHeight };
 
     //variables
     isAttacking = false;
@@ -60,14 +77,46 @@ void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
 
 void BossEnemy::Update(f32 deltaTime)
 {
+    // Save position to ignore inner wall collisions
+    AEVec2 ghostPos = transform.GetPosition();
+
     // BaseEnemy handles Projectiles and Death animations
     BaseEnemy::Update(deltaTime);
     
     // If we are stopped or dying dont run AI or movement
     if (stopped || isDying) return;
 
-    //Update Enemy FSM
+    // Restore position so we float through inner blocks
+    transform.SetPosition(ghostPos.x, ghostPos.y);
+
+    // Update Enemy FSM (This calculates the movement)
     EnemyFSM(deltaTime);
+
+    // FORCE the boss to stay inside the outer map boundaries
+
+    float bossHalfWidth = fabs(transform.GetScale().x) * 0.5f;
+    float bossHalfHeight = fabs(transform.GetScale().y) * 0.5f;
+    float tileSize = map->GetTileSize();
+
+    //  tile of buffer just for the ceiling
+    float ceilingBuffer = tileSize * 2.0f;
+
+    float minX = tileSize + bossHalfWidth;
+    float maxX = (map->GetNumCol() * tileSize) - tileSize - bossHalfWidth;
+
+    float minY = tileSize + bossHalfHeight;
+
+    // Subtract the ceiling buffer so the Boss is forced to fly lower
+    float maxY = (map->GetNumRow() * tileSize) - ceilingBuffer - bossHalfHeight;
+
+    AEVec2 pos = transform.GetPosition();
+
+    if (pos.x < minX) pos.x = minX;
+    if (pos.x > maxX) pos.x = maxX;
+    if (pos.y < minY) pos.y = minY;
+    if (pos.y > maxY) pos.y = maxY;
+
+    transform.SetPosition(pos.x, pos.y);
 
     Player* player = Player::GetInstance();
     AEVec2 myPos = transform.GetPosition();
@@ -263,7 +312,7 @@ bool BossEnemy::UpdateMoving(f32 deltaTime)
     position.x += velocity.x * deltaTime;
     position.y += velocity.y * deltaTime;
 
-    transform.SetPosition(position.x, position.y);
+	transform.SetPosition(position.x, position.y);
 
     //Check for whether boss reached near position
     if (position.x > targetPos.x - 5.0f && position.x < targetPos.x + 5.0f && position.y > targetPos.y - 5.0f && position.y < targetPos.y + 5.0f)
@@ -278,8 +327,11 @@ void BossEnemy::EnterExhausted()
 {
     currentBossState = BOSS_STATE::EXHAUSTED;
 
-    //Enable weakpoint or smth idk
-    ActivateWeakpoint();
+    // so the Boss doesn't drift away
+    velocity = { 0.0f, 0.0f };
+
+    // Turn the Weakpoint ON
+    weakpoint.active = true;
 
     timer = exhaustedTimer;
     stateCounter = 0;
@@ -316,26 +368,16 @@ void BossEnemy::ActivateWeakpoint()
     weakpoint.lerpVector = { currentPos.x, weakpoint.maxY + 2.f };
 }
 
-void BossEnemy::UpdateWeakpoint(f32 deltaTime)
+void BossEnemy::UpdateWeakpoint(f32)
 {
-    AEVec2 pos = weakpoint.transform.GetPosition();
+    // Get the Boss's exact current position
+    AEVec2 bossPos = transform.GetPosition();
 
-    if (pos.y >= weakpoint.maxY)
-    {
-        weakpoint.dir = -1;
-        weakpoint.lerpVector = { pos.x, weakpoint.minY - 2.f };
-    }
-    else if (pos.y <= weakpoint.minY)
-    {
-        weakpoint.dir = 1;
-        weakpoint.lerpVector = { pos.x, weakpoint.maxY + 2.f };
-    }
+    // Use a sine wave to create a smooth, floating bobbing effect
+    float bobbingOffset = sinf(timer * 5.0f) * 15.0f;
 
-    //pos.y += weakpoint.dir * 25.f * deltaTime;
-
-    AEVec2Lerp(&pos, &pos, &weakpoint.lerpVector, deltaTime);
-
-    weakpoint.transform.SetPosition(pos.x, pos.y);
+    // Pin the weakpoint to the Boss's chest + the bobbing offset
+    weakpoint.transform.SetPosition(bossPos.x, bossPos.y + bobbingOffset);
 }
 
 Weakpoint BossEnemy::GetWeakpoint() const
@@ -380,24 +422,38 @@ void BossEnemy::SpawnRandomEnemy()
 {
     BaseEnemy* randEnemy = nullptr;
 
+    // Start with the Boss's position
+    float spawnX = transform.GetPosition().x;
+    float spawnY = transform.GetPosition().y - 100.0f;
+
+    // Create a "Safe Zone" that is 3 tiles away from the outer walls and floor/ceiling
+    float safeBuffer = map->GetTileSize() * 3.0f;
+    float mapMaxX = (map->GetNumCol() * map->GetTileSize()) - safeBuffer;
+    float mapMaxY = (map->GetNumRow() * map->GetTileSize()) - safeBuffer;
+
+    // If the Boss is inside a wall, force the spawn X back into the room
+    if (spawnX < safeBuffer) spawnX = safeBuffer;
+    if (spawnX > mapMaxX)    spawnX = mapMaxX;
+
+    // If the Boss is inside the ceiling or floor force the spawn Y back into the room
+    if (spawnY < safeBuffer) spawnY = safeBuffer;
+    if (spawnY > mapMaxY)    spawnY = mapMaxY;
+
     int choice = rand() % 3;
     if (choice == 0)
     {
-        // spawn archer somehow lol
         randEnemy = new ArcherEnemy();
-        randEnemy->Init(transform.GetPosition().x, transform.GetPosition().y, 85.f, 60.f, "sniperenemy");
+        randEnemy->Init(spawnX, spawnY, 85.f, 60.f, "sniperenemy");
     }
     else if (choice == 1)
     {
-        // spawn bat somehow
         randEnemy = new BatEnemy();
-        randEnemy->Init(transform.GetPosition().x, transform.GetPosition().y, 85.f, 60.f, "batenemy");
+        randEnemy->Init(spawnX, spawnY, 85.f, 60.f, "batenemy");
     }
     else
     {
-        // spawn shadow
         randEnemy = new ShadowEnemy();
-        randEnemy->Init(transform.GetPosition().x, transform.GetPosition().y, 85.f, 60.f, "shadow1");
+        randEnemy->Init(spawnX, spawnY, 85.f, 60.f, "shadow1");
     }
 
     if (randEnemy)

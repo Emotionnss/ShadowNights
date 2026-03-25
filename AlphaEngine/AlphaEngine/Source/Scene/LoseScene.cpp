@@ -10,6 +10,8 @@
 
 LoseScene::LoseScene(int idToRestart) {
     restartLevelID = idToRestart;
+	player = Player::GetInstance();
+	player->SetHealth(100);
 }
 
 void LoseScene::Load() {

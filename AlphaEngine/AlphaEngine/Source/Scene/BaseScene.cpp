@@ -174,7 +174,7 @@ void BaseScene::Update() {
 				abilityHandler->TriggerAnchor();
 			}
 			else {
-				SceneManager::ChangeScene(new LoseScene());
+				SceneManager::ChangeScene(new LoseScene(levelID));
 			}
 		}
 
@@ -352,10 +352,6 @@ void BaseScene::Free() {
 		player->ClearProjectileList();
 	}
 
-	delete btnResume; delete btnSaveMenu; delete btnLoadMenu; delete btnExit;
-
-	delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
-
 	for (BaseEnemy* enemy : enemyList) {
 		delete enemy;
 	}
@@ -370,6 +366,11 @@ void BaseScene::Free() {
 }
 
 void BaseScene::Unload() {
+
+	delete btnResume; delete btnSaveMenu; delete btnLoadMenu; delete btnExit;
+
+	delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
+
 	player = nullptr;
 	abilityHandler = nullptr;
 	meshManager = nullptr;

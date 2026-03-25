@@ -10,6 +10,7 @@ void BossScene::Init() {
     boss->Init(1400.f, 300.0f, 85.0f, 60.0f, "boss");
     enemyList.push_back(boss);
     boss->isBoss = true;
+	levelID = 2;
 }
 
 void BossScene::Update() {

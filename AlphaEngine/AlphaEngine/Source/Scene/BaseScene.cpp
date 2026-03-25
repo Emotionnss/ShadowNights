@@ -241,7 +241,8 @@ void BaseScene::Update() {
 						break;
 					}
 					else {
-						enemy->TakeDamage(5);
+						// 1 because itll vaporise the boss by ticking every frame lol
+						enemy->TakeDamage(1);
 					}
 				}
 			}

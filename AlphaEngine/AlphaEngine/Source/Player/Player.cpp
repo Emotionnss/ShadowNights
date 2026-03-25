@@ -134,14 +134,18 @@ void Player::HandleInput()
 	}
 	else if (AEInputCheckTriggered(AEVK_RBUTTON))
 	{
-		AudioManager::GetInstance()->PlaySFXOneShot("player_slash");
+		if (swordCooldown <= 0.f)
+		{
+			AudioManager::GetInstance()->PlaySFXOneShot("player_slash");
 
-		s32 xDir, yDir;
-		AEInputGetCursorPosition(&xDir, &yDir);
-		AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
-		AEVec2 playerDir = ShootDirection(mousePos);
+			s32 xDir, yDir;
+			AEInputGetCursorPosition(&xDir, &yDir);
+			AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
+			AEVec2 playerDir = ShootDirection(mousePos);
 
-		projectileList.push_back(new SwordProjectile(GetTransform().GetPosition(), playerDir));
+			projectileList.push_back(new SwordProjectile(GetTransform().GetPosition(), playerDir));
+			swordCooldown = swordMaxCooldown;
+		}
 	}
 }
 
@@ -390,6 +394,10 @@ void Player::Update(float deltaTime)
 	AimArrow();
 	AEVec2 currentForces{ 0.f, gravity }; // Acceleration
 
+	if (swordCooldown >= 0.f)
+	{
+		swordCooldown -= deltaTime;
+	}
 	// Check For X Input
 	if (input.x != 0.f)
 	{

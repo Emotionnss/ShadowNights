@@ -10,6 +10,8 @@ SwordProjectile::SwordProjectile(AEVec2 pos, AEVec2 dir)
 	transform.SetScale(size * 5.f, size * 10.f);
 	transform.SetPosition(pos.x, pos.y);
 
+	collidesWithTiles = false;
+
 	if (sharedSwordTex == nullptr) {
 		sharedSwordTex = AEGfxTextureLoad("Assets/Weapons/swordSlash.png");
 	}

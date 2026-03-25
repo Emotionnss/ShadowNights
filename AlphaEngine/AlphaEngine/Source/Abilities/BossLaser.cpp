@@ -52,7 +52,6 @@ void BossLaser::Update(float deltaTime)
     // charging phase
     if (charging)
     {
-        std::cout << "CHARGING" << std::endl;
         startupDelay -= 1.f * deltaTime;
         if (startupDelay <= 0.f)
         {
@@ -71,8 +70,6 @@ void BossLaser::Update(float deltaTime)
 
     if (AABBOverlap(laserPos, laserHalf, playerPos, playerHalf) && damageCooldown <= 0.f)
     {
-        std::cout << "LASER TICK" << std::endl;
-
         player->TakeDamage(20);
         damageCooldown = baseCooldown;
     }

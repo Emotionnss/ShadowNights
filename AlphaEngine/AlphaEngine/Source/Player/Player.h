@@ -72,6 +72,9 @@ private:
 
 	f32 speed, maxSpeed, friction, size, gravity, jumpForce;
 
+	f32 swordCooldown = 0.f;
+	f32 swordMaxCooldown = 5.f;
+
 	f32 maxHP, currentHP;
 
 	f32 damagedTimer;

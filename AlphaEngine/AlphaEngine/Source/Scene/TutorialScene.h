@@ -66,6 +66,16 @@ public:
         AEGfxDestroyFont(fontId);
     }
 
+    void Load()
+    {
+        BaseScene::Load();
+
+        if (player != nullptr)
+        {
+            player->SetHealth(100.f);
+        }
+    }
+
     void Draw()
     {
         BaseScene::Draw();

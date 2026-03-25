@@ -140,7 +140,7 @@ void BaseScene::Update() {
 				//ParticleManager::GetInstance()->ClearAll();
 			}
 			else {
-				SceneManager::ChangeScene(new MainMenu());
+				//SceneManager::ChangeScene(new MainMenu());
 			}
 		}
 

@@ -59,8 +59,6 @@ void BaseScene::Load() {
 void BaseScene::Init() {
 	player->GetTransform().SetPosition(300.0f, 900.0f);
 
-	player->SetHealth(100.f);
-
 	if (!audio->GetMusicGroup())
 	{
 		audio->PlayMusic(levelBGM, 1.f);
@@ -135,21 +133,11 @@ void BaseScene::Update() {
 
 		// DOOR COLLISION CHECK
 		if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR) {
-
-			// clear the current scene's resources before changing to the next scene to prevent memory leaks and cross over of resources
-			// Clear the Particle Manager
-			ParticleManager::GetInstance()->ClearAll();
-
-			// Clear the Player's active projectiles so they don't cross over
-			for (auto p : player->projectileList) {
-				delete p;
-			}
-			player->projectileList.clear();
-
 			if (nextScene != nullptr) {
 				BaseScene* pNext = nextScene;
 				nextScene = nullptr;
 				SceneManager::ChangeScene(pNext);
+				//ParticleManager::GetInstance()->ClearAll();
 			}
 			else {
 				SceneManager::ChangeScene(new MainMenu());
@@ -186,7 +174,7 @@ void BaseScene::Update() {
 				abilityHandler->TriggerAnchor();
 			}
 			else {
-				SceneManager::ChangeScene(new LoseScene(levelID));
+				SceneManager::ChangeScene(new LoseScene());
 			}
 		}
 
@@ -202,35 +190,6 @@ void BaseScene::Update() {
 				BaseEnemy* enemy = enemyList[j];
 				if (enemy->IsDying()) continue;
 
-				// WEAKPOINT LOGIC
-				// Check if the enemy is actually the Boss
-				BossEnemy* boss = dynamic_cast<BossEnemy*>(enemy);
-				if (boss) {
-					// Get the weakpoint
-					Weakpoint wp = boss->GetWeakpoint();
-
-					// Only take damage if the weakpoint is active
-					if (wp.active) {
-						AEVec2 wpPos = wp.transform.GetPosition();
-						AEVec2 wpHalf = { fabs(wp.transform.GetScale().x) / 2.0f, wp.transform.GetScale().y / 2.0f };
-
-						// Check collision against the small weakpoint, NOT the giant boss body
-						if (AABBOverlap(projPos, projHalf, wpPos, wpHalf)) {
-							if (dynamic_cast<SwordProjectile*>(pProj) == nullptr) {
-								boss->TakeDamage(3);
-								destroyProjectile = true;
-								break;
-							}
-							else {
-								boss->TakeDamage(5);
-							}
-						}
-					}
-					// Force the loop to skip to the next enemy so the bullet ignores the main boss body
-					continue;
-				}
-
-				// normal enemy collision logic for regular enemies and the boss's main body (which is invulnerable)
 				AEVec2 enemyPos = enemy->transform.GetPosition();
 				AEVec2 enemyHalf = { fabs(enemy->transform.GetScale().x) / 2.0f, enemy->transform.GetScale().y / 2.0f };
 
@@ -241,8 +200,7 @@ void BaseScene::Update() {
 						break;
 					}
 					else {
-						// 1 because itll vaporise the boss by ticking every frame lol
-						enemy->TakeDamage(1);
+						enemy->TakeDamage(5);
 					}
 				}
 			}
@@ -386,31 +344,32 @@ bool BaseScene::FileExists(int slot) const {
 }
 
 void BaseScene::Free() {
-	// 1. Only delete things created in Init()!
-	if (abilityHandler) {
+	if (abilityHandler)
 		delete abilityHandler;
-		abilityHandler = nullptr; // Always null out after deleting!
+
+	if (player != nullptr)
+	{
+		player->ClearProjectileList();
 	}
+
+	delete btnResume; delete btnSaveMenu; delete btnLoadMenu; delete btnExit;
+
+	delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
 
 	for (BaseEnemy* enemy : enemyList) {
 		delete enemy;
 	}
 	enemyList.clear();
 
-	ParticleManager::GetInstance()->ClearAll();
-}	
-
-void BaseScene::Unload() {
-	// 1. Delete things created in Load()!
-	delete btnResume; delete btnSaveMenu; delete btnLoadMenu; delete btnExit;
-	delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
-
 	if (bg) {
 		delete bg;
 		bg = nullptr;
 	}
 
-	// 2. Clear out dangling pointers
+	ParticleManager::GetInstance()->ClearAll();
+}
+
+void BaseScene::Unload() {
 	player = nullptr;
 	abilityHandler = nullptr;
 	meshManager = nullptr;

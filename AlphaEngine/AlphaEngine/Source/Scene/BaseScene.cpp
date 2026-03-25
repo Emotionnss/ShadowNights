@@ -152,7 +152,7 @@ void BaseScene::Update() {
 				SceneManager::ChangeScene(pNext);
 			}
 			else {
-				SceneManager::ChangeScene(new MainMenu());
+				//SceneManager::ChangeScene(new MainMenu());
 			}
 		}
 

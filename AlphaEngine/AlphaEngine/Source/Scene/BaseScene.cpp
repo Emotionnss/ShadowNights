@@ -6,6 +6,7 @@
 #include "BossScene.h"
 #include "MainMenu.h"
 #include "LoseScene.h"
+#include "TutorialScene.h"
 #include "../Utils/utils.h"
 #include "../Enemy/ShadowEnemy.h"
 #include "../Enemy/BatEnemy.h"
@@ -318,7 +319,7 @@ void BaseScene::SaveGame(int slot) {
 	std::ofstream f(path);
 	if (f.is_open()) {
 		AEVec2 pos = player->GetTransform().GetPosition();
-		f << pos.x << " " << pos.y << " " << player->GetHealth();
+		f << levelID << " " << pos.x << " " << pos.y << " " << player->GetHealth();
 		f.close();
 		popupTimer = 2.0f;
 	}
@@ -328,11 +329,36 @@ void BaseScene::LoadGame(int slot) {
 	std::string path = "save_slot_" + std::to_string(slot) + ".txt";
 	std::ifstream f(path);
 	if (f.is_open()) {
+
+		int savedLevelID; //hold the level
 		float x, y, hp;
-		if (f >> x >> y >> hp) {
+
+		// Read the levelID first, then the coordinates and health
+		if (f >> savedLevelID >> x >> y >> hp) {
+
+			// Always restore player stats
 			player->GetTransform().SetPosition(x, y);
 			player->SetHealth(hp);
 			isPaused = false;
+
+			// If the save file is from a different level than the one that was saved
+			if (savedLevelID != this->levelID) {
+
+				if (savedLevelID == 1) {
+					// Route to Level 1
+					SceneManager::ChangeScene(new BaseScene(slot));
+				}
+
+				else if (savedLevelID == 0) {
+					// Route to Main Menu
+					SceneManager::ChangeScene(new TutorialScene(slot));
+				}
+
+				else if (savedLevelID == 2) {
+					// Route to Boss Room
+					SceneManager::ChangeScene(new BossScene(slot));
+				}
+			}
 		}
 		f.close();
 	}

@@ -18,5 +18,6 @@ private:
     Button* btnPlay = nullptr;
     Button* btnLoad = nullptr;
     Button* btnSettings = nullptr;
+    Button* btnCredits = nullptr;
     Button* btnQuit = nullptr;
 };

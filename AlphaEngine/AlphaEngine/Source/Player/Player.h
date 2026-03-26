@@ -63,7 +63,9 @@ private:
 	Transform2D arrowTfm{};
 	AEGfxTexture* arrowTex{};
 	Transform2D healthbar;
-	AEGfxTexture* healthbarBorder;
+	AEGfxTexture* healthbarOverlay;
+	Transform2D healthbarOverlayTfm;
+	AEGfxTexture* healthBarBG;
 	enum Direction { LEFT = -1, RIGHT = 1, IDLE = 0 };
 	Direction playerDirection = RIGHT;
 

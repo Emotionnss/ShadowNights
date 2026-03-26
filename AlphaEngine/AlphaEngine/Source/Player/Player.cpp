@@ -23,7 +23,8 @@ Player::Player()
 
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y); // Get Camera Position
 	AEVec2Set(&cameraOffset, 200.f, -50.f); // Set Camera Offset Position
-	healthbarBorder = AEGfxTextureLoad("Assets/Abilities/hp_border.png");
+	healthbarOverlay = AEGfxTextureLoad("Assets/Abilities/healthbar.png");
+	healthbarOverlayTfm.SetScale(maxHP*5.f, 100.f);
 	arrowTex = AEGfxTextureLoad("Assets/Weapons/pointer.png");
 	// Sprite Handling
 	sprite = new Sprite(CSVManager::ReadInfo("tempPlayer"));
@@ -43,8 +44,8 @@ Player::~Player()
 		delete sprite;
 		sprite = nullptr;
 	}
-	if (healthbarBorder)
-		AEGfxTextureUnload(healthbarBorder);
+	if (healthbarOverlay)
+		AEGfxTextureUnload(healthbarOverlay);
 	if (arrowTex)
 		AEGfxTextureUnload(arrowTex);
 }
@@ -503,9 +504,11 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 
 	AEVec2 CamPos;
 	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
-	matrix.SetPosition(CamPos.x - 250.f, CamPos.y + 350.f);
+	matrix.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f +  168.f, CamPos.y + 335.f);
 	float safeValue = AEClamp(value, 0.f, maxHP);
-	matrix.SetScale(safeValue * 5.f, 55.f);
+	matrix.SetScale(safeValue * 3.75f, 25.f);
+
+	healthbarOverlayTfm.SetPosition(CamPos.x - AEGfxGetWindowWidth()/2.f + 50.f, CamPos.y + 300.f);
 
 	AEGfxSetTransform(matrix.GetMatrix().m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
@@ -516,9 +519,9 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.f);
-	matrix.SetScale(maxHP * 5.f, 55.f);
-	AEGfxTextureSet(healthbarBorder, 0, 0);
-	AEGfxSetTransform(matrix.GetMatrix().m);
+	
+	AEGfxTextureSet(healthbarOverlay, 0, 0);
+	AEGfxSetTransform(healthbarOverlayTfm.GetMatrix().m);
 	AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 }
 

@@ -117,6 +117,10 @@ void BaseScene::Update() {
 
 	f32 dt = (f32)AEFrameRateControllerGetFrameTime();
 
+	if (dt > 0.033f) {
+		dt = 0.01667f;
+	}
+
 	if (!isPaused) {
 		audio->ResumeMusic();
 		player->Update(dt);

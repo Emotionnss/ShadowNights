@@ -35,8 +35,8 @@ void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
     BaseEnemy::Init(x, y, w, h, spriteName);
 
 	//override base enemy stats
-    health = 5000;
-    maxHealth = 5000;
+    health = 2000;
+    maxHealth = 2000;
 
     deathAnimName = "death";
 
@@ -47,9 +47,12 @@ void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
     float bossHalfWidth = 200.0f;
     float bossHalfHeight = 200.0f;
     float tileSize = map->GetTileSize();
+
+    // The CSV has 7 empty tiles on the left before the brick wall starts!
+    float leftWallBuffer = tileSize * 7.0f;
     float ceilingBuffer = tileSize * 2.0f;
 
-    minCoordLimit = { tileSize + bossHalfWidth, tileSize + bossHalfHeight };
+    minCoordLimit = { leftWallBuffer + bossHalfWidth, tileSize + bossHalfHeight };
     maxCoordLimit = { (map->GetNumCol() * tileSize) - tileSize - bossHalfWidth,
                       (map->GetNumRow() * tileSize) - ceilingBuffer - bossHalfHeight };
 
@@ -89,7 +92,7 @@ void BossEnemy::Update(f32 deltaTime)
     // Restore position so we float through inner blocks
     transform.SetPosition(ghostPos.x, ghostPos.y);
 
-    // Update Enemy FSM (This calculates the movement)
+    // (This calculates the movement)
     EnemyFSM(deltaTime);
 
     // FORCE the boss to stay inside the outer map boundaries
@@ -98,15 +101,14 @@ void BossEnemy::Update(f32 deltaTime)
     float bossHalfHeight = fabs(transform.GetScale().y) * 0.5f;
     float tileSize = map->GetTileSize();
 
-    //  tile of buffer just for the ceiling
+	// add the buffer to prevent the boss from clipping into the ceiling and left wall since those are the only two sides we care about for now
     float ceilingBuffer = tileSize * 2.0f;
+    float leftWallBuffer = tileSize * 7.0f;
 
-    float minX = tileSize + bossHalfWidth;
+    float minX = leftWallBuffer + bossHalfWidth;
     float maxX = (map->GetNumCol() * tileSize) - tileSize - bossHalfWidth;
 
     float minY = tileSize + bossHalfHeight;
-
-    // Subtract the ceiling buffer so the Boss is forced to fly lower
     float maxY = (map->GetNumRow() * tileSize) - ceilingBuffer - bossHalfHeight;
 
     AEVec2 pos = transform.GetPosition();

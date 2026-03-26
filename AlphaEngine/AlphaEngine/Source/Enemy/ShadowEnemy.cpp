@@ -37,7 +37,6 @@ void ShadowEnemy::Update(float deltaTime)
     float colliderWidth = 40.0f;
     float colliderHeight = 60.0f;
 
-    Map* map = Map::GetInstance();
     Player* player = Player::GetInstance();
 
     AEVec2 myPos = transform.GetPosition();

@@ -83,7 +83,6 @@ void ArcherEnemy::Update(float deltaTime)
     float colliderHeight = 60.0f;
     AEVec2 halfSize{ colliderWidth / 2.f, colliderHeight / 2.f };
 
-    Map* map = Map::GetInstance();
     float left = position.x - halfSize.x;
     float right = position.x + halfSize.x;
     float bottom = position.y - halfSize.y;

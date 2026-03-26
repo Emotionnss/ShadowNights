@@ -2,6 +2,7 @@
 #include "../System/Scenemanager.h"
 #include "TutorialScene.h"
 #include "Level1Scene.h"
+#include "Credits.h"
 #include "AEEngine.h"
 #include <iostream>
 #include <fstream>
@@ -21,7 +22,8 @@ void MainMenu::Load() {
     btnPlay = new Button(0.0f, 90.0f, 200.0f, 50.0f, "New Game");
     btnLoad = new Button(0.0f, 30.0f, 200.0f, 50.0f, "Load Game");
     btnSettings = new Button(0.0f, -30.0f, 200.0f, 50.0f, "Settings");
-    btnQuit = new Button(0.0f, -90.0f, 200.0f, 50.0f, "Quit");
+    btnCredits = new Button(0.0f, -90.0f, 200.0f, 50.0f, "Credits");
+    btnQuit = new Button(0.0f, -150.0f, 200.0f, 50.0f, "Quit");
 
     btnSlot1 = new Button(0.0f, 90.0f, 200.0f, 50.0f, "Slot 1");
     btnSlot2 = new Button(0.0f, 30.0f, 200.0f, 50.0f, "Slot 2");
@@ -53,6 +55,11 @@ void MainMenu::Update() {
         if (btnSettings->IsClicked()) {
             std::cout << "Settings Pressed" << std::endl;
         }
+        if (btnCredits->IsClicked())
+        {
+            //change to credits
+            SceneManager::ChangeScene(new CreditsScene());
+        }
         if (btnQuit->IsClicked()) {
             gGameRunning = false;
         }
@@ -74,6 +81,7 @@ void MainMenu::Draw() {
         btnPlay->Draw();
         btnLoad->Draw();
         btnSettings->Draw();
+        btnCredits->Draw();
         btnQuit->Draw();
     }
     else {
@@ -85,7 +93,7 @@ void MainMenu::Draw() {
 }
 
 void MainMenu::Free() {
-    delete btnPlay; delete btnLoad; delete btnSettings; delete btnQuit;
+    delete btnPlay; delete btnLoad; delete btnSettings; delete btnCredits; delete btnQuit;
     delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
     Button::FreeResources();
 }

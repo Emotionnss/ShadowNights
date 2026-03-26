@@ -41,6 +41,7 @@
     <ClCompile Include="Source\System\AudioManager.cpp" />
     <ClCompile Include="Source\Scene\TutorialScene.cpp" />
     <ClCompile Include="Source\Scene\Level1Scene.cpp" />
+    <ClCompile Include="Source\Scene\Credits.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Abilities\BossExplosive.h" />
@@ -83,5 +84,6 @@
     <ClInclude Include="Source\System\AudioManager.h" />
     <ClInclude Include="Source\Scene\TutorialScene.h" />
     <ClInclude Include="Source\Scene\Level1Scene.h" />
+    <ClInclude Include="Source\Scene\Credits.h" />
   </ItemGroup>
 </Project>

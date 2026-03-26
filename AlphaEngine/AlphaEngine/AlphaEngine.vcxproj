@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Scene\Credits.cpp" />
     <ClCompile Include="Source\Scene\Level1Scene.cpp" />
     <ClCompile Include="Source\Scene\LoseScene.cpp" />
     <ClCompile Include="Source\particle\ParticleManager.cpp" />
@@ -53,6 +54,7 @@
     <ClCompile Include="Source\Scene\TutorialScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Scene\Credits.h" />
     <ClInclude Include="Source\Scene\Level1Scene.h" />
     <ClInclude Include="Source\Scene\LoseScene.h" />
     <ClInclude Include="Source\particle\ParticleManager.h" />

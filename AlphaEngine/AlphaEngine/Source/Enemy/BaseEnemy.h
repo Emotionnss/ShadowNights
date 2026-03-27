@@ -7,6 +7,15 @@
 #include <vector>
 #include <string>
 
+/*!
+@file       BaseEnemy.h
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+             used for the BaseEnemy class, which is the parent class
+             of all enemies in the game, and contains common variables and
+			functions used across all enemy types.
+*//*_______________________________________________________________________*/
+
 class BaseEnemy : public GameObject
 {
 public:

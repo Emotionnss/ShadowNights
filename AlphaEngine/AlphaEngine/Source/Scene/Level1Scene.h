@@ -3,7 +3,7 @@
 #include "BossScene.h"
 
 /*!
-@file       Level1Scene.cpp
+@file       Level1Scene.h
 @author     Lim Chee Kang (l.cheekang)
 @brief      This file contains definitions of functions and variables
             used for the Level1Scene class, which is the first level of the game,

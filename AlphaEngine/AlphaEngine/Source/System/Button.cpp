@@ -3,6 +3,16 @@
 #include <cstdio>
 #include "MeshManager.h"
 
+/*!
+@file       Button.cpp
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+             used for the Button class, which is a UI element used for
+             clickable buttons in the game, and contains functions to draw
+             the button, check if it's hovered or clicked, and manage its
+			 resources.
+*//*_______________________________________________________________________*/
+
 AEGfxTexture* Button::sprite = nullptr;
 AEGfxVertexList* Button::pMesh = nullptr;
 s8 Button::fontId = -1;

@@ -12,6 +12,15 @@
 #include <vector>
 #include <string>
 
+/*!
+@file       BaseScene.h
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+            used for the BaseScene class, which is the parent class
+            of all scenes in the game, and contains common variables and
+			functions used across all scenes
+*//*_______________________________________________________________________*/
+
 class BaseScene {
 public:
     BaseScene(int slot = 0);

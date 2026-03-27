@@ -80,7 +80,7 @@ void BaseProjectile::Draw(AEGfxVertexList* mesh)
 
         AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f);
 
-        // --- FIX 4: Add this line to force the sword wave to ignore the purple paint! ---
+        // Add this line to force the sword wave to ignore the purple paint
         AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
 
         AEGfxSetBlendMode(AE_GFX_BM_BLEND);
@@ -89,7 +89,7 @@ void BaseProjectile::Draw(AEGfxVertexList* mesh)
         AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);
     }
 
-    // --- THE UNIVERSAL CLEANUP BRUSH ---
+    // THE UNIVERSAL CLEANUP BRUSH
     // Put this at the end of ALL drawing functions
     AEGfxTextureSet(nullptr, 0, 0);
     AEGfxSetRenderMode(AE_GFX_RM_COLOR);

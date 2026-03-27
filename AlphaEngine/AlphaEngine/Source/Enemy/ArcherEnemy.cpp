@@ -4,6 +4,16 @@
 #include <cmath>
 #include <algorithm>
 
+/*!
+@file       ArcherEnemy.cpp
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+             used for the ArcherEnemy class, which is a type of enemy
+             that shoots projectiles at the player from a distance, and contains
+             the specific implementation of the archer's behavior, such as its
+			 shooting logic and animations.
+*//*_______________________________________________________________________*/
+
 ArcherEnemy::ArcherEnemy() : BaseEnemy()
 {
 }

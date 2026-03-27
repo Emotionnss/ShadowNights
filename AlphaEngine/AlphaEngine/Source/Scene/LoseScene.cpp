@@ -8,6 +8,15 @@
 #include <fstream>
 #include <string>
 
+/*!
+@file       LoseScene.cpp
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+             used for the LoseScene class, which is the scene that is shown
+             when the player dies, and contains buttons to restart the level,
+			load from a save, or return to the main menu.
+*//*_______________________________________________________________________*/
+
 LoseScene::LoseScene(int idToRestart) {
     restartLevelID = idToRestart;
 	player = Player::GetInstance();

@@ -2,6 +2,14 @@
 #include "BaseEnemy.h"
 #include "../System/MeshManager.h"
 
+/*!
+@file       BatEnemy.h
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+             used for the BatEnemy class, which is a flying enemy that chases
+			 the player when they get close, and shoots projectiles at them.
+*//*_______________________________________________________________________*/
+
 class BatEnemy : public BaseEnemy
 {
 public:

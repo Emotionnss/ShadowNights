@@ -14,6 +14,15 @@
 #include "../particle/ParticleManager.h"
 #include "../System/SettingsManager.h"
 
+/*!
+@file       BaseScene.cpp
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+			used for the BaseScene class, which is the parent class
+			of all scenes in the game, and contains common variables and
+			functions used across all scenes
+*//*_______________________________________________________________________*/
+
 extern void ShutdownSwordResources();
 extern void ShutdownKnifeResources();
 

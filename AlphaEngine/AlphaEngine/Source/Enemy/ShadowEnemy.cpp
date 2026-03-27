@@ -4,6 +4,16 @@
 #include <cmath>
 #include <algorithm>
 
+/*!
+@file       ShadowEnemy.cpp
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+             used for the ShadowEnemy class, which is a melee enemy that patrols
+             back and forth until the player gets close, at which point it will
+             stop to attack them with a projectile, then resume patrolling after.
+			 It also has a surprise animation that plays when it first aggros to the player.
+*//*_______________________________________________________________________*/
+
 ShadowEnemy::ShadowEnemy() : BaseEnemy()
 {
 }

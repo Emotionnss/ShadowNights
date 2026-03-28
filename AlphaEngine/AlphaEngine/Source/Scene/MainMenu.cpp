@@ -2,6 +2,7 @@
 #include "../System/Scenemanager.h"
 #include "TutorialScene.h"
 #include "Level1Scene.h"
+#include "SettingsScene.h"
 #include "Credits.h"
 #include "AEEngine.h"
 #include <iostream>
@@ -62,7 +63,7 @@ void MainMenu::Update() {
             btnSlot3->SetLabel(FileExists(3) ? "Load Slot 3" : "Empty");
         }
         if (btnSettings->IsClicked()) {
-            std::cout << "Settings Pressed" << std::endl;
+            SceneManager::ChangeScene(new SettingsScene());
         }
         if (btnCredits->IsClicked())
         {

@@ -1,3 +1,10 @@
+/*!
+@file       BossLaser.h
+@author     Bay Yeok Hao (yeokhao.bay)
+@brief      This file contains declarations of functions used by BossLaser
+			which is an object created by BossEnemy when attacking
+*//*_______________________________________________________________________*/
+
 #include "../Player/Player.h"
 #include "../Player/Transform2D.h"
 #include "../Sprite/Sprite.h"
@@ -23,7 +30,7 @@ private:
 	float damageCooldown = 0.f;
 
 	// lifespan of the entire ability
-	float baseLifespan = 10.f;
+	float baseLifespan = 3.f;
 	float lifespan = baseLifespan;
 
 	// wind up for a bit of leeway

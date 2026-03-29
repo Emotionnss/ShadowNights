@@ -1,3 +1,10 @@
+/*!
+@file       BaseProjectile.h
+@author     Bay Yeok Hao (yeokhao.bay)
+@brief      This file contains declarations of functions used by BaseProjectile,
+            a base class that all other projectiles will inherit from
+*//*_______________________________________________________________________*/
+
 #pragma once
 #include "../Player/Transform2D.h"
 

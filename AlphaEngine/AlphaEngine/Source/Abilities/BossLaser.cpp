@@ -1,9 +1,17 @@
+/*!
+@file       BossLaser.cpp
+@author     Bay Yeok Hao (yeokhao.bay)
+@brief      This file contains definitions of functions used by BossLaser
+            which is an object created by BossEnemy when attacking
+*//*_______________________________________________________________________*/
+
 #include "BossLaser.h"
 #include "../System/MeshManager.h"
 #include "../Enemy/BossEnemy.h"
 #include "../System/CSVManager.h"
 #include <iostream>
 
+// Constructor
 BossLaser::BossLaser()
 	: meshManager{ MeshManager::GetInstance() },
     player{ Player::GetInstance() },
@@ -16,6 +24,7 @@ BossLaser::BossLaser()
     transform.SetScale(250, 1000);
 }
 
+// Overload of constructor for custom parameters
 BossLaser::BossLaser(float baseLifespan, float startupTime)
     : meshManager{ MeshManager::GetInstance() },
     player{ Player::GetInstance() },
@@ -31,8 +40,10 @@ BossLaser::BossLaser(float baseLifespan, float startupTime)
     transform.SetScale(250, 1000);
 }
 
+// Destructor
 BossLaser::~BossLaser()
 {
+    // Cleanup
     meshManager = nullptr;
     player = nullptr;
     if (laserSprite)
@@ -42,14 +53,16 @@ BossLaser::~BossLaser()
     }
 }
 
+// Update
 void BossLaser::Update(float deltaTime)
 {
     if (!active)
         return;
 
+    // Run sprite update
     laserSprite->Update();
     
-    // charging phase
+    // Charging phase
     if (charging)
     {
         startupDelay -= 1.f * deltaTime;
@@ -61,24 +74,27 @@ void BossLaser::Update(float deltaTime)
         return;
     }
 
-    // attacking phase
+    // Attacking phase
     AEVec2 laserPos = transform.GetPosition();
-    AEVec2 laserHalf = { transform.GetScale().x, transform.GetScale().y };
+    AEVec2 laserHalf = { transform.GetScale().x * 0.5f, transform.GetScale().y * 0.5f };
 
     AEVec2 playerPos = player->GetTransform().GetPosition();
-    AEVec2 playerHalf = { 35.0f, 35.0f };
+    AEVec2 playerHalf = { player->GetTransform().GetScale().x * 0.5f, player->GetTransform().GetScale().y * 0.5f };
 
+    // Damage player if they collided with bounding box of the laser
     if (AABBOverlap(laserPos, laserHalf, playerPos, playerHalf) && damageCooldown <= 0.f)
     {
         player->TakeDamage(20);
         damageCooldown = baseCooldown;
     }
 
+    // Damage safeguard to ensure laser does not tick damage every frame
     if (damageCooldown > 0.f)
     {
         damageCooldown -= 1.f * deltaTime;
     }
 
+    // Tick down object's lifespan
     lifespan -= 1.f * deltaTime;
     if (lifespan <= 0.f)
     {
@@ -87,31 +103,28 @@ void BossLaser::Update(float deltaTime)
         lifespan = baseLifespan;
     }
 }
+
+// Render
 void BossLaser::Draw()
 {
     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-    //AEGfxSetBlendMode(AE_GFX_BM_BLEND);
     if (active)
     {
-        //AEGfxSetTransparency(1.f);
-        //AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-        //AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
-        //AEGfxSetTransform(transform.GetMatrix().m);
-        //AEGfxMeshDraw(meshManager->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);
-
         laserSprite->Render(transform, 1.f);
     }
 }
 
+// Upon activation (spawning) of ability by BossEnemy
 bool BossLaser::Triggered(AEVec2 pos)
 {
-    if (active)//if its active
+    // Toggle "active-ness"
+    if (active)
     {
-        active = false;//deactivate it
+        active = false;
         charging = false;
         lifespan = baseLifespan;
     }
-    else //if not active
+    else
     {
         active = true;
         charging = true;
@@ -120,5 +133,5 @@ bool BossLaser::Triggered(AEVec2 pos)
 
         laserSprite->PlayAnimation("spawn", 1, 1.f);
     }
-    return active;//return its activity
+    return active;
 }

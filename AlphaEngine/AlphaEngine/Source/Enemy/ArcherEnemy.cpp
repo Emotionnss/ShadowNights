@@ -4,6 +4,16 @@
 #include <cmath>
 #include <algorithm>
 
+/*!
+@file       ArcherEnemy.cpp
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+             used for the ArcherEnemy class, which is a type of enemy
+             that shoots projectiles at the player from a distance, and contains
+             the specific implementation of the archer's behavior, such as its
+			 shooting logic and animations.
+*//*_______________________________________________________________________*/
+
 ArcherEnemy::ArcherEnemy() : BaseEnemy()
 {
 }
@@ -83,7 +93,6 @@ void ArcherEnemy::Update(float deltaTime)
     float colliderHeight = 60.0f;
     AEVec2 halfSize{ colliderWidth / 2.f, colliderHeight / 2.f };
 
-    Map* map = Map::GetInstance();
     float left = position.x - halfSize.x;
     float right = position.x + halfSize.x;
     float bottom = position.y - halfSize.y;

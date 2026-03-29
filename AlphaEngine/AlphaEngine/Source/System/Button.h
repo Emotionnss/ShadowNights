@@ -1,6 +1,14 @@
 #pragma once
 #include "AEEngine.h"
 
+/*!
+@file       Button.h
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+             used for the Button class, which is a UI element used across
+			 multiple scenes in the game, such as the main menu and pause menu.
+*//*_______________________________________________________________________*/
+
 class Button {
 public:
     Button(float x, float y, float w, float h, const char* text);

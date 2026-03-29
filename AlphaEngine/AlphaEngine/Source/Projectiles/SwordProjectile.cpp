@@ -1,3 +1,10 @@
+/*!
+@file       SwordProjectile.cpp
+@author     Bay Yeok Hao (yeokhao.bay)
+@brief      This file contains definitions of functions used by SwordProjectile,
+			and inherited methods from BaseProjectile
+*//*_______________________________________________________________________*/
+
 #include "SwordProjectile.h"
 #include "../particle/ParticleManager.h"
 

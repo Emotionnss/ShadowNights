@@ -2,6 +2,15 @@
 #include "BaseScene.h"
 #include "Level1Scene.h"
 
+/*!
+@file       TutorialScene.h
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+             used for the TutorialScene class, which is the first scene of the game,
+             and contains the specific implementation of the scene, such as the
+			tutorial text that is shown and the map used.
+*//*_______________________________________________________________________*/
+
 struct TutorialText
 {
     AEGfxTexture* tex;

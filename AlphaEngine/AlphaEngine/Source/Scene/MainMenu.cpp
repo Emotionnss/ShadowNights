@@ -2,10 +2,21 @@
 #include "../System/Scenemanager.h"
 #include "TutorialScene.h"
 #include "Level1Scene.h"
+#include "SettingsScene.h"
+#include "Credits.h"
 #include "AEEngine.h"
 #include <iostream>
 #include <fstream>
 #include <string>
+
+/*!
+@file       MainMenu.cpp
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+            used for the MainMenu class, which is the first scene of the game,
+            and contains buttons to start a new game, load from a save, access settings,
+			view credits, or quit the game.
+*//*_______________________________________________________________________*/
 
 extern bool gGameRunning;
 
@@ -21,7 +32,8 @@ void MainMenu::Load() {
     btnPlay = new Button(0.0f, 90.0f, 200.0f, 50.0f, "New Game");
     btnLoad = new Button(0.0f, 30.0f, 200.0f, 50.0f, "Load Game");
     btnSettings = new Button(0.0f, -30.0f, 200.0f, 50.0f, "Settings");
-    btnQuit = new Button(0.0f, -90.0f, 200.0f, 50.0f, "Quit");
+    btnCredits = new Button(0.0f, -90.0f, 200.0f, 50.0f, "Credits");
+    btnQuit = new Button(0.0f, -150.0f, 200.0f, 50.0f, "Quit");
 
     btnSlot1 = new Button(0.0f, 90.0f, 200.0f, 50.0f, "Slot 1");
     btnSlot2 = new Button(0.0f, 30.0f, 200.0f, 50.0f, "Slot 2");
@@ -42,7 +54,7 @@ void MainMenu::Update() {
             DeleteSave(3);
 
             // Start the fresh game
-            SceneManager::ChangeScene(new TutorialScene());
+            SceneManager::ChangeScene(new BossScene());
         }
         if (btnLoad->IsClicked()) {
             menuPage = 2;
@@ -51,7 +63,12 @@ void MainMenu::Update() {
             btnSlot3->SetLabel(FileExists(3) ? "Load Slot 3" : "Empty");
         }
         if (btnSettings->IsClicked()) {
-            std::cout << "Settings Pressed" << std::endl;
+            SceneManager::ChangeScene(new SettingsScene());
+        }
+        if (btnCredits->IsClicked())
+        {
+            //change to credits
+            SceneManager::ChangeScene(new CreditsScene());
         }
         if (btnQuit->IsClicked()) {
             gGameRunning = false;
@@ -74,6 +91,7 @@ void MainMenu::Draw() {
         btnPlay->Draw();
         btnLoad->Draw();
         btnSettings->Draw();
+        btnCredits->Draw();
         btnQuit->Draw();
     }
     else {
@@ -85,7 +103,7 @@ void MainMenu::Draw() {
 }
 
 void MainMenu::Free() {
-    delete btnPlay; delete btnLoad; delete btnSettings; delete btnQuit;
+    delete btnPlay; delete btnLoad; delete btnSettings; delete btnCredits; delete btnQuit;
     delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
     Button::FreeResources();
 }

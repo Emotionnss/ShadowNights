@@ -5,6 +5,14 @@
 #include <algorithm>
 #include <cstdlib>
 
+/*!
+@file       BatEnemy.cpp
+@author     Lim Chee Kang (l.cheekang)
+@brief      This file contains definitions of functions and variables
+             used for the BatEnemy class, which is a flying enemy that chases
+			 the player when they get close, and shoots projectiles at them.
+*//*_______________________________________________________________________*/
+
 BatEnemy::BatEnemy() : BaseEnemy()
 {
 }
@@ -139,7 +147,7 @@ void BatEnemy::Update(float deltaTime)
         }
     }
 
-    // --- PHYSICS & MAP COLLISION ---
+    // PHYSICS & MAP COLLISION
     float colliderWidth = 40.0f;
     float colliderHeight = 40.0f;
 

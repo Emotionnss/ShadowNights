@@ -104,7 +104,7 @@ void EnemyProjectile::Draw(AEGfxVertexList* mesh)
         AEGfxSetColorToAdd(0.4f, 0.0f, 0.6f, 1.0f);
 
         AEGfxSetTransform(transform.GetMatrix().m);
-        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
+        AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
     }
 
     // --- THE UNIVERSAL CLEANUP BRUSH ---

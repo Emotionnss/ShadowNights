@@ -56,6 +56,8 @@ public:
 	Sprite* GetSprite() const;
 
 	bool CheckProjectileCollision(BaseProjectile* proj, Map* map);
+
+	void SetMoveable(bool state);
 private:
 	void AimRotation();
 	AEVec2 ShootDirection(AEVec2 mousePosition) const;
@@ -63,7 +65,9 @@ private:
 	Transform2D arrowTfm{};
 	AEGfxTexture* arrowTex{};
 	Transform2D healthbar;
-	AEGfxTexture* healthbarBorder;
+	AEGfxTexture* healthbarOverlay;
+	Transform2D healthbarOverlayTfm;
+	AEGfxTexture* healthBarBG;
 	enum Direction { LEFT = -1, RIGHT = 1, IDLE = 0 };
 	Direction playerDirection = RIGHT;
 
@@ -84,6 +88,8 @@ private:
 	Map* map;
 
 	Tile collidedXTile, collidedYTile;
+
+	bool canMove = true;
 protected:
 	std::string currentAnimState = "";
 	void PlayAnim(std::string name, s32 count = -1);

@@ -38,7 +38,7 @@ void SettingsScene::Init() {
 }
 
 void SettingsScene::Update() {
-    f32 dt = (f32)AEFrameRateControllerGetFrameTime();
+    //f32 dt = (f32)AEFrameRateControllerGetFrameTime();
 
     // Handle Navigation Clicks
     if (btnAudioTab->IsClicked())    currentTab = SETTINGS_TAB::AUDIO;

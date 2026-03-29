@@ -56,6 +56,8 @@ public:
 	Sprite* GetSprite() const;
 
 	bool CheckProjectileCollision(BaseProjectile* proj, Map* map);
+
+	void SetMoveable(bool state);
 private:
 	void AimRotation();
 	AEVec2 ShootDirection(AEVec2 mousePosition) const;
@@ -86,6 +88,8 @@ private:
 	Map* map;
 
 	Tile collidedXTile, collidedYTile;
+
+	bool canMove = true;
 protected:
 	std::string currentAnimState = "";
 	void PlayAnim(std::string name, s32 count = -1);

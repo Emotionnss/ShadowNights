@@ -54,7 +54,7 @@ void MainMenu::Update() {
             DeleteSave(3);
 
             // Start the fresh game
-            SceneManager::ChangeScene(new TutorialScene());
+            SceneManager::ChangeScene(new BossScene());
         }
         if (btnLoad->IsClicked()) {
             menuPage = 2;

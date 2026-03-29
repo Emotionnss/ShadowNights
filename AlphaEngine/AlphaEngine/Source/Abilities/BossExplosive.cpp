@@ -1,6 +1,14 @@
+/*!
+@file       BossExplosive.cpp
+@author     Bay Yeok Hao (yeokhao.bay)
+@brief      This file contains definitions of functions used by BossExplosive
+			which is an object created by BossEnemy when attacking
+*//*_______________________________________________________________________*/
+
 #include "BossExplosive.h"
 #include <iostream>
 
+// Constructor
 BossExplosive::BossExplosive()
 	: player{ Player::GetInstance() },
 	meshManager{ MeshManager::GetInstance() }
@@ -15,9 +23,10 @@ BossExplosive::BossExplosive(int numBullets)
 	this->numBullets = numBullets;
 }
 
+// Overload of constructor for custom parameters
 BossExplosive::~BossExplosive()
 {
-	// cleanup
+	// Cleanup
 	if (bigProjectile)
 	{
 		if (bigProjectile->projTex)
@@ -35,11 +44,13 @@ BossExplosive::~BossExplosive()
 	smallProjectiles.clear();
 }
 
+// Update
 void BossExplosive::Update(float deltaTime)
 {
 	if (!active)
 		return;
 
+	// Move bigProjectile
 	if (bigProjectile)
 	{
 		bigProjectile->Update(deltaTime);
@@ -53,7 +64,8 @@ void BossExplosive::Update(float deltaTime)
 			bigProjectile = nullptr;
 		}
 	}
-
+	
+	// Move smaller projectiles
 	for (BaseProjectile* proj : smallProjectiles)
 	{
 		proj->Update(deltaTime);
@@ -71,6 +83,7 @@ void BossExplosive::Update(float deltaTime)
 		}
 	}
 
+	// If smaller projectiles have expired, clean them up
 	for (size_t i = 0; i < smallProjectiles.size();)
 	{
 		if (smallProjectiles[i]->GetLifespan() <= 0.f)
@@ -87,27 +100,27 @@ void BossExplosive::Update(float deltaTime)
 	}
 }
 
+// Render
 void BossExplosive::Draw()
 {
+	// Render bigProjectile
 	if (bigProjectile)
 		bigProjectile->Draw(meshManager->GetMesh(TEXTURE_SQUARE));
 
+	// Render smaller projectiles
 	for (BaseProjectile* proj : smallProjectiles)
 	{
 		proj->Draw(meshManager->GetMesh(TEXTURE_SQUARE));
 	}
 }
 
-void BossExplosive::Exit()
-{
-	
-}
-
+// Upon activation (spawning) of ability by BossEnemy
 bool BossExplosive::Triggered(AEVec2 pos, AEVec2 dir)
 {
 	if (bigProjectile)
 		delete bigProjectile;
 
+	// Spawn dummy bigProjectile
 	bigProjectile = new BaseProjectile(pos, dir, true);
 	bigProjectile->transform.SetScale(100.f, 100.f);
 	bigProjectile->SetLifespan(2.f);
@@ -118,8 +131,10 @@ bool BossExplosive::Triggered(AEVec2 pos, AEVec2 dir)
 	return true;
 }
 
+// Once bigProjectile has expired, explode into smaller projectiles
 void BossExplosive::Explode(AEVec2 origin)
 {
+	// bigProjectile explodes, spawn smaller projectiles where it exploded
 	for (int i = 0; i < numBullets; i++)
 	{
 		float angle = (2 * PI / numBullets) * i;

@@ -5,6 +5,7 @@
 void BossScene::Init() {
     BaseScene::Init();
     player->GetTransform().SetPosition(300.0f, 200.0f);
+    player->SetMoveable(false);
 
     boss = new BossEnemy();
     boss->Init(1400.f, 300.0f, 85.0f, 60.0f, "boss");
@@ -31,6 +32,10 @@ void BossScene::Update() {
     {
         AEGfxSetCamPosition(boss->transform.GetPosition().x, boss->transform.GetPosition().y);
         cutsceneDuration -= 1 * dt;
+        if (cutsceneDuration < 0.f)
+        {
+            player->SetMoveable(true);
+        }
     }
 
     if (boss && boss->IsReadyToDelete()) {

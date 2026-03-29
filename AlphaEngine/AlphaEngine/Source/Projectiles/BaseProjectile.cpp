@@ -1,3 +1,10 @@
+/*!
+@file       BaseProjectile.cpp
+@author     Bay Yeok Hao (yeokhao.bay)
+@brief      This file contains definitions of functions used by BaseProjectile,
+            a base class that all other projectiles will inherit from
+*//*_______________________________________________________________________*/
+
 #include "BaseProjectile.h"
 #include <iostream>
 #include "../System/MeshManager.h"
@@ -86,7 +93,7 @@ void BaseProjectile::Draw(AEGfxVertexList* mesh)
         AEGfxSetBlendMode(AE_GFX_BM_BLEND);
         AEGfxSetTransparency(1.0f);
         AEGfxSetTransform(transform.GetMatrix().m);
-        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);
+        AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
     }
 
     // THE UNIVERSAL CLEANUP BRUSH

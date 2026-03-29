@@ -390,7 +390,9 @@ void Player::Update(float deltaTime)
 	{
 		damagedTimer -= deltaTime;
 	}
-	HandleInput(); // Handle Input Internally
+
+	if (canMove)
+		HandleInput(); // Handle Input Internally
 	AimRotation();
 	AimArrow();
 	AEVec2 currentForces{ 0.f, gravity }; // Acceleration
@@ -654,3 +656,7 @@ bool Player::CheckProjectileCollision(BaseProjectile* proj, Map* map)
 	return false;
 }
 
+void Player::SetMoveable(bool state)
+{
+	canMove = state;
+}

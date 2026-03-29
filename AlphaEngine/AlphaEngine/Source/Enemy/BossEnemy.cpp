@@ -1,3 +1,12 @@
+/*!
+@file       BossEnemy.cpp
+@author     Yap Yu Xuan Daevon (yuxuandaevon.yap), Bay Yeok Hao (yeokhao.bay)
+@brief      This file contains definitions of functions used by BossEnemy for
+            attacking the player. Randomly uses 3 abilities (BossLaser, 
+            BossExplosive, SpawnRandomEnemy)
+*//*_______________________________________________________________________*/
+
+
 #include "BossEnemy.h"
 #include "../Player/Player.h"
 #include "../System/MeshManager.h"
@@ -17,6 +26,7 @@ BossEnemy::~BossEnemy()
 {
     AEGfxTextureUnload(weakpoint.tex);
 
+    // Cleanup Laser, Explosive, BaseEnemy resources
     for (BossLaser* l : bossLasers)
         delete l;
     bossLasers.clear();
@@ -135,6 +145,7 @@ void BossEnemy::Update(f32 deltaTime)
 
     if (sprite) sprite->Update();
 
+    // Handle randomized ability queueing
     if (isCasting)
     {
         castProgress += deltaTime;
@@ -160,6 +171,7 @@ void BossEnemy::Update(f32 deltaTime)
         }
     }
 
+    // Handle casting bar for pending attack
     attackCooldown -= deltaTime;
     if (attackCooldown <= 0.f)
     {
@@ -179,6 +191,7 @@ void BossEnemy::Update(f32 deltaTime)
         attackCooldown = 3.f;
     }
 
+    // Update vector containing Lasers and Explosives
     for (BossLaser* l : bossLasers)
     {
         l->Update(deltaTime);
@@ -208,6 +221,7 @@ void BossEnemy::Draw()
         AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
     }
 
+    // Render cast bar if ability cast in progress
     if (isCasting)
     {
         castbarTransform = transform;
@@ -222,6 +236,7 @@ void BossEnemy::Draw()
         AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
     }
 
+    // Render all active Lasers and Explosives
     for (BossLaser* l : bossLasers)
         l->Draw();
     for (BossExplosive* e : bossExplosives)
@@ -269,7 +284,6 @@ void BossEnemy::EnemyFSM(f32 deltaTime)
         EnterExhausted();
     }
 
-    //Enter exhaustion mode thru some means idk yet
     //EnterExhausted();
 
     //HP Check
@@ -387,6 +401,7 @@ Weakpoint BossEnemy::GetWeakpoint() const
     return weakpoint;
 }
 
+// Helper function to queue the next pending boss ability
 void BossEnemy::StartCast(PendingAttack attackType)
 {
     isCasting = true;
@@ -398,14 +413,16 @@ void BossEnemy::StartCast(PendingAttack attackType)
     else if (attackType == PendingAttack::SPAWN_RANDOM_ENEMY) castDuration = 2.f;
 }
 
+// Laser ability activation
 void BossEnemy::FireLaser()
 {
     Player* player = Player::GetInstance();
     BossLaser* newLaser = new BossLaser();
-    newLaser->Triggered(player->GetTransform().GetPosition());
+    newLaser->Triggered({ player->GetTransform().GetPosition().x, 500.f });
     bossLasers.push_back(newLaser);
 }
 
+// Explosive ability activation
 void BossEnemy::FireExplosive()
 {
     BossExplosive* newExplosive = new BossExplosive();
@@ -415,11 +432,13 @@ void BossEnemy::FireExplosive()
     bossExplosives.push_back(newExplosive);
 }
 
+// Getter to return the random enemy to be spawned in the scene
 std::vector<BaseEnemy*>& BossEnemy::GetPendingSpawns()
 {
     return pendingSpawns;
 }
 
+// Random enemy spawn(Sniper, Bat, Shadow) ability activation
 void BossEnemy::SpawnRandomEnemy()
 {
     BaseEnemy* randEnemy = nullptr;

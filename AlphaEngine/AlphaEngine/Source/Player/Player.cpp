@@ -144,29 +144,28 @@ void Player::HandleInput()
 	}
 }
 
-AEVec2 Player::CalcPlayerToMouseDirNormalized(AEVec2& output)
+AEVec2 Player::CalcPlayerToMouseDirNormalized(AEVec2& output, AEVec2& cameraOffsetValue)
 {
+	// I've refactored this part 6 times please no more
 	s32 xDir, yDir;
 	AEInputGetCursorPosition(&xDir, &yDir);
-	AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
+	AEVec2 mouseScreenPos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
 
-	// Convert mouse to world space
-	AEVec2 mouseWorld = ScreenToWorldPos(mousePos);
+	// Alienise output for direction and aim from camera offset
+	AEVec2 mouseViewportPos = ScreenToWorldPos(mouseScreenPos);
+	cameraOffsetValue.x = mouseViewportPos.x;
+	cameraOffsetValue.y = mouseViewportPos.y;
+
+	AEVec2 mouseWorldPos;
+	mouseWorldPos.x = mouseViewportPos.x + cameraPosition.x;
+	mouseWorldPos.y = mouseViewportPos.y + cameraPosition.y;
 
 	AEVec2 playerPos = transform.GetPosition();
+	playerToMouseVector.x = mouseWorldPos.x - playerPos.x;
+	playerToMouseVector.y = mouseWorldPos.y - playerPos.y;
 
-	// Offset by player position
-	mouseWorld.x += playerPos.x;
-	mouseWorld.y += playerPos.y;
-
-	// Get direction from player to mouse
-	output.x = mouseWorld.x - playerPos.x;
-	output.y = mouseWorld.y - playerPos.y;
-
-	AEVec2Set(&playerToMouseVector, output.x, output.y);
-
+	output = playerToMouseVector;
 	AEVec2Normalize(&output, &output);
-
 	return output;
 }
 
@@ -349,7 +348,7 @@ void Player::Update(float deltaTime)
 		damagedTimer -= deltaTime;
 	}
 
-	CalcPlayerToMouseDirNormalized(playerToMouseVectorNormalized); // Calculates player to mouse direction normalized
+	CalcPlayerToMouseDirNormalized(playerToMouseVectorNormalized, cameraOffset); // Calculates player to mouse direction normalized
 
 	if (canMove)
 	{
@@ -394,12 +393,41 @@ void Player::Update(float deltaTime)
 	AimArrow(playerToMouseVectorNormalized); // Updates Aim Arrow after player position
 	AimRotation(playerToMouseVectorNormalized); // Checks player facing direction
 
-	// Camera Lerping
+	// Camera Lerping I'm so tired of this honestly
 	AEVec2 newPlayerPos = GetTransform().GetPosition();
-	AEVec2 cameraLerpVector{ playerToMouseVector.x + newPlayerPos.x, playerToMouseVector.y + newPlayerPos.y };
-	cameraLerpVector.x = AEClamp(cameraLerpVector.x, newPlayerPos.x + (-300), newPlayerPos.x + 300);
-	cameraLerpVector.y = AEClamp(cameraLerpVector.y, newPlayerPos.y + (-150), newPlayerPos.y + 150);
-	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpVector, deltaTime * 4.f);
+
+	float clampedOffsetX = AEClamp(cameraOffset.x, -200.f, 200.f);
+	float clampedOffsetY = AEClamp(cameraOffset.y, -150.f, 150.f);
+
+	AEVec2 cameraLerpTarget{
+		newPlayerPos.x + clampedOffsetX,
+		newPlayerPos.y + clampedOffsetY
+	};
+
+	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpTarget, deltaTime * 4.f);
+
+	Tile minTile = map->GetTileFromTilePos(0, 0);
+	Tile maxTile = map->GetTileFromTilePos(map->GetNumCol() - 1, map->GetNumRow() - 1);
+
+	AEVec2 minBound = minTile.transform.GetPosition();
+	AEVec2 maxBound = maxTile.transform.GetPosition();
+
+	float halfTileSize = map->GetTileSize() / 2;
+
+	// Ensure min is actually less than max
+	float minX = (minBound.x < maxBound.x) ? minBound.x : maxBound.x;
+	float maxX = (maxBound.x > minBound.x) ? maxBound.x : minBound.x;
+	float minY = (minBound.y < maxBound.y) ? minBound.y : maxBound.y;
+	float maxY = (maxBound.y > minBound.y) ? maxBound.y : minBound.y;
+
+	// Account for camera viewport size
+	float halfViewWidth = AEGfxGetWindowWidth() * 0.5f;
+	float halfViewHeight = AEGfxGetWindowHeight() * 0.5f;
+
+	// Clamp camera position to map bounds minus half viewport
+	cameraPosition.x = AEClamp(cameraPosition.x, minX + halfViewWidth - halfTileSize, maxX - halfViewWidth + halfTileSize);
+	cameraPosition.y = AEClamp(cameraPosition.y, minY + halfViewHeight - halfTileSize, maxY - halfViewHeight + halfTileSize);
+
 	AEGfxSetCamPosition(cameraPosition.x, cameraPosition.y);
 
 	// Update Animation FSM

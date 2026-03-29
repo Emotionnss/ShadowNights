@@ -60,7 +60,7 @@ public:
 
 private:
 	AEVec2 playerToMouseVector, playerToMouseVectorNormalized;
-	AEVec2 CalcPlayerToMouseDirNormalized(AEVec2& output);
+	AEVec2 CalcPlayerToMouseDirNormalized(AEVec2& output, AEVec2& cameraOffsetValue);
 
 	void AimRotation(AEVec2& inputValue);
 	void AimArrow(AEVec2& inputValue);
@@ -86,7 +86,7 @@ private:
 	f32 damagedTimer;
 
 	//AEVec2 cameraPosition, cameraOffset;
-	AEVec2 cameraPosition;
+	AEVec2 cameraPosition, cameraOffset;
 
 	Map* map;
 

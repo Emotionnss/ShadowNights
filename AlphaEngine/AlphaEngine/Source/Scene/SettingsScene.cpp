@@ -70,6 +70,7 @@ void SettingsScene::Update() {
 
     case SETTINGS_TAB::GAMEPLAY:
         // TODO: Add keybinding buttons or difficulty toggles here
+        // Ain't no way I doing keybindings yet LMAO
         break;
     }
 }

@@ -69,8 +69,8 @@ void SettingsScene::Update() {
 		// TODO: Link to window resizing logic
 		if (btnToggleFullscreen->IsClicked()) {
 			// Toggle fullscreen logic here
-			//bool isFullScreen = AESysIsFullScreen();
-			//AESysSetFullScreen(!isFullScreen);
+			bool isFullScreen = AESysIsFullScreen();
+			AESysSetFullScreen(!isFullScreen);
 		}
 
 		btnToggleMute->SetLabel(AESysIsFullScreen() ? "Fullscreen: ON" : "Fullscreen: OFF");

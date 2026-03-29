@@ -85,15 +85,34 @@ void Button::Draw()
 
 bool Button::IsHovered()
 {
-    POINT mousePos;
-    GetCursorPos(&mousePos);
-    ScreenToClient(AESysGetWindowHandle(), &mousePos);
+	HWND hwnd = AESysGetWindowHandle(); // Get the window handle from the engine
+	POINT mousePos; // Structure to hold mouse position
+	GetCursorPos(&mousePos); // Get mouse position in screen coordinates
+	ScreenToClient(hwnd, &mousePos); // Convert to client area coordinates
+
+	// Get current window size to convert mouse position to game world coordinates
+	RECT rect; // Structure to hold window dimensions
+    GetClientRect(hwnd, &rect);
+	float currentWinWidth = static_cast<float>(rect.right - rect.left); // Calculate current window width
+	float currentWinHeight = static_cast<float>(rect.bottom - rect.top); // Calculate current window height
+
+    // Safety check to prevent dividing by zero when minimizing
+    if (currentWinWidth <= 0.0f || currentWinHeight <= 0.0f) return false;
 
     float camX, camY;
     AEGfxGetCamPosition(&camX, &camY);
 
-    float worldMouseX = (mousePos.x - 800.0f) + camX;
-    float worldMouseY = (450.0f - mousePos.y) + camY;
+	// convert mouse position to game world coordinates:
+    float percentX = mousePos.x / currentWinWidth;
+    float percentY = mousePos.y / currentWinHeight;
+
+	// map to 1600x900 virtual resolution
+    float scaledMouseX = percentX * 1600.0f;
+    float scaledMouseY = percentY * 900.0f;
+
+    // shift origin to center and adjust for camera position
+    float worldMouseX = (scaledMouseX - 800.0f) + camX;
+    float worldMouseY = (450.0f - scaledMouseY) + camY;
 
     return (worldMouseX > x - w / 2.0f && worldMouseX < x + w / 2.0f &&
         worldMouseY > y - h / 2.0f && worldMouseY < y + h / 2.0f);

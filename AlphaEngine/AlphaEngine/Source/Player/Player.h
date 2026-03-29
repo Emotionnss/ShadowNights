@@ -48,8 +48,6 @@ public:
 	void SetCollidedYTile(const Tile variable);
 	Tile GetCollidedYTile();
 
-	void UpdateCamera(AEVec2 input);
-
 	std::vector<BaseProjectile*> GetProjectileList() { return projectileList; }
 	void ClearProjectileList();
 
@@ -60,9 +58,10 @@ public:
 	bool CheckProjectileCollision(BaseProjectile* proj, Map* map);
 
 	void SetMoveable(bool state);
+
 private:
-	AEVec2 playerToMouseDirNormalized;
-	AEVec2 PlayerToMouseDirection(AEVec2& output) const;
+	AEVec2 playerToMouseVector, playerToMouseVectorNormalized;
+	AEVec2 CalcPlayerToMouseDirNormalized(AEVec2& output);
 
 	void AimRotation(AEVec2& input);
 	void AimArrow(AEVec2& input);
@@ -87,7 +86,8 @@ private:
 
 	f32 damagedTimer;
 
-	AEVec2 cameraPosition, cameraOffset;
+	//AEVec2 cameraPosition, cameraOffset;
+	AEVec2 cameraPosition;
 
 	Map* map;
 

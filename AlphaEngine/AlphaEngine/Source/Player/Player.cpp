@@ -22,7 +22,7 @@ Player::Player()
 	GetTransform().SetScale(size, size); // Set Scale of transform
 
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y); // Get Camera Position
-	AEVec2Set(&cameraOffset, 200.f, -50.f); // Set Camera Offset Position
+	//AEVec2Set(&cameraOffset, 200.f, -50.f); // Set Camera Offset Position
 
 	healthbarOverlay = AEGfxTextureLoad("Assets/Abilities/healthbar.png");
 	healthbarOverlayTfm.SetScale(maxHP * 5.f, 100.f);
@@ -127,7 +127,7 @@ void Player::HandleInput()
 	{
 		AudioManager::GetInstance()->PlaySFXOneShot("player_attack");
 
-		projectileList.push_back(new BaseProjectile(GetTransform().GetPosition(), playerToMouseDirNormalized));
+		projectileList.push_back(new BaseProjectile(GetTransform().GetPosition(), playerToMouseVectorNormalized));
 	}
 	else if (AEInputCheckTriggered(AEVK_RBUTTON))
 	{
@@ -135,13 +135,13 @@ void Player::HandleInput()
 		{
 			AudioManager::GetInstance()->PlaySFXOneShot("player_slash");
 
-			projectileList.push_back(new SwordProjectile(GetTransform().GetPosition(), playerToMouseDirNormalized));
+			projectileList.push_back(new SwordProjectile(GetTransform().GetPosition(), playerToMouseVectorNormalized));
 			swordCooldown = swordMaxCooldown;
 		}
 	}
 }
 
-AEVec2 Player::PlayerToMouseDirection(AEVec2& output) const
+AEVec2 Player::CalcPlayerToMouseDirNormalized(AEVec2& output)
 {
 	s32 xDir, yDir;
 	AEInputGetCursorPosition(&xDir, &yDir);
@@ -150,18 +150,17 @@ AEVec2 Player::PlayerToMouseDirection(AEVec2& output) const
 	// Convert mouse to world space
 	AEVec2 mouseWorld = ScreenToWorldPos(mousePos);
 
-	// Offset by camera position
-	mouseWorld.x += cameraPosition.x;
-	mouseWorld.y += cameraPosition.y;
-
-	// Get direction from player to mouse
 	AEVec2 playerPos = transform.GetPosition();
 
+	// Offset by player position
+	mouseWorld.x += playerPos.x;
+	mouseWorld.y += playerPos.y;
+
+	// Get direction from player to mouse
 	output.x = mouseWorld.x - playerPos.x;
 	output.y = mouseWorld.y - playerPos.y;
 
-	//printf("Player Direction X:%.3f\n", playerDir.x);
-	//printf("Player Direction Y:%.3f\n", playerDir.y);
+	AEVec2Set(&playerToMouseVector, output.x, output.y);
 
 	AEVec2Normalize(&output, &output);
 
@@ -340,11 +339,6 @@ void Player::AimRotation(AEVec2& input)
 	}
 }
 
-void Player::UpdateCamera(AEVec2 input)
-{
-
-}
-
 void Player::Update(float deltaTime)
 {
 	if (damagedTimer > 0.f)
@@ -352,8 +346,7 @@ void Player::Update(float deltaTime)
 		damagedTimer -= deltaTime;
 	}
 
-	PlayerToMouseDirection(playerToMouseDirNormalized); // Calculates player to mouse direction normalized
-	AimRotation(playerToMouseDirNormalized); // Checks player facing direction
+	CalcPlayerToMouseDirNormalized(playerToMouseVectorNormalized); // Calculates player to mouse direction normalized
 
 	if (canMove)
 	{
@@ -394,19 +387,17 @@ void Player::Update(float deltaTime)
 	// Set Final Position
 	GetTransform().SetPosition(currentPosition.x, currentPosition.y);
 
-	// I just need somebody to heal
-	AimArrow(playerToMouseDirNormalized); // Updates Aim Arrow after player position
+	// I just need somebody to heal, somebody to love
+	AimArrow(playerToMouseVectorNormalized); // Updates Aim Arrow after player position
+	AimRotation(playerToMouseVectorNormalized); // Checks player facing direction
 
 	// Camera Lerping
-	AEVec2 cameraLerpVector{ GetTransform().GetPosition().x + cameraOffset.x * input.x,
-							GetTransform().GetPosition().y + cameraOffset.y };
-	AEVec2 newCameraPos;
-	AEVec2Lerp(&newCameraPos, &cameraPosition, &cameraLerpVector, deltaTime * 5.f);
-	cameraPosition = newCameraPos;
+	AEVec2 newPlayerPos = GetTransform().GetPosition();
+	AEVec2 cameraLerpVector{ playerToMouseVector.x + newPlayerPos.x, playerToMouseVector.y + newPlayerPos.y };
+	cameraLerpVector.x = AEClamp(cameraLerpVector.x, newPlayerPos.x + (-300), newPlayerPos.x + 300);
+	cameraLerpVector.y = AEClamp(cameraLerpVector.y, newPlayerPos.y + (-150), newPlayerPos.y + 150);
+	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpVector, deltaTime * 4.f);
 	AEGfxSetCamPosition(cameraPosition.x, cameraPosition.y);
-
-	printf("X:%.3f\n", playerToMouseDirNormalized.x);
-	printf("Y:%.3f\n", playerToMouseDirNormalized.y);
 
 	// Update Animation FSM
 	if (input.x != 0 && isGrounded)

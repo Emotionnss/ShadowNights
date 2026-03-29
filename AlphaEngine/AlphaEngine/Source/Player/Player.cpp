@@ -263,7 +263,6 @@ void Player::ResolveY(AEVec2& position)
 			if (!map->CheckTile(tile.tileType) || type == TILE_TYPE::BACKGROUND)
 				continue;
 
-
 			AEVec2 tilePos = tile.transform.GetPosition();
 
 			// One way platform
@@ -353,14 +352,13 @@ void Player::Update(float deltaTime)
 		damagedTimer -= deltaTime;
 	}
 
-	if (canMove)
-	{
-		HandleInput(); // Handle Input Internally
-	}
-
 	PlayerToMouseDirection(playerToMouseDirNormalized); // Calculates player to mouse direction normalized
 	AimRotation(playerToMouseDirNormalized); // Checks player facing direction
-	AimArrow(playerToMouseDirNormalized); // Updates Aim Arrow based on mouse direction
+
+	if (canMove)
+	{
+		HandleInput();
+	}
 
 	AEVec2 currentForces{ 0.f, gravity }; // Acceleration
 
@@ -395,6 +393,9 @@ void Player::Update(float deltaTime)
 
 	// Set Final Position
 	GetTransform().SetPosition(currentPosition.x, currentPosition.y);
+
+	// I just need somebody to heal
+	AimArrow(playerToMouseDirNormalized); // Updates Aim Arrow after player position
 
 	// Camera Lerping
 	AEVec2 cameraLerpVector{ GetTransform().GetPosition().x + cameraOffset.x * input.x,

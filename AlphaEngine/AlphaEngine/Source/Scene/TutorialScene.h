@@ -81,7 +81,7 @@ public:
 
         if (player != nullptr)
         {
-            player->SetHealth(100.f);
+            player->SetHealth(100);
         }
     }
 

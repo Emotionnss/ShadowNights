@@ -36,26 +36,25 @@ public:
 	void DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matrix);
 
 	// I hate whoever forced me to do this
-	template <typename T>
-	void TakeDamage(T damage);
+	void TakeDamage(float damage);
 
 	void SetHealth(float val);
-	f32 GetHealth();
+	f32 GetHealth() const;
 
 	void SetCollidedXTile(const Tile variable);
-	Tile GetCollidedXTile();
+	Tile GetCollidedXTile() const;
 
 	void SetCollidedYTile(const Tile variable);
-	Tile GetCollidedYTile();
+	Tile GetCollidedYTile() const;
 
-	std::vector<BaseProjectile*> GetProjectileList() { return projectileList; }
+	std::vector<BaseProjectile*> GetProjectileList() const { return projectileList; }
 	void ClearProjectileList();
 
 	std::vector<BaseProjectile*> projectileList;
 
 	Sprite* GetSprite() const;
 
-	bool CheckProjectileCollision(BaseProjectile* proj, Map* map);
+	bool CheckProjectileCollision(BaseProjectile* proj, Map* mapData);
 
 	void SetMoveable(bool state);
 
@@ -63,8 +62,8 @@ private:
 	AEVec2 playerToMouseVector, playerToMouseVectorNormalized;
 	AEVec2 CalcPlayerToMouseDirNormalized(AEVec2& output);
 
-	void AimRotation(AEVec2& input);
-	void AimArrow(AEVec2& input);
+	void AimRotation(AEVec2& inputValue);
+	void AimArrow(AEVec2& inputValue);
 	Transform2D arrowTfm{};
 	AEGfxTexture* arrowTex{};
 	Transform2D healthbar;

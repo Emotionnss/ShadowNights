@@ -17,6 +17,9 @@ Player::Player()
 	, gravity{ -1400.f }
 	, isGrounded{ false }
 	, damagedTimer{ 0.f }
+	, healthBarBG{ nullptr }
+	, playerToMouseVector{ 0.f, 0.f }
+	, playerToMouseVectorNormalized{ 0.f, 0.f }
 {
 	SetStatic(false);
 	GetTransform().SetScale(size, size); // Set Scale of transform
@@ -56,7 +59,7 @@ void Player::SetHealth(float val)
 	currentHP = val;
 }
 
-f32 Player::GetHealth()
+f32 Player::GetHealth() const
 {
 	return currentHP;
 }
@@ -66,7 +69,7 @@ void Player::SetCollidedXTile(const Tile variable)
 	collidedXTile = variable;
 }
 
-Tile Player::GetCollidedXTile()
+Tile Player::GetCollidedXTile() const
 {
 	return collidedXTile;
 }
@@ -75,7 +78,7 @@ void Player::SetCollidedYTile(const Tile variable)
 {
 	collidedYTile = variable;
 }
-Tile Player::GetCollidedYTile()
+Tile Player::GetCollidedYTile() const
 {
 	return collidedYTile;
 }
@@ -167,10 +170,10 @@ AEVec2 Player::CalcPlayerToMouseDirNormalized(AEVec2& output)
 	return output;
 }
 
-void Player::AimArrow(AEVec2& input)
+void Player::AimArrow(AEVec2& inputValue)
 {
-	arrowTfm.SetRotation(atan2f(input.y, input.x));
-	arrowTfm.SetPosition(transform.GetPosition().x + input.x * 50, transform.GetPosition().y + input.y * 50);
+	arrowTfm.SetRotation(atan2f(inputValue.y, inputValue.x));
+	arrowTfm.SetPosition(transform.GetPosition().x + inputValue.x * 50, transform.GetPosition().y + inputValue.y * 50);
 }
 
 void Player::ResolveX(AEVec2& position)
@@ -318,19 +321,19 @@ void Player::ResolveY(AEVec2& position)
 	}
 }
 
-void Player::AimRotation(AEVec2& input)
+void Player::AimRotation(AEVec2& inputValue)
 {
 	switch (playerDirection)
 	{
 	case LEFT:
-		if (input.x > 0)
+		if (inputValue.x > 0)
 		{
 			playerDirection = RIGHT;
 			transform.SetScale(-transform.GetScale().x, transform.GetScale().y);
 		}
 		break;
 	case RIGHT:
-		if (input.x < 0)
+		if (inputValue.x < 0)
 		{
 			playerDirection = LEFT;
 			transform.SetScale(-transform.GetScale().x, transform.GetScale().y);
@@ -466,7 +469,7 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 		TakeDamage(10);
 	}
 
-	AEVec2 CamPos;
+	AEVec2 CamPos{};
 	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
 	matrix.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f + 168.f, CamPos.y + 335.f);
 	float safeValue = AEClamp(value, 0.f, maxHP);
@@ -489,12 +492,11 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 	AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 }
 
-template <typename T>
-void Player::TakeDamage(T damage)
+void Player::TakeDamage(float damage)
 {
 	AudioManager::GetInstance()->PlaySFXOneShot("player_hurt");
 
-	int x = (currentHP - damage < 0) ? 0 : (currentHP - damage);
+	float x = (currentHP - damage < 0) ? 0 : (currentHP - damage);
 	SetHealth(x);
 	damagedTimer = 0.5f;
 }
@@ -606,17 +608,17 @@ void Player::Draw(AEGfxVertexList* mesh)
 	*/
 }
 
-bool Player::CheckProjectileCollision(BaseProjectile* proj, Map* map)
+bool Player::CheckProjectileCollision(BaseProjectile* proj, Map* mapData)
 {
-	for (s32 i = 0; i < map->GetNumCol(); ++i)
-		for (s32 j = 0; j < map->GetNumRow(); ++j)
+	for (s32 i = 0; i < mapData->GetNumCol(); ++i)
+		for (s32 j = 0; j < mapData->GetNumRow(); ++j)
 		{
-			Tile const& tmp = map->GetTileFromTilePos(i, j);
+			Tile const& tmp = mapData->GetTileFromTilePos(static_cast<float>(i), static_cast<float>(j));
 			AEVec2 projHalf = { proj->transform.GetScale().x * 0.5f, proj->transform.GetScale().y * 0.5f };
 			AEVec2 tileHalf = { tmp.transform.GetScale().x * 0.5f, tmp.transform.GetScale().y * 0.5f };
 
 			if (AABBOverlap(proj->transform.GetPosition(), projHalf, tmp.transform.GetPosition(), tileHalf) && proj->collidesWithTiles)
-				return map->CheckTile(tmp.tileType);
+				return mapData->CheckTile(tmp.tileType);
 		}
 	return false;
 }

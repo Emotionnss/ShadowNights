@@ -48,6 +48,8 @@ public:
 	void SetCollidedYTile(const Tile variable);
 	Tile GetCollidedYTile();
 
+	void UpdateCamera(AEVec2 input);
+
 	std::vector<BaseProjectile*> GetProjectileList() { return projectileList; }
 	void ClearProjectileList();
 
@@ -59,9 +61,11 @@ public:
 
 	void SetMoveable(bool state);
 private:
-	void AimRotation();
-	AEVec2 ShootDirection(AEVec2 mousePosition) const;
-	void AimArrow();
+	AEVec2 playerToMouseDirNormalized;
+	AEVec2 PlayerToMouseDirection(AEVec2& output) const;
+
+	void AimRotation(AEVec2& input);
+	void AimArrow(AEVec2& input);
 	Transform2D arrowTfm{};
 	AEGfxTexture* arrowTex{};
 	Transform2D healthbar;

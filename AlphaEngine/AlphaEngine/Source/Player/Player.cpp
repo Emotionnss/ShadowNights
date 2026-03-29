@@ -23,8 +23,9 @@ Player::Player()
 
 	AEGfxGetCamPosition(&cameraPosition.x, &cameraPosition.y); // Get Camera Position
 	AEVec2Set(&cameraOffset, 200.f, -50.f); // Set Camera Offset Position
+
 	healthbarOverlay = AEGfxTextureLoad("Assets/Abilities/healthbar.png");
-	healthbarOverlayTfm.SetScale(maxHP*5.f, 100.f);
+	healthbarOverlayTfm.SetScale(maxHP * 5.f, 100.f);
 	arrowTex = AEGfxTextureLoad("Assets/Weapons/pointer.png");
 	// Sprite Handling
 	sprite = new Sprite(CSVManager::ReadInfo("tempPlayer"));
@@ -126,12 +127,7 @@ void Player::HandleInput()
 	{
 		AudioManager::GetInstance()->PlaySFXOneShot("player_attack");
 
-		s32 xDir, yDir;
-		AEInputGetCursorPosition(&xDir, &yDir);
-		AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
-		AEVec2 playerDir = ShootDirection(mousePos);
-
-		projectileList.push_back(new BaseProjectile(GetTransform().GetPosition(), playerDir));
+		projectileList.push_back(new BaseProjectile(GetTransform().GetPosition(), playerToMouseDirNormalized));
 	}
 	else if (AEInputCheckTriggered(AEVK_RBUTTON))
 	{
@@ -139,50 +135,43 @@ void Player::HandleInput()
 		{
 			AudioManager::GetInstance()->PlaySFXOneShot("player_slash");
 
-			s32 xDir, yDir;
-			AEInputGetCursorPosition(&xDir, &yDir);
-			AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
-			AEVec2 playerDir = ShootDirection(mousePos);
-
-			projectileList.push_back(new SwordProjectile(GetTransform().GetPosition(), playerDir));
+			projectileList.push_back(new SwordProjectile(GetTransform().GetPosition(), playerToMouseDirNormalized));
 			swordCooldown = swordMaxCooldown;
 		}
 	}
 }
 
-AEVec2 Player::ShootDirection(AEVec2 mousePosition) const
-{
-	// Convert mouse to world space
-	AEVec2 mouseWorld = ScreenToWorldPos(mousePosition);
-
-	float camX, camY;
-	AEGfxGetCamPosition(&camX, &camY);
-
-	// Offset by camera position
-	mouseWorld.x += camX;
-	mouseWorld.y += camY;
-
-	// Get direction from player to mouse
-	AEVec2 playerPos = transform.GetPosition();
-	AEVec2 playerDir;
-	playerDir.x = mouseWorld.x - playerPos.x;
-	playerDir.y = mouseWorld.y - playerPos.y;
-
-	AEVec2Normalize(&playerDir, &playerDir);
-
-	return playerDir;
-}
-
-void Player::AimArrow()
+AEVec2 Player::PlayerToMouseDirection(AEVec2& output) const
 {
 	s32 xDir, yDir;
 	AEInputGetCursorPosition(&xDir, &yDir);
 	AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
-	AEVec2 playerDir = ShootDirection(mousePos);
 
-	arrowTfm.SetRotation(atan2f(playerDir.y, playerDir.x));
-	arrowTfm.SetPosition(transform.GetPosition().x + playerDir.x * 50, transform.GetPosition().y + playerDir.y * 50);
+	// Convert mouse to world space
+	AEVec2 mouseWorld = ScreenToWorldPos(mousePos);
 
+	// Offset by camera position
+	mouseWorld.x += cameraPosition.x;
+	mouseWorld.y += cameraPosition.y;
+
+	// Get direction from player to mouse
+	AEVec2 playerPos = transform.GetPosition();
+
+	output.x = mouseWorld.x - playerPos.x;
+	output.y = mouseWorld.y - playerPos.y;
+
+	//printf("Player Direction X:%.3f\n", playerDir.x);
+	//printf("Player Direction Y:%.3f\n", playerDir.y);
+
+	AEVec2Normalize(&output, &output);
+
+	return output;
+}
+
+void Player::AimArrow(AEVec2& input)
+{
+	arrowTfm.SetRotation(atan2f(input.y, input.x));
+	arrowTfm.SetPosition(transform.GetPosition().x + input.x * 50, transform.GetPosition().y + input.y * 50);
 }
 
 void Player::ResolveX(AEVec2& position)
@@ -250,8 +239,7 @@ void Player::ResolveY(AEVec2& position)
 	const float  tileSizeHalf = map->GetTileSize() * 0.5f;
 	const AEVec2 tileHalf{ tileSizeHalf, tileSizeHalf };
 
-
-	const AEVec2 oldPosition = GetTransform().GetPosition(); // Should change this
+	const AEVec2 oldPosition = GetTransform().GetPosition();
 
 	isGrounded = false;
 
@@ -308,32 +296,6 @@ void Player::ResolveY(AEVec2& position)
 				}
 				continue;
 			}
-			/*
-			if (type == TILE_TYPE::FLOOR)
-			{
-				const float tileTop = tilePos.y + tileHalf.y;
-				const float prevBottom = oldPosition.y - halfSize.y;
-
-				// Horizontal overlap
-				float dx = position.x - tilePos.x;
-				float px = (halfSize.x + tileHalf.x) - fabsf(dx);
-				if (px <= 0.f) continue;
-
-				// Vertical overlap
-				float dy = position.y - tilePos.y;
-				float py = (halfSize.y + tileHalf.y) - fabsf(dy);
-				if (py <= 0.f) continue;
-
-				if (prevBottom >= tileTop && GetVelocity().y <= 0.f)
-				{
-					position.y = tileTop + halfSize.y;
-					SetVelocity(GetVelocity().x, 0.f);
-					isGrounded = true;
-					SetCollidedYTile(tile);
-				}
-				continue;
-			}
-			*/
 
 			// Tile Resolution
 			float dx = position.x - tilePos.x;
@@ -358,30 +320,30 @@ void Player::ResolveY(AEVec2& position)
 	}
 }
 
-void Player::AimRotation()
+void Player::AimRotation(AEVec2& input)
 {
-	s32 xDir, yDir;
-	AEInputGetCursorPosition(&xDir, &yDir);
-	AEVec2 mousePos = { static_cast<f32>(xDir), static_cast<f32>(yDir) };
-	AEVec2 playerDir = ShootDirection(mousePos);
-
 	switch (playerDirection)
 	{
 	case LEFT:
-		if (playerDir.x > 0)
+		if (input.x > 0)
 		{
 			playerDirection = RIGHT;
 			transform.SetScale(-transform.GetScale().x, transform.GetScale().y);
 		}
 		break;
 	case RIGHT:
-		if (playerDir.x < 0)
+		if (input.x < 0)
 		{
 			playerDirection = LEFT;
 			transform.SetScale(-transform.GetScale().x, transform.GetScale().y);
 		}
 		break;
 	}
+}
+
+void Player::UpdateCamera(AEVec2 input)
+{
+
 }
 
 void Player::Update(float deltaTime)
@@ -392,15 +354,21 @@ void Player::Update(float deltaTime)
 	}
 
 	if (canMove)
+	{
 		HandleInput(); // Handle Input Internally
-	AimRotation();
-	AimArrow();
+	}
+
+	PlayerToMouseDirection(playerToMouseDirNormalized); // Calculates player to mouse direction normalized
+	AimRotation(playerToMouseDirNormalized); // Checks player facing direction
+	AimArrow(playerToMouseDirNormalized); // Updates Aim Arrow based on mouse direction
+
 	AEVec2 currentForces{ 0.f, gravity }; // Acceleration
 
 	if (swordCooldown >= 0.f)
 	{
 		swordCooldown -= deltaTime;
 	}
+
 	// Check For X Input
 	if (input.x != 0.f)
 	{
@@ -421,8 +389,6 @@ void Player::Update(float deltaTime)
 	// Update Current Position
 	AEVec2 currentPosition = GetTransform().GetPosition();
 	currentPosition.x += currentVelocity.x * deltaTime;
-
-	// Collision
 	ResolveX(currentPosition);
 	currentPosition.y += currentVelocity.y * deltaTime;
 	ResolveY(currentPosition);
@@ -430,12 +396,16 @@ void Player::Update(float deltaTime)
 	// Set Final Position
 	GetTransform().SetPosition(currentPosition.x, currentPosition.y);
 
+	// Camera Lerping
 	AEVec2 cameraLerpVector{ GetTransform().GetPosition().x + cameraOffset.x * input.x,
 							GetTransform().GetPosition().y + cameraOffset.y };
 	AEVec2 newCameraPos;
 	AEVec2Lerp(&newCameraPos, &cameraPosition, &cameraLerpVector, deltaTime * 5.f);
 	cameraPosition = newCameraPos;
 	AEGfxSetCamPosition(cameraPosition.x, cameraPosition.y);
+
+	printf("X:%.3f\n", playerToMouseDirNormalized.x);
+	printf("Y:%.3f\n", playerToMouseDirNormalized.y);
 
 	// Update Animation FSM
 	if (input.x != 0 && isGrounded)
@@ -506,11 +476,11 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 
 	AEVec2 CamPos;
 	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
-	matrix.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f +  168.f, CamPos.y + 335.f);
+	matrix.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f + 168.f, CamPos.y + 335.f);
 	float safeValue = AEClamp(value, 0.f, maxHP);
 	matrix.SetScale(safeValue * 3.75f, 25.f);
 
-	healthbarOverlayTfm.SetPosition(CamPos.x - AEGfxGetWindowWidth()/2.f + 50.f, CamPos.y + 300.f);
+	healthbarOverlayTfm.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f + 50.f, CamPos.y + 300.f);
 
 	AEGfxSetTransform(matrix.GetMatrix().m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
@@ -521,7 +491,7 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.f);
-	
+
 	AEGfxTextureSet(healthbarOverlay, 0, 0);
 	AEGfxSetTransform(healthbarOverlayTfm.GetMatrix().m);
 	AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);

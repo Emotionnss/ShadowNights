@@ -20,6 +20,7 @@ Player::Player()
 	, healthBarBG{ nullptr }
 	, playerToMouseVector{ 0.f, 0.f }
 	, playerToMouseVectorNormalized{ 0.f, 0.f }
+	, cameraOffset{ 0.f, 0.f }
 {
 	SetStatic(false);
 	GetTransform().SetScale(size, size); // Set Scale of transform
@@ -156,7 +157,7 @@ AEVec2 Player::CalcPlayerToMouseDirNormalized(AEVec2& output, AEVec2& cameraOffs
 	cameraOffsetValue.x = mouseViewportPos.x;
 	cameraOffsetValue.y = mouseViewportPos.y;
 
-	AEVec2 mouseWorldPos;
+	AEVec2 mouseWorldPos{};
 	mouseWorldPos.x = mouseViewportPos.x + cameraPosition.x;
 	mouseWorldPos.y = mouseViewportPos.y + cameraPosition.y;
 
@@ -396,6 +397,7 @@ void Player::Update(float deltaTime)
 	// Camera Lerping I'm so tired of this honestly
 	AEVec2 newPlayerPos = GetTransform().GetPosition();
 
+	// Clamps offset between player and cursor to certain lengths
 	float clampedOffsetX = AEClamp(cameraOffset.x, -200.f, 200.f);
 	float clampedOffsetY = AEClamp(cameraOffset.y, -150.f, 150.f);
 
@@ -406,12 +408,15 @@ void Player::Update(float deltaTime)
 
 	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpTarget, deltaTime * 4.f);
 
-	Tile minTile = map->GetTileFromTilePos(0, 0);
-	Tile maxTile = map->GetTileFromTilePos(map->GetNumCol() - 1, map->GetNumRow() - 1);
+	// Gather minBound tile and maxBound tile
+	Tile minTile = map->GetTileFromTilePos(static_cast<float>(0), static_cast <float>(0));
+	Tile maxTile = map->GetTileFromTilePos(static_cast<float>(map->GetNumCol() - 1), static_cast<float>(map->GetNumRow() - 1));
 
+	// Gather tiles world position
 	AEVec2 minBound = minTile.transform.GetPosition();
 	AEVec2 maxBound = maxTile.transform.GetPosition();
 
+	// I don't know why I need this line but it collects tile size and halves it
 	float halfTileSize = map->GetTileSize() / 2;
 
 	// Ensure min is actually less than max

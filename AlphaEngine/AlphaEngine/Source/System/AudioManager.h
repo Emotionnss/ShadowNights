@@ -34,7 +34,7 @@ private:
 	AEAudioGroup SFX_LOOP;
 	AEAudioGroup SFX_SINGLE;
 	int ClipCount;
-	bool SFXplaying, BGMplaying;
+	bool SFXplaying, BGMplaying, isMuted;
 
 	std::vector<AudioClip> AudioClipList;
 
@@ -46,8 +46,12 @@ private:
 	const AudioClip* GetAudioClip(const std::string& name) const;
 
 public:
+
 	AudioManager();
 	~AudioManager();
+
+	bool GetMuteStatus() const { return isMuted; }
+	void SetMute();
 
 	/*!
 	@brief	Plays audio clip one shot (No loop)
@@ -58,8 +62,8 @@ public:
 	@brief	Plays audio clip with loop
 	*/
 	void PlayEffect(const std::string& name, f32 volume = 1.0f, f32 pitch = 1.0f);
-	void PauseEffect();
-	void ResumeEffect();
+	void PauseEffect() const;
+	void ResumeEffect() const;
 	void StopEffect();
 
 	bool GetEffectGroup() const;
@@ -68,8 +72,8 @@ public:
 	@brief	Plays audio with loop
 	*/
 	void PlayMusic(const std::string& name, f32 volume = 1.0f, f32 pitch = 1.0f);
-	void PauseMusic();
-	void ResumeMusic();
+	void PauseMusic() const;
+	void ResumeMusic() const;
 	void StopMusic();
 
 	bool GetMusicGroup() const;

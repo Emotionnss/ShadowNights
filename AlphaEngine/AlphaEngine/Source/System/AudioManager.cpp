@@ -9,6 +9,7 @@ AudioManager::AudioManager()
 	, ClipCount{ 0 }
 	, BGMplaying{ false }
 	, SFXplaying{ false }
+	, isMuted{ false }
 {
 	settings = SettingsManager::GetInstance();
 	if (settings != nullptr)
@@ -43,6 +44,36 @@ AudioManager::~AudioManager()
 	AEAudioUnloadAudioGroup(BGM_LOOP);
 	AEAudioUnloadAudioGroup(SFX_LOOP);
 	AEAudioUnloadAudioGroup(SFX_SINGLE);
+}
+
+void AudioManager::SetMute()
+{
+	if (isMuted)
+	{
+		if (BGMplaying)
+		{
+			ResumeMusic();
+		}
+
+		if (SFXplaying)
+		{
+			ResumeEffect();
+		}
+	}
+	else
+	{
+		if (BGMplaying)
+		{
+			PauseMusic();
+		}
+
+		if (SFXplaying)
+		{
+			PauseEffect();
+		}
+	}
+
+	isMuted = !isMuted;
 }
 
 void AudioManager::Trim(std::string& str)
@@ -150,6 +181,11 @@ const AudioClip* AudioManager::GetAudioClip(const std::string& name) const
 
 void AudioManager::PlaySFXOneShot(const std::string& name, f32 volume, f32 pitch)
 {
+	if (isMuted)
+	{
+		return;
+	}
+
 	const AudioClip* index = GetAudioClip(name);
 	if (index != nullptr)
 	{
@@ -159,6 +195,11 @@ void AudioManager::PlaySFXOneShot(const std::string& name, f32 volume, f32 pitch
 
 void AudioManager::PlayEffect(const std::string& name, f32 volume, f32 pitch)
 {
+	if (isMuted)
+	{
+		return;
+	}
+
 	const AudioClip* index = GetAudioClip(name);
 	if (index != nullptr)
 	{
@@ -168,12 +209,12 @@ void AudioManager::PlayEffect(const std::string& name, f32 volume, f32 pitch)
 	}
 }
 
-void AudioManager::PauseEffect()
+void AudioManager::PauseEffect() const
 {
 	AEAudioPauseGroup(SFX_LOOP);
 }
 
-void AudioManager::ResumeEffect()
+void AudioManager::ResumeEffect() const
 {
 	AEAudioResumeGroup(SFX_LOOP);
 }
@@ -191,6 +232,11 @@ bool AudioManager::GetEffectGroup() const
 
 void AudioManager::PlayMusic(const std::string& name, f32 volume, f32 pitch)
 {
+	if (isMuted)
+	{
+		return;
+	}
+
 	const AudioClip* index = GetAudioClip(name);
 	if (index != nullptr)
 	{
@@ -200,11 +246,11 @@ void AudioManager::PlayMusic(const std::string& name, f32 volume, f32 pitch)
 	}
 }
 
-void AudioManager::PauseMusic()
+void AudioManager::PauseMusic() const
 {
 	AEAudioPauseGroup(BGM_LOOP);
 }
-void AudioManager::ResumeMusic()
+void AudioManager::ResumeMusic() const
 {
 	AEAudioResumeGroup(BGM_LOOP);
 }

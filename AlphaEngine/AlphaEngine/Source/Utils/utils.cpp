@@ -56,7 +56,7 @@ bool AABBOverlap(AEVec2 aPosition, AEVec2 aHalf, AEVec2 bPosition, AEVec2 bHalf)
 
 AEVec2 ScreenToWorldPos(AEVec2 MouseScreenWorldPos)
 {
-	AEVec2 temp;
+	AEVec2 temp{};
     temp.x = MouseScreenWorldPos.x - (AEGfxGetWindowWidth() * 0.5f);
     temp.y = (AEGfxGetWindowHeight() * 0.5f) - MouseScreenWorldPos.y;
     return temp;

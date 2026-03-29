@@ -45,13 +45,8 @@ void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
     BaseEnemy::Init(x, y, w, h, spriteName);
 
 	//override base enemy stats
-<<<<<<< HEAD
     health = 200;
     maxHealth = 200;
-=======
-    health = 2000;
-    maxHealth = 2000;
->>>>>>> 58bb938b22f43552be67a16d40060b6249db114f
 
     deathAnimName = "death";
 

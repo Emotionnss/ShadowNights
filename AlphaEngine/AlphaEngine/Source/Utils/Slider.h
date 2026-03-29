@@ -97,4 +97,11 @@ public:
 	@return void
 	*//*______________________________________________________________*/
 	void RenderSlider();
+
+	/*!
+	@brief	Check whether slider is being dragged by mouse
+	@param	void
+	@return bool
+	*//*______________________________________________________________*/
+	bool IsHeld() const;
 };

@@ -618,7 +618,10 @@ void Player::Draw(AEGfxVertexList* mesh)
 	//for arrow surrounding player
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
+	if (swordCooldown <= 0.f)
+		AEGfxSetColorToAdd(0.24f, 1.f, 0.84f, 0.0f);
+	else
+		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
 
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1);

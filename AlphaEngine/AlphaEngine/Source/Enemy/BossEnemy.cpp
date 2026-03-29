@@ -427,7 +427,7 @@ void BossEnemy::FireExplosive()
 {
     BossExplosive* newExplosive = new BossExplosive();
     float dirX = transform.GetScale().x > 0.f ? 1.f : -1.f;
-    AEVec2 dir = { dirX, AERandFloat() };
+    AEVec2 dir = { dirX, AERandFloat() * 2.f - 1.f };
     newExplosive->Triggered(transform.GetPosition(), dir);
     bossExplosives.push_back(newExplosive);
 }

@@ -443,22 +443,28 @@ void BossEnemy::SpawnRandomEnemy()
 {
     BaseEnemy* randEnemy = nullptr;
 
-    // Start with the Boss's position
+	//the boss position is a bit too high for the random enemy to spawn at, so we will spawn it slightly below the boss's current position
     float spawnX = transform.GetPosition().x;
     float spawnY = transform.GetPosition().y - 100.0f;
 
-    // Create a "Safe Zone" that is 3 tiles away from the outer walls and floor/ceiling
-    float safeBuffer = map->GetTileSize() * 3.0f;
-    float mapMaxX = (map->GetNumCol() * map->GetTileSize()) - safeBuffer;
-    float mapMaxY = (map->GetNumRow() * map->GetTileSize()) - safeBuffer;
+	// there are some map boundaries we need to respect to prevent the random enemy from spawning inside walls, so we will calculate those first and adjust the spawn coordinates if necessary
+    float tileSize = map->GetTileSize();
+    float leftWallBuffer = tileSize * 7.0f;
+    float ceilingBuffer = tileSize * 2.0f;
+    float safeBuffer = tileSize * 2.0f;
 
-    // If the Boss is inside a wall, force the spawn X back into the room
-    if (spawnX < safeBuffer) spawnX = safeBuffer;
-    if (spawnX > mapMaxX)    spawnX = mapMaxX;
+	// absolute minimum and maximum coordinates that the random enemy can spawn at, taking into account the boss's position and the map boundaries
+    float minX = leftWallBuffer + safeBuffer;
+    float maxX = (map->GetNumCol() * tileSize) - safeBuffer;
+    float minY = safeBuffer;
+    float maxY = (map->GetNumRow() * tileSize) - ceilingBuffer - safeBuffer;
 
-    // If the Boss is inside the ceiling or floor force the spawn Y back into the room
-    if (spawnY < safeBuffer) spawnY = safeBuffer;
-    if (spawnY > mapMaxY)    spawnY = mapMaxY;
+	// constrain the spawn coordinates to be within the safe boundaries
+    if (spawnX < minX) spawnX = minX;
+    if (spawnX > maxX) spawnX = maxX;
+
+    if (spawnY < minY) spawnY = minY;
+    if (spawnY > maxY) spawnY = maxY;
 
     int choice = rand() % 3;
     if (choice == 0)

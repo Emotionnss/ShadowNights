@@ -1,3 +1,9 @@
+/*!
+@file       TimeStop.h
+@author     Chew Zavier (c.zavier)
+@brief      This file contains declarations of functions used by the Time Stop ability which is a
+			player ability that allows the user to stop time in an area around the activated position
+*//*_______________________________________________________________________*/
 #include "../System/MeshManager.h"
 #include "../Player/Transform2D.h"
 #include "../Player/Player.h"

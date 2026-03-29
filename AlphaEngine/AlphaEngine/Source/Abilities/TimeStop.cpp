@@ -1,3 +1,9 @@
+/*!
+@file       TimeStop.cpp
+@author     Chew Zavier (c.zavier)
+@brief      This file contains definitions of functions used by the Time Stop ability which is a
+            player ability that allows the user to stop time in an area around the activated position
+*//*_______________________________________________________________________*/
 #include "TimeStop.h"
 #include <iostream>
 #include "../Utils/utils.h"
@@ -24,7 +30,7 @@ TimeStop::~TimeStop()//destructor
     }
 }
 
-void TimeStop::Update(std::vector<BaseEnemy*> enemyList, float dt)
+void TimeStop::Update(std::vector<BaseEnemy*> enemyList, float dt)//update
 {
     if (active)//if time stopped
     {

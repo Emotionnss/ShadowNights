@@ -1,3 +1,9 @@
+/*!
+@file       TimeSlow.cpp
+@author     Chew Zavier (c.zavier)
+@brief      This file contains definitions of functions used by the Time Slow ability which is a
+			player ability that allows the user to slow down time across the whole map
+*//*_______________________________________________________________________*/
 #include "TimeSlow.h"
 #include <iostream>
 TimeSlow::TimeSlow()//default constructor
@@ -35,7 +41,7 @@ void TimeSlow::Update(float dt)//update
 		timeSlowTransform.SetPosition(player->GetTransform().GetPosition());//set the slow sprite onto our player
 
 	}
-	if (startDespawn)
+	if (startDespawn)//despawning sequence
 	{
 		if (despawningTimer > 0)
 		{
@@ -51,12 +57,12 @@ void TimeSlow::Update(float dt)//update
 
 bool TimeSlow::ToggleSlow(std::vector<BaseEnemy*> enemyList)
 {
-	if (active == true)
+	if (active == true)//if the ability is already active
 	{
-		startDespawn = true;
-		timeSlowSprite->PlayAnimation("despawn", 1, despawningTime);
+		startDespawn = true;//start despawning
+		timeSlowSprite->PlayAnimation("despawn", 1, despawningTime);//play despawn animation
 		active = false;
-		for (BaseEnemy* enemy : enemyList)
+		for (BaseEnemy* enemy : enemyList)//unslow every enemy and their projectile
 		{
 			enemy->Slowed(false);
 			for (BaseProjectile* proj : enemy->GetProjectiles())
@@ -64,26 +70,26 @@ bool TimeSlow::ToggleSlow(std::vector<BaseEnemy*> enemyList)
 				proj->slowed = false;
 			}
 		}
-		for (BaseProjectile* proj : player->GetProjectileList())
+		for (BaseProjectile* proj : player->GetProjectileList())//unslow all projectile thrown by player
 		{
 			proj->slowed = false;
 		}
 	}
 	else
 	{
-		timeSlowSprite->PlayAnimation("spawn", 1, 0.6f);
-		startDespawn = false;
-		active = true;
-		for (BaseProjectile* proj : player->GetProjectileList())//e
+		timeSlowSprite->PlayAnimation("spawn", 1, 0.6f);//play spawning animation
+		startDespawn = false;//not despawning
+		active = true;//is active
+		for (BaseProjectile* proj : player->GetProjectileList())//slow all projectiles thrown
 		{
 			proj->slowed = true;
 		}
-		for (BaseEnemy* enemy : enemyList)
+		for (BaseEnemy* enemy : enemyList)//slow all enemies and their projectiles
 		{
 			enemy->Slowed(true);
 			for (BaseProjectile* proj : enemy->GetProjectiles())
 			{
-				proj->slowed = false;
+				proj->slowed = true;
 			}
 		}
 	}

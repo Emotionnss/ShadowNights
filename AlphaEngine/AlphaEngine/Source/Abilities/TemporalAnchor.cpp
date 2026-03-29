@@ -1,3 +1,9 @@
+/*!
+@file       TemporalAnchor.cpp
+@author     Chew Zavier (c.zavier)
+@brief      This file contains definitions of functions used by the Temporal Anchor which is a
+			player ability that allows the user to rewind time upon death or reactivation
+*//*_______________________________________________________________________*/
 #include "TemporalAnchor.h"
 #include <iostream>
 #include "../Utils/utils.h"
@@ -12,9 +18,9 @@ TemporalAnchor::TemporalAnchor() ://default constructor
 	anchorSprite{},
 	audioManager{AudioManager::GetInstance()}
 {
-	zoneTfm.SetScale(1000, 1000);
-	anchorTfm.SetScale(100, 100);
-	anchorSpawnTfm.SetScale(100, 100);
+	zoneTfm.SetScale(1000, 1000);//zone scale
+	anchorTfm.SetScale(100, 100);//anchor scale
+	anchorSpawnTfm.SetScale(100, 100);//anchor spawn scale
 	anchorSprite = new Sprite(CSVManager::ReadInfo("anchor"));//create new sprite for the anchor
 	anchorSprite->PlayAnimation("spawn", -1, 0.5f);//make it play an animation on enter
 
@@ -37,7 +43,7 @@ TemporalAnchor::~TemporalAnchor()//default destructor
 		delete anchorSprite;
 		anchorSprite = nullptr;
 	}
-	if (anchorSpawnSprite)
+	if (anchorSpawnSprite)//same for anchor spawn sprite
 	{
 		delete anchorSpawnSprite;
 		anchorSpawnSprite = nullptr;
@@ -47,20 +53,18 @@ TemporalAnchor::~TemporalAnchor()//default destructor
 
 void TemporalAnchor::Update(f32 dt)//update function based on dt
 {
-	if (spawning)
+	if (spawning)//if its in the midst of spawning
 	{
-
-		anchorSpawnTfm.SetPosition(player->GetTransform().GetPosition());
-		spawnTimer += -1 * dt;
-		if (spawnTimer <= 0)
+		anchorSpawnTfm.SetPosition(anchorPos);//follow the anchor position
+		spawnTimer += -1 * dt;//reduce timer
+		if (spawnTimer <= 0)//if times up
 		{
+			spawnTimer = spawnTime;//reset timer
+			spawning = false;//nol onger spawning
+			active = true;//officially start the ability
 
-			spawnTimer = spawnTime;
-			spawning = false;
-			active = true;
-
-			anchorTfm.SetPosition(anchorSpawnTfm.GetPosition());
-			zoneTfm.SetPosition(anchorSpawnTfm.GetPosition());
+			anchorTfm.SetPosition(anchorSpawnTfm.GetPosition());//set anchor pos
+			zoneTfm.SetPosition(anchorSpawnTfm.GetPosition());//set zone pos
 		}
 	}
 	if (active && !reversing && !spawning)//if the abilitiy is active AND not reversing the player back to the anchor position
@@ -119,25 +123,23 @@ void TemporalAnchor::Update(f32 dt)//update function based on dt
 
 bool TemporalAnchor::Anchor(AEVec2 anchPos)
 {
-	if (abilityAnchoring)
+	if (abilityAnchoring)//if ability is already active
 	{
-		active = false;
+		active = false;//deactivate
 		abilityAnchoring = false;
 		spawning = false;
-		reversing = true;
-		iter = ghostVect.size() - 1;
-		audioManager->PlaySFXOneShot("time_reverse");
-		//player->GetTransform().SetPosition(anchorTfm.GetPosition());
+		reversing = true;//start reversing
+		iter = ghostVect.size() - 1;//iterator starts at the back of the vector
+		audioManager->PlaySFXOneShot("time_reverse");//play rewinding sound
 
 	}
 	else
 	{
-		//active = true;
-		abilityAnchoring = true;
-		spawning = true;
-		savedHealth = player->GetHealth();
-
-		anchorSpawnSprite->PlayAnimation("spawn", 1, spawnTime);
+		abilityAnchoring = true;//set anchoring to true
+		spawning = true;//start spawning anim
+		savedHealth = player->GetHealth();//save the amount of health the player currently has
+		anchorPos = anchPos;//set anchor pos
+		anchorSpawnSprite->PlayAnimation("spawn", 1, spawnTime);//spawn
 	}
 	return abilityAnchoring;
 }
@@ -152,8 +154,11 @@ void TemporalAnchor::Draw()
 	//zone for timestop
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	//spawning sprite for the anchor
 	if(spawning)
 		anchorSpawnSprite->Render(anchorSpawnTfm);
+
+	//if the ability is officially active
 	if (active)
 	{
 		AEGfxSetTransparency(0.25f);
@@ -162,16 +167,15 @@ void TemporalAnchor::Draw()
 		AEGfxSetTransform(zoneTfm.GetMatrix().m);
 		AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
 
-		anchorSprite->Render(anchorTfm);
+		anchorSprite->Render(anchorTfm);//render thea nchor
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		AEGfxSetTransparency(0.25f);
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 
 		Sprite* ghostSprite = player->GetSprite();
 
-		for (Ghosts ghost : ghostVect)
+		for (Ghosts ghost : ghostVect)//and render the ghosts in the vector
 		{
-
 			ghostTfm.SetPosition(ghost.position);
 			AEGfxTextureSet(ghostSprite->GetSpriteTexture(), ghost.spriteUV.x, ghost.spriteUV.y);
 			AEGfxSetTransform(ghostTfm.GetMatrix().m);
@@ -181,14 +185,14 @@ void TemporalAnchor::Draw()
 	}
 }
 
-void TemporalAnchor::SaveGhost(AEVec2 UVs, AEVec2 playerPos)
+void TemporalAnchor::SaveGhost(AEVec2 UVs, AEVec2 playerPos)//for saving the ghosts
 {
 	Ghosts ghost{ UVs,playerPos };
 	ghostVect.push_back(ghost);
 	/*std::cout << "saving UV" << UVs.x << " " << UVs.y << " vector size" << ghostVect.size() << '\n';*/
 }
 
-bool TemporalAnchor::Reversing() const
+bool TemporalAnchor::Reversing() const//returns if the player is reversing back in time
 {
 	return reversing;
 }

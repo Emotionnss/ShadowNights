@@ -9,10 +9,6 @@
 #include "TimeSlow.h"
 #include "TemporalAnchor.h"
 
-#include "BossLaser.h"
-#include "BossExplosive.h"
-
-
 #include "../System/MeshManager.h"
 #include "../Sprite/Sprite.h"
 
@@ -26,9 +22,6 @@ private:
 	TimeStop* timeStop = new TimeStop();
 	TimeSlow* timeSlow = new TimeSlow();
 	TemporalAnchor* tempAnch = new TemporalAnchor();
-
-	std::vector<BossLaser*> bossLasers;
-	std::vector<BossExplosive*> bossExplosives;
 
 	Player* player = nullptr;//player pointer
 	f32 slowCost{}, stopCost, temporalCost;//costs for the abilities
@@ -50,13 +43,16 @@ private:
 	f32 a1Alpha{}, a2Alpha{}, a3Alpha{};//alpha for the icons
 
 	AudioManager* audioManager{};//audio manager
+
+	bool showUI{};//show ui for cutscene in bossScene
 public:
-	void TriggerAnchor();
-	AbilityHandler();
-	~AbilityHandler();
-	void AbilityUpdate(std::vector<BaseEnemy*> enemylist,float deltaTime);
-	void Draw();
-	bool Anchored()const;
-	bool Reverse() const;
+	AbilityHandler();//constructor
+	~AbilityHandler();//destructor
+	void AbilityUpdate(std::vector<BaseEnemy*> enemylist,float deltaTime);///update
+	void Draw();//render
+	bool Anchored()const;//anchored getter
+	bool Reverse() const;//reversing getter
+	void TriggerAnchor();//anchor trigger
+	void ShowUI(bool show);//showui setter
 };
 

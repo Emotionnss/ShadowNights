@@ -6,7 +6,7 @@ void BossScene::Init() {
     BaseScene::Init();
     player->GetTransform().SetPosition(300.0f, 200.0f);
     player->SetMoveable(false);
-
+    abilityHandler->ShowUI(false);
     boss = new BossEnemy();
     boss->Init(1400.f, 300.0f, 85.0f, 60.0f, "boss");
     enemyList.push_back(boss);
@@ -35,6 +35,7 @@ void BossScene::Update() {
         if (cutsceneDuration < 0.f)
         {
             player->SetMoveable(true);
+            abilityHandler->ShowUI(true);
         }
     }
 

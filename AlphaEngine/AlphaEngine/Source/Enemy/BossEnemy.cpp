@@ -204,7 +204,96 @@ void BossEnemy::Update(f32 deltaTime)
 
 void BossEnemy::Draw()
 {
-    BaseEnemy::Draw();
+    //BaseEnemy::Draw();
+
+    float alpha = 1.0f;
+
+    if (isDying)
+    {
+        alpha = deathTimer / oriDeathTimer;
+        if (alpha < 0.0f) alpha = 0.0f;
+        if (alpha > 1.0f) alpha = 1.0f;
+    }
+
+    if (weakpoint.active)
+    {
+        alpha = 0.5f;
+    }
+    else
+    {
+        alpha = 1.f;
+    }
+
+    if (sprite) sprite->Render(transform, alpha);
+
+    if (!isDying)
+    {
+        // Safely wipe the paintbrush
+        AEGfxTextureSet(nullptr, 0, 0);
+
+        AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+        AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f);
+        AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+        AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+        AEGfxSetTransparency(1.0f);
+
+        if (!isBoss)
+        {
+            healthbarTransform = transform;
+
+            healthbarTransform.SetPosition(
+                transform.GetPosition().x,
+                transform.GetPosition().y + (0.5f * transform.GetScale().y) + 15.f
+            );
+            healthbarTransform.SetScale((static_cast<float>(health) / static_cast<float>(maxHealth)) * 100.f, 10.f);
+        }
+        else
+        {
+            AEVec2 camPos = { 0.f, 0.f };
+            AEGfxGetCamPosition(&camPos.x, &camPos.y);
+
+            healthbarTransform.SetPosition(
+                camPos.x,
+                camPos.y - 300.f
+            );
+            healthbarTransform.SetScale((static_cast<float>(health) / static_cast<float>(maxHealth)) * 1000.f, 50.f);
+        }
+
+        AEGfxSetTransform(healthbarTransform.GetMatrix().m);
+        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);
+        AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    for (EnemyProjectile* p : enemyProjectiles)
+    {
+        p->Draw(nullptr);
+    }
+
+    if (path.size() > 1)
+    {
+        if (settingsManager->GetTilesDebug())
+        {
+            map->RenderCheckedTilesDebug();
+        }
+
+        if (settingsManager->GetPathDebug())
+        {
+            map->RenderPathDebug(path);
+        }
+    }
+
+
+
+    AEGfxTextureSet(nullptr, 0, 0);
+    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+    AEGfxSetTransparency(1.0f);
+    AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+    AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+
+    // This specifically stops the Giant Red Bars!
+    AEMtx33 identity;
+    AEMtx33Identity(&identity);
+    AEGfxSetTransform(identity.m);
 
     if (weakpoint.active)
     {

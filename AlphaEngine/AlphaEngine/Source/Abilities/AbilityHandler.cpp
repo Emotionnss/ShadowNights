@@ -62,14 +62,6 @@ AbilityHandler::~AbilityHandler()
 	delete timeStop;
 	delete timeSlow;
 	delete tempAnch;
-
-	for (BossLaser* l : bossLasers)
-		delete l;
-	bossLasers.clear();
-
-	for (BossExplosive* e : bossExplosives)
-		delete e;
-	bossExplosives.clear();
 }
 
 void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList, float dt)
@@ -82,13 +74,6 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList, float dt)
 	timeStop->Update(enemyList, dt);
 	timeSlow->Update(dt);
 	tempAnch->Update(dt);
-
-	for (BossLaser* l : bossLasers)
-		l->Update(dt);
-
-	for (BossExplosive* e : bossExplosives)
-		e->Update(dt);
-
 	//check for inputs and activate/deactivate the abilities
 	if (AEInputCheckTriggered(AEVK_E))
 	{
@@ -108,26 +93,12 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList, float dt)
 		resource = anchored ? resource - temporalCost : resource;
 	}
 
+	
 	//temporarily stop time if the player is reversing 
 	timeStop->TempStop(Reverse());
 
 	//anchored boolean dependant on if hte player is currently anchored
 	anchored = tempAnch->Anchor();
-
-	if (AEInputCheckTriggered(AEVK_T))
-	{
-		BossLaser* newLaser = new BossLaser();
-		newLaser->Triggered(player->GetTransform().GetPosition());
-		bossLasers.push_back(newLaser);
-	}
-	if (AEInputCheckTriggered(AEVK_G))
-	{
-		BossExplosive* newExplosive = new BossExplosive();
-		newExplosive->Triggered(player->GetTransform().GetPosition(), { 1.f, 0.f });
-		bossExplosives.push_back(newExplosive);
-	}
-
-
 	//separated into 2 if statements so that the cost is additive
 	if (timeStopped)
 	{
@@ -172,67 +143,63 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList, float dt)
 
 void AbilityHandler::Draw()
 {
-	//for the VFX of the abilities
-	timeStop->Draw();
-	timeSlow->Draw();
-	tempAnch->Draw();
+	if (showUI)
+	{
+		//for the VFX of the abilities
+		timeStop->Draw();
+		timeSlow->Draw();
+		tempAnch->Draw();
 
-	for (BossLaser* l : bossLasers)
-		l->Draw();
+		//for resource bar bg
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
 
-	for (BossExplosive* e : bossExplosives)
-		e->Draw();
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1);
 
-	//for resource bar bg
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
+		AEGfxTextureSet(barBG, 0, 0);
 
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(1);
+		AEGfxSetTransform(barBgTfm.GetMatrix().m);
+		AEGfxMeshDraw(meshManager->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 
-	AEGfxTextureSet(barBG, 0, 0);
-
-	AEGfxSetTransform(barBgTfm.GetMatrix().m);
-	AEGfxMeshDraw(meshManager->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
-
-	//resource bar for the abilties
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(1.f);
-	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetColorToAdd(1.f, 1.f, 255.f, 0.f);
-	AEGfxSetTransform(resourceBarTfm.GetMatrix().m);
-	AEGfxMeshDraw(meshManager->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
+		//resource bar for the abilties
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(1.f, 1.f, 255.f, 0.f);
+		AEGfxSetTransform(resourceBarTfm.GetMatrix().m);
+		AEGfxMeshDraw(meshManager->GetMesh(CORNER_SQUARE), AE_GFX_MDM_TRIANGLES);
 
 
-	//for ability 1 UI
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
+		//for ability 1 UI
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
 
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(a1Alpha);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(a1Alpha);
 
-	AEGfxTextureSet(a1Tex, 0, 0);
-	AEGfxSetTransform(a1Tfm.GetMatrix().m);
-	AEGfxMeshDraw(meshManager->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+		AEGfxTextureSet(a1Tex, 0, 0);
+		AEGfxSetTransform(a1Tfm.GetMatrix().m);
+		AEGfxMeshDraw(meshManager->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 
-	//for ability 2 UI
-	AEGfxSetTransparency(a2Alpha);
+		//for ability 2 UI
+		AEGfxSetTransparency(a2Alpha);
 
-	AEGfxTextureSet(a2Tex, 0, 0);
-	AEGfxSetTransform(a2Tfm.GetMatrix().m);
-	AEGfxMeshDraw(meshManager->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+		AEGfxTextureSet(a2Tex, 0, 0);
+		AEGfxSetTransform(a2Tfm.GetMatrix().m);
+		AEGfxMeshDraw(meshManager->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 
-	//ability 3 Ui
-	AEGfxSetTransparency(a3Alpha);
+		//ability 3 Ui
+		AEGfxSetTransparency(a3Alpha);
 
-	AEGfxTextureSet(a3Tex, 0, 0);
-	AEGfxSetTransform(a3Tfm.GetMatrix().m);
-	AEGfxMeshDraw(meshManager->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+		AEGfxTextureSet(a3Tex, 0, 0);
+		AEGfxSetTransform(a3Tfm.GetMatrix().m);
+		AEGfxMeshDraw(meshManager->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 
-
+	}
 }
 //returns if player is anchored
 bool AbilityHandler::Anchored() const
@@ -244,9 +211,13 @@ bool AbilityHandler::Reverse() const
 {
 	return tempAnch->Reversing();
 }
-//triggers the anchor again
+//triggers the anchor
 void AbilityHandler::TriggerAnchor()
 {
 	anchored = tempAnch->Anchor(player->GetTransform().GetPosition());
-
 }
+void AbilityHandler::ShowUI(bool show)
+{
+	showUI = show;
+}
+

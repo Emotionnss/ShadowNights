@@ -490,39 +490,42 @@ void Player::Update(float deltaTime)
 
 void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matrix)
 {
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(0.25f);
-
-	AEGfxSetColorToMultiply(1.f, 0.0f, 0.0f, 1.0f);
-	AEGfxSetColorToAdd(1.f, 0.f, 0.f, 1.f);
-
-	if (AEInputCheckTriggered(AEVK_1))
+	if (canMove)
 	{
-		TakeDamage(10);
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(0.25f);
+
+		AEGfxSetColorToMultiply(1.f, 0.0f, 0.0f, 1.0f);
+		AEGfxSetColorToAdd(1.f, 0.f, 0.f, 1.f);
+
+		if (AEInputCheckTriggered(AEVK_1))
+		{
+			TakeDamage(10);
+		}
+
+		AEVec2 CamPos{};
+		AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
+		matrix.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f + 168.f, CamPos.y + 335.f);
+		float safeValue = AEClamp(value, 0.f, maxHP);
+		matrix.SetScale(safeValue * 3.75f, 25.f);
+
+		healthbarOverlayTfm.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f + 50.f, CamPos.y + 300.f);
+
+		AEGfxSetTransform(matrix.GetMatrix().m);
+		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
+
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.f);
+
+		AEGfxTextureSet(healthbarOverlay, 0, 0);
+		AEGfxSetTransform(healthbarOverlayTfm.GetMatrix().m);
+		AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 	}
-
-	AEVec2 CamPos{};
-	AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
-	matrix.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f + 168.f, CamPos.y + 335.f);
-	float safeValue = AEClamp(value, 0.f, maxHP);
-	matrix.SetScale(safeValue * 3.75f, 25.f);
-
-	healthbarOverlayTfm.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f + 50.f, CamPos.y + 300.f);
-
-	AEGfxSetTransform(matrix.GetMatrix().m);
-	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
-	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
-
-	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	AEGfxSetTransparency(1.f);
-
-	AEGfxTextureSet(healthbarOverlay, 0, 0);
-	AEGfxSetTransform(healthbarOverlayTfm.GetMatrix().m);
-	AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(CORNER_TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 }
 
 void Player::TakeDamage(float damage)

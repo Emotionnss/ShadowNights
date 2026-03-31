@@ -58,9 +58,14 @@ public:
 
 	void SetMoveable(bool state);
 
+	void TriggerCameraShake(f32 intensity, f32 duration);
+
 private:
 	AEVec2 playerToMouseVector, playerToMouseVectorNormalized;
 	AEVec2 CalcPlayerToMouseDirNormalized(AEVec2& output, AEVec2& cameraOffsetValue);
+
+	void UpdateCameraPosition(f32 _dt);
+	f32 shakeIntensity, shakeDuration, shakeTimer;
 
 	void AimRotation(AEVec2& inputValue);
 	void AimArrow(AEVec2& inputValue);

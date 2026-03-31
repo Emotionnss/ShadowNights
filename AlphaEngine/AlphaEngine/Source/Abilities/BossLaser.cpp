@@ -70,6 +70,7 @@ void BossLaser::Update(float deltaTime)
         {
             charging = false;
             laserSprite->PlayAnimation("attack", -1, 1.f);
+            player->TriggerCameraShake(6.f, 4.f);
         }
         return;
     }

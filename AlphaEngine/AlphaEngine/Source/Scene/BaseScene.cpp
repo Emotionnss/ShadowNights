@@ -68,6 +68,7 @@ void BaseScene::Load() {
 
 void BaseScene::Init() {
 	player->GetTransform().SetPosition(300.0f, 900.0f);
+	player->TriggerCameraShake(0.f, 0.f); // Reset Camera Shake
 
 	if (!audio->GetMusicGroup())
 	{

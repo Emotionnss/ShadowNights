@@ -21,6 +21,9 @@ Player::Player()
 	, playerToMouseVector{ 0.f, 0.f }
 	, playerToMouseVectorNormalized{ 0.f, 0.f }
 	, cameraOffset{ 0.f, 0.f }
+	, shakeIntensity{ 0.f }
+	, shakeDuration{ 0.f }
+	, shakeTimer{ 0.f }
 {
 	SetStatic(false);
 	GetTransform().SetScale(size, size); // Set Scale of transform
@@ -342,6 +345,68 @@ void Player::AimRotation(AEVec2& inputValue)
 	}
 }
 
+void Player::TriggerCameraShake(f32 intensity, f32 duration)
+{
+	shakeIntensity = intensity;
+	shakeDuration = duration;
+	shakeTimer = duration;
+}
+
+void Player::UpdateCameraPosition(f32 _dt)
+{
+	AEVec2 playerPosition = GetTransform().GetPosition();
+
+	// Clamps offset between player and cursor to certain lengths
+	float clampedOffsetX = AEClamp(cameraOffset.x, -200.f, 200.f);
+	float clampedOffsetY = AEClamp(cameraOffset.y, -150.f, 150.f);
+
+	AEVec2 cameraLerpTarget{
+		playerPosition.x + clampedOffsetX,
+		playerPosition.y + clampedOffsetY
+	};
+
+	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpTarget, _dt * 4.f);
+
+	// Gather minBound tile and maxBound tile
+	Tile minTile = map->GetTileFromTilePos(static_cast<float>(0), static_cast <float>(0));
+	Tile maxTile = map->GetTileFromTilePos(static_cast<float>(map->GetNumCol() - 1), static_cast<float>(map->GetNumRow() - 1));
+
+	// Gather tiles world position
+	AEVec2 minBound = minTile.transform.GetPosition();
+	AEVec2 maxBound = maxTile.transform.GetPosition();
+
+	float halfTileSize = map->GetTileSize() / 2;
+
+	// Ensure min is actually less than max
+	float minX = (minBound.x < maxBound.x) ? minBound.x : maxBound.x;
+	float maxX = (maxBound.x > minBound.x) ? maxBound.x : minBound.x;
+	float minY = (minBound.y < maxBound.y) ? minBound.y : maxBound.y;
+	float maxY = (maxBound.y > minBound.y) ? maxBound.y : minBound.y;
+
+	// Account for camera viewport size
+	float halfViewWidth = AEGfxGetWindowWidth() * 0.5f;
+	float halfViewHeight = AEGfxGetWindowHeight() * 0.5f;
+
+	// Clamp camera position to map bounds minus half viewport
+	cameraPosition.x = AEClamp(cameraPosition.x, minX + halfViewWidth - halfTileSize, maxX - halfViewWidth + halfTileSize);
+	cameraPosition.y = AEClamp(cameraPosition.y, minY + halfViewHeight - halfTileSize, maxY - halfViewHeight + halfTileSize);
+
+	if (shakeTimer > 0.f)
+	{
+		shakeTimer -= _dt;
+		float progress = shakeTimer / shakeDuration;
+		float currentIntensity = shakeIntensity * progress;
+
+		float offsetX = (AERandFloat() * 2.f - 1.f) * currentIntensity;
+		float offsetY = (AERandFloat() * 2.f - 1.f) * currentIntensity;
+
+		cameraPosition.x += offsetX;
+		cameraPosition.y += offsetY;
+	}
+
+	AEGfxSetCamPosition(cameraPosition.x, cameraPosition.y);
+}
+
 void Player::Update(float deltaTime)
 {
 	if (damagedTimer > 0.f)
@@ -390,50 +455,11 @@ void Player::Update(float deltaTime)
 	// Set Final Position
 	GetTransform().SetPosition(currentPosition.x, currentPosition.y);
 
-	// I just need somebody to heal, somebody to love
 	AimArrow(playerToMouseVectorNormalized); // Updates Aim Arrow after player position
 	AimRotation(playerToMouseVectorNormalized); // Checks player facing direction
 
-	// Camera Lerping I'm so tired of this honestly
-	AEVec2 newPlayerPos = GetTransform().GetPosition();
-
-	// Clamps offset between player and cursor to certain lengths
-	float clampedOffsetX = AEClamp(cameraOffset.x, -200.f, 200.f);
-	float clampedOffsetY = AEClamp(cameraOffset.y, -150.f, 150.f);
-
-	AEVec2 cameraLerpTarget{
-		newPlayerPos.x + clampedOffsetX,
-		newPlayerPos.y + clampedOffsetY
-	};
-
-	AEVec2Lerp(&cameraPosition, &cameraPosition, &cameraLerpTarget, deltaTime * 4.f);
-
-	// Gather minBound tile and maxBound tile
-	Tile minTile = map->GetTileFromTilePos(static_cast<float>(0), static_cast <float>(0));
-	Tile maxTile = map->GetTileFromTilePos(static_cast<float>(map->GetNumCol() - 1), static_cast<float>(map->GetNumRow() - 1));
-
-	// Gather tiles world position
-	AEVec2 minBound = minTile.transform.GetPosition();
-	AEVec2 maxBound = maxTile.transform.GetPosition();
-
-	// I don't know why I need this line but it collects tile size and halves it
-	float halfTileSize = map->GetTileSize() / 2;
-
-	// Ensure min is actually less than max
-	float minX = (minBound.x < maxBound.x) ? minBound.x : maxBound.x;
-	float maxX = (maxBound.x > minBound.x) ? maxBound.x : minBound.x;
-	float minY = (minBound.y < maxBound.y) ? minBound.y : maxBound.y;
-	float maxY = (maxBound.y > minBound.y) ? maxBound.y : minBound.y;
-
-	// Account for camera viewport size
-	float halfViewWidth = AEGfxGetWindowWidth() * 0.5f;
-	float halfViewHeight = AEGfxGetWindowHeight() * 0.5f;
-
-	// Clamp camera position to map bounds minus half viewport
-	cameraPosition.x = AEClamp(cameraPosition.x, minX + halfViewWidth - halfTileSize, maxX - halfViewWidth + halfTileSize);
-	cameraPosition.y = AEClamp(cameraPosition.y, minY + halfViewHeight - halfTileSize, maxY - halfViewHeight + halfTileSize);
-
-	AEGfxSetCamPosition(cameraPosition.x, cameraPosition.y);
+	//Camera Update
+	UpdateCameraPosition(deltaTime);
 
 	// Update Animation FSM
 	if (input.x != 0 && isGrounded)

@@ -73,7 +73,7 @@ void SettingsScene::Update() {
 			AESysSetFullScreen(!isFullScreen);
 		}
 
-		btnToggleMute->SetLabel(AESysIsFullScreen() ? "Fullscreen: ON" : "Fullscreen: OFF");
+		btnToggleFullscreen->SetLabel(AESysIsFullScreen() ? "Fullscreen: ON" : "Fullscreen: OFF");
 
 		break;
 

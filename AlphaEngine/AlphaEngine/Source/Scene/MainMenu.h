@@ -9,7 +9,7 @@
 @brief      This file contains definitions of functions and variables
             used for the MainMenu class, which is the first scene of the game,
             and contains buttons to start a new game, load from a save, access settings,
-			view credits, or quit the game
+            view credits, or quit the game
 *//*_______________________________________________________________________*/
 
 class MainMenu : public BaseScene {
@@ -29,4 +29,6 @@ private:
     Button* btnSettings = nullptr;
     Button* btnCredits = nullptr;
     Button* btnQuit = nullptr;
+    Button* btnYes = nullptr;
+    Button* btnNo = nullptr;
 };

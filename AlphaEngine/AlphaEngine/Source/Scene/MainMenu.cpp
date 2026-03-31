@@ -2,8 +2,8 @@
 #include "../System/Scenemanager.h"
 #include "TutorialScene.h"
 #include "Level1Scene.h"
-#include "SettingsScene.h"
 #include "Credits.h"
+#include "SettingsScene.h" 
 #include "AEEngine.h"
 #include <iostream>
 #include <fstream>
@@ -15,7 +15,7 @@
 @brief      This file contains definitions of functions and variables
             used for the MainMenu class, which is the first scene of the game,
             and contains buttons to start a new game, load from a save, access settings,
-			view credits, or quit the game.
+            view credits, or quit the game.
 *//*_______________________________________________________________________*/
 
 extern bool gGameRunning;
@@ -27,6 +27,9 @@ void MainMenu::DeleteSave(int slot) {
 
 void MainMenu::Load() {
     AEGfxReset();
+
+    meshManager = MeshManager::GetInstance();
+    bg = new Background("Assets/Sprites/Background/Dark Gothic Castle.png");
     if (Button::fontId == -1) Button::LoadResources();
 
     btnPlay = new Button(0.0f, 90.0f, 200.0f, 50.0f, "New Game");
@@ -39,6 +42,10 @@ void MainMenu::Load() {
     btnSlot2 = new Button(0.0f, 30.0f, 200.0f, 50.0f, "Slot 2");
     btnSlot3 = new Button(0.0f, -30.0f, 200.0f, 50.0f, "Slot 3");
     btnBack = new Button(0.0f, -90.0f, 200.0f, 50.0f, "Back");
+
+    // Confirmation Buttons
+    btnYes = new Button(-100.0f, -50.0f, 150.0f, 50.0f, "Yes");
+    btnNo = new Button(100.0f, -50.0f, 150.0f, 50.0f, "No");
 }
 
 void MainMenu::Init() {
@@ -48,13 +55,10 @@ void MainMenu::Init() {
 void MainMenu::Update() {
     if (menuPage == 0) {
         if (btnPlay->IsClicked()) {
-            // Delete all 3 save slots to reset progress
             DeleteSave(1);
             DeleteSave(2);
             DeleteSave(3);
-
-            // Start the fresh game
-            SceneManager::ChangeScene(new BossScene());
+            SceneManager::ChangeScene(new TutorialScene());
         }
         if (btnLoad->IsClicked()) {
             menuPage = 2;
@@ -67,25 +71,32 @@ void MainMenu::Update() {
         }
         if (btnCredits->IsClicked())
         {
-            //change to credits
             SceneManager::ChangeScene(new CreditsScene());
         }
         if (btnQuit->IsClicked()) {
-            gGameRunning = false;
+            menuPage = 3;
         }
     }
-    else {
+    else if (menuPage == 1 || menuPage == 2) {
         if (btnBack->IsClicked()) menuPage = 0;
 
         if (btnSlot1->IsClicked() && FileExists(1)) SceneManager::ChangeScene(new TutorialScene(1));
         if (btnSlot2->IsClicked() && FileExists(2)) SceneManager::ChangeScene(new TutorialScene(2));
         if (btnSlot3->IsClicked() && FileExists(3)) SceneManager::ChangeScene(new TutorialScene(3));
     }
+    else if (menuPage == 3) {
+        if (btnYes->IsClicked()) gGameRunning = false;
+        if (btnNo->IsClicked()) menuPage = 0;
+    }
 }
 
 void MainMenu::Draw() {
     AEGfxSetCamPosition(0.0f, 0.0f);
     AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+
+    if (bg && meshManager) {
+        bg->Draw(meshManager->GetMesh(TEXTURE_SQUARE));
+    }
 
     if (menuPage == 0) {
         btnPlay->Draw();
@@ -94,17 +105,34 @@ void MainMenu::Draw() {
         btnCredits->Draw();
         btnQuit->Draw();
     }
-    else {
+    else if (menuPage == 1 || menuPage == 2) {
         btnSlot1->Draw();
         btnSlot2->Draw();
         btnSlot3->Draw();
         btnBack->Draw();
+    }
+    else if (menuPage == 3) {
+        btnYes->Draw();
+        btnNo->Draw();
+
+        char line1[64];
+        snprintf(line1, sizeof(line1), "Quit to Desktop?");
+        float w1 = 0.0f, h1 = 0.0f;
+        AEGfxGetPrintSize(Button::fontId, line1, 1.0f, &w1, &h1);
+        AEGfxPrint(Button::fontId, line1, -(w1 / 2.0f), 0.15f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
     }
 }
 
 void MainMenu::Free() {
     delete btnPlay; delete btnLoad; delete btnSettings; delete btnCredits; delete btnQuit;
     delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
+    delete btnYes; delete btnNo;
+
+    if (bg) {
+        delete bg;
+        bg = nullptr;
+    }
+
     Button::FreeResources();
 }
 

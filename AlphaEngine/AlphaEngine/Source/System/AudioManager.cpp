@@ -48,32 +48,17 @@ AudioManager::~AudioManager()
 
 void AudioManager::SetMute()
 {
-	if (isMuted)
-	{
-		if (BGMplaying)
-		{
-			ResumeMusic();
-		}
-
-		if (SFXplaying)
-		{
-			ResumeEffect();
-		}
-	}
-	else
-	{
-		if (BGMplaying)
-		{
-			PauseMusic();
-		}
-
-		if (SFXplaying)
-		{
-			PauseEffect();
-		}
-	}
-
 	isMuted = !isMuted;
+
+	// Determine what the volume should be based on the new mute status
+	float bgmVol = isMuted ? 0.0f : localBGMVolume;
+	float sfxVol = isMuted ? 0.0f : localSFXVolume;
+
+	// Apply volumes to the groups. 
+	// This mutes everything currently playing AND anything that starts playing later.
+	AEAudioSetGroupVolume(BGM_LOOP, bgmVol);
+	AEAudioSetGroupVolume(SFX_LOOP, sfxVol);
+	AEAudioSetGroupVolume(SFX_SINGLE, sfxVol);
 }
 
 void AudioManager::Trim(std::string& str)
@@ -111,11 +96,11 @@ void AudioManager::ParseCSV(const std::string& csvPath)
 		std::stringstream ss(line);
 		std::string name, filename, isMusicStr;
 
-		// Column A — clip name
+		// Column A ï¿½ clip name
 		if (!std::getline(ss, name, ',')) continue;
-		// Column B — audio filename
+		// Column B ï¿½ audio filename
 		if (!std::getline(ss, filename, ',')) continue;
-		// Column C — is music (true/false)
+		// Column C ï¿½ is music (true/false)
 		if (!std::getline(ss, isMusicStr, ',')) continue;
 
 		Trim(name);
@@ -158,7 +143,6 @@ void AudioManager::LoadAll()
 
 const AudioClip* AudioManager::GetAudioClip(const std::string& name) const
 {
-	// Strict audio check if audio is in list and has valid audio
 	for (int i = 0; i < ClipCount; ++i)
 	{
 		if (AudioClipList[i].name == name)
@@ -181,11 +165,6 @@ const AudioClip* AudioManager::GetAudioClip(const std::string& name) const
 
 void AudioManager::PlaySFXOneShot(const std::string& name, f32 volume, f32 pitch)
 {
-	if (isMuted)
-	{
-		return;
-	}
-
 	const AudioClip* index = GetAudioClip(name);
 	if (index != nullptr)
 	{
@@ -195,11 +174,6 @@ void AudioManager::PlaySFXOneShot(const std::string& name, f32 volume, f32 pitch
 
 void AudioManager::PlayEffect(const std::string& name, f32 volume, f32 pitch)
 {
-	if (isMuted)
-	{
-		return;
-	}
-
 	const AudioClip* index = GetAudioClip(name);
 	if (index != nullptr)
 	{
@@ -232,11 +206,6 @@ bool AudioManager::GetEffectGroup() const
 
 void AudioManager::PlayMusic(const std::string& name, f32 volume, f32 pitch)
 {
-	if (isMuted)
-	{
-		return;
-	}
-
 	const AudioClip* index = GetAudioClip(name);
 	if (index != nullptr)
 	{

@@ -14,13 +14,13 @@
 @brief      This file contains definitions of functions and variables
              used for the LoseScene class, which is the scene that is shown
              when the player dies, and contains buttons to restart the level,
-			load from a save, or return to the main menu.
+             load from a save, or return to the main menu.
 *//*_______________________________________________________________________*/
 
 LoseScene::LoseScene(int idToRestart) {
     restartLevelID = idToRestart;
-	player = Player::GetInstance();
-	player->SetHealth(100);
+    player = Player::GetInstance();
+    player->SetHealth(100);
 }
 
 void LoseScene::Load() {
@@ -44,7 +44,6 @@ void LoseScene::Init() {
 void LoseScene::Update() {
     if (menuPage == 0) {
         if (btnRestart->IsClicked()) {
-            //holds the level and load them accordingly to where player died
             if (restartLevelID == 0) {
                 SceneManager::ChangeScene(new TutorialScene());
             }
@@ -91,7 +90,13 @@ void LoseScene::Draw() {
     }
 
     if (Button::fontId != -1) {
-        AEGfxPrint(Button::fontId, "YOU DIED!", -0.1f, 0.3f, 1.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+        char loseMsg[64];
+        snprintf(loseMsg, sizeof(loseMsg), "YOU DIED!");
+
+        float w = 0.0f, h = 0.0f;
+        AEGfxGetPrintSize(Button::fontId, loseMsg, 1.5f, &w, &h);
+
+        AEGfxPrint(Button::fontId, loseMsg, -(w / 2.0f), 0.35f, 1.5f, 1.0f, 1.0f, 1.0f, 1.0f);
     }
 }
 

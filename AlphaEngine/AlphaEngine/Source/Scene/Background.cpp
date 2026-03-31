@@ -1,17 +1,19 @@
 #include "Background.h"
 #include <iostream>
 
-Background::Background()
+//can now be used for any background by passing in the file path of the texture to use, instead of hardcoding it
+Background::Background(const char* texturePath)
 	: projTex{ }
 {
 	transform.SetScale(1600, 900);
 	transform.SetPosition(0, 0);
 
-	projTex = AEGfxTextureLoad("Assets/Sprites/Background/orig_big.png");
+	//load the texture using the provided path instead of hardcoding it
+	projTex = AEGfxTextureLoad(texturePath);
 
 	if (projTex)
 	{
-		std::cout << "projTex" << std::endl;
+		std::cout << "Loaded Background: " << texturePath << std::endl;
 	}
 }
 

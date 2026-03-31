@@ -64,11 +64,18 @@ void BaseScene::Load() {
 	btnSlot2 = new Button(0.0f, 0.0f, 200.0f, 50.0f, "Slot 2");
 	btnSlot3 = new Button(0.0f, 0.0f, 200.0f, 50.0f, "Slot 3");
 	btnBack = new Button(0.0f, 0.0f, 200.0f, 50.0f, "Back");
+
+	btnYes = new Button(0.0f, 0.0f, 150.0f, 50.0f, "Yes");
+	btnNo = new Button(0.0f, 0.0f, 150.0f, 50.0f, "No");
+
+	btnSettings = new Button(0.0f, 0.0f, 200.0f, 50.0f, "Settings");
+	btnToggleMute = new Button(0.0f, 0.0f, 250.0f, 50.0f, "Mute: OFF");
+	btnToggleFullscreen = new Button(0.0f, 0.0f, 250.0f, 50.0f, "Fullscreen: OFF");
+	btnSettingsBack = new Button(0.0f, 0.0f, 200.0f, 50.0f, "Back");
 }
 
 void BaseScene::Init() {
 	player->GetTransform().SetPosition(300.0f, 900.0f);
-	player->TriggerCameraShake(0.f, 0.f); // Reset Camera Shake
 
 	if (!audio->GetMusicGroup())
 	{
@@ -146,16 +153,11 @@ void BaseScene::Update() {
 			map->SetTile(TILE_TYPE::OPEN_DOOR, DoorTilePosition.y, DoorTilePosition.x);
 		}
 
-		// DOOR COLLISION CHECK
 		if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR) {
 			if (nextScene != nullptr) {
 				BaseScene* pNext = nextScene;
 				nextScene = nullptr;
 				SceneManager::ChangeScene(pNext);
-				//ParticleManager::GetInstance()->ClearAll();
-			}
-			else {
-				//SceneManager::ChangeScene(new MainMenu());
 			}
 		}
 
@@ -245,10 +247,11 @@ void BaseScene::Update() {
 		AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
 
 		if (menuPage == 0) {
-			btnResume->SetPosition(CamPos.x, CamPos.y + 100.0f);
-			btnSaveMenu->SetPosition(CamPos.x, CamPos.y + 30.0f);
-			btnLoadMenu->SetPosition(CamPos.x, CamPos.y - 40.0f);
-			btnExit->SetPosition(CamPos.x, CamPos.y - 110.0f);
+			btnResume->SetPosition(CamPos.x, CamPos.y + 120.0f);
+			btnSaveMenu->SetPosition(CamPos.x, CamPos.y + 50.0f);
+			btnLoadMenu->SetPosition(CamPos.x, CamPos.y - 20.0f);
+			btnSettings->SetPosition(CamPos.x, CamPos.y - 90.0f);
+			btnExit->SetPosition(CamPos.x, CamPos.y - 160.0f);
 
 			if (btnResume->IsClicked()) isPaused = false;
 			if (btnSaveMenu->IsClicked()) {
@@ -263,9 +266,10 @@ void BaseScene::Update() {
 				btnSlot2->SetLabel(FileExists(2) ? "Load Slot 2" : "Empty");
 				btnSlot3->SetLabel(FileExists(3) ? "Load Slot 3" : "Empty");
 			}
-			if (btnExit->IsClicked()) SceneManager::ChangeScene(new MainMenu());
+			if (btnSettings->IsClicked()) menuPage = 4;
+			if (btnExit->IsClicked()) menuPage = 3;
 		}
-		else {
+		else if (menuPage == 1 || menuPage == 2) {
 			btnSlot1->SetPosition(CamPos.x, CamPos.y + 100.0f);
 			btnSlot2->SetPosition(CamPos.x, CamPos.y + 30.0f);
 			btnSlot3->SetPosition(CamPos.x, CamPos.y - 40.0f);
@@ -276,11 +280,43 @@ void BaseScene::Update() {
 			if (btnSlot2->IsClicked()) { if (menuPage == 1) SaveGame(2); else LoadGame(2); menuPage = 0; }
 			if (btnSlot3->IsClicked()) { if (menuPage == 1) SaveGame(3); else LoadGame(3); menuPage = 0; }
 		}
+		else if (menuPage == 3) {
+			btnYes->SetPosition(CamPos.x - 100.0f, CamPos.y - 50.0f);
+			btnNo->SetPosition(CamPos.x + 100.0f, CamPos.y - 50.0f);
+
+			if (btnYes->IsClicked()) SceneManager::ChangeScene(new MainMenu());
+			if (btnNo->IsClicked()) menuPage = 0;
+		}
+		else if (menuPage == 4) {
+			btnToggleMute->SetPosition(CamPos.x, CamPos.y + 50.0f);
+			btnToggleFullscreen->SetPosition(CamPos.x, CamPos.y - 20.0f);
+			btnSettingsBack->SetPosition(CamPos.x, CamPos.y - 100.0f);
+
+			// Mute logic
+			if (btnToggleMute->IsClicked()) {
+				audio->SetMute();
+			}
+			btnToggleMute->SetLabel(audio->GetMuteStatus() ? "Mute: ON" : "Mute: OFF");
+
+			// Fullscreen logic
+			if (btnToggleFullscreen->IsClicked()) {
+				bool isFullScreen = AESysIsFullScreen();
+				AESysSetFullScreen(!isFullScreen);
+			}
+			btnToggleFullscreen->SetLabel(AESysIsFullScreen() ? "Fullscreen: ON" : "Fullscreen: OFF");
+
+			if (btnSettingsBack->IsClicked()) menuPage = 0;
+		}
 	}
 }
 
 void BaseScene::Draw() {
-	bg->Draw(meshManager->GetMesh(TEXTURE_SQUARE));
+
+	if (!meshManager) return;
+
+	if (bg && meshManager) {
+		bg->Draw(meshManager->GetMesh(TEXTURE_SQUARE));
+	}
 	map->RenderMap();
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -315,14 +351,45 @@ void BaseScene::Draw() {
 		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
 
 		if (menuPage == 0) {
-			btnResume->Draw(); btnSaveMenu->Draw(); btnLoadMenu->Draw(); btnExit->Draw();
+			btnResume->Draw(); btnSaveMenu->Draw(); btnLoadMenu->Draw(); btnSettings->Draw(); btnExit->Draw();
 		}
-		else {
+		else if (menuPage == 1 || menuPage == 2) {
 			btnSlot1->Draw(); btnSlot2->Draw(); btnSlot3->Draw(); btnBack->Draw();
+		}
+		else if (menuPage == 3) {
+			btnYes->Draw();
+			btnNo->Draw();
+
+			char line1[64];
+			snprintf(line1, sizeof(line1), "Are you sure you want to quit?");
+			float w1 = 0.0f, h1 = 0.0f;
+			AEGfxGetPrintSize(Button::fontId, line1, 1.0f, &w1, &h1);
+			AEGfxPrint(Button::fontId, line1, -(w1 / 2.0f), 0.15f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+
+			char line2[64];
+			snprintf(line2, sizeof(line2), "Unsaved progress will be lost.");
+			float w2 = 0.0f, h2 = 0.0f;
+			AEGfxGetPrintSize(Button::fontId, line2, 1.0f, &w2, &h2);
+			AEGfxPrint(Button::fontId, line2, -(w2 / 2.0f), 0.05f, 1.0f, 1.0f, 0.5f, 0.5f, 1.0f);
+		}
+		else if (menuPage == 4) {
+			btnToggleMute->Draw();
+			btnToggleFullscreen->Draw();
+			btnSettingsBack->Draw();
+
+			char title[64];
+			snprintf(title, sizeof(title), "Settings");
+			float wt = 0.0f, ht = 0.0f;
+			AEGfxGetPrintSize(Button::fontId, title, 1.0f, &wt, &ht);
+			AEGfxPrint(Button::fontId, title, -(wt / 2.0f), 0.25f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 		}
 
 		if (popupTimer > 0.0f) {
-			AEGfxPrint(Button::fontId, "Game Saved!", -0.1f, 0.35f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f);
+			char msg[64];
+			snprintf(msg, sizeof(msg), "Game Saved!");
+			float wm = 0.0f, hm = 0.0f;
+			AEGfxGetPrintSize(Button::fontId, msg, 1.0f, &wm, &hm);
+			AEGfxPrint(Button::fontId, msg, -(wm / 2.0f), 0.35f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f);
 			popupTimer -= (f32)AEFrameRateControllerGetFrameTime();
 		}
 	}
@@ -344,32 +411,24 @@ void BaseScene::LoadGame(int slot) {
 	std::ifstream f(path);
 	if (f.is_open()) {
 
-		int savedLevelID; //hold the level
+		int savedLevelID;
 		float x, y, hp;
 
-		// Read the levelID first, then the coordinates and health
 		if (f >> savedLevelID >> x >> y >> hp) {
 
-			// Always restore player stats
 			player->GetTransform().SetPosition(x, y);
 			player->SetHealth(hp);
 			isPaused = false;
 
-			// If the save file is from a different level than the one that was saved
 			if (savedLevelID != this->levelID) {
 
 				if (savedLevelID == 1) {
-					// Route to Level 1
 					SceneManager::ChangeScene(new BaseScene(slot));
 				}
-
 				else if (savedLevelID == 0) {
-					// Route to Main Menu
 					SceneManager::ChangeScene(new TutorialScene(slot));
 				}
-
 				else if (savedLevelID == 2) {
-					// Route to Boss Room
 					SceneManager::ChangeScene(new BossScene(slot));
 				}
 			}
@@ -408,8 +467,13 @@ void BaseScene::Free() {
 void BaseScene::Unload() {
 
 	delete btnResume; delete btnSaveMenu; delete btnLoadMenu; delete btnExit;
-
 	delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
+	delete btnYes; delete btnNo;
+
+	delete btnSettings;
+	delete btnToggleMute;
+	delete btnToggleFullscreen;
+	delete btnSettingsBack;
 
 	player = nullptr;
 	abilityHandler = nullptr;

@@ -13,9 +13,9 @@ class Button {
 public:
     Button(float x, float y, float w, float h, const char* text);
 
-    void Draw();        
-    bool IsHovered();   
-    bool IsClicked();   
+    void Draw() const;        
+    bool IsHovered() const;   
+    bool IsClicked() const;   
     void SetPosition(float x, float y);
     void SetLabel(const char* text);
 

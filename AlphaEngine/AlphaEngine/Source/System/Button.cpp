@@ -33,7 +33,7 @@ void Button::SetLabel(const char* text) {
     }
 }
 
-void Button::Draw()
+void Button::Draw() const
 {
     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
     AEGfxSetBlendMode(AE_GFX_BM_BLEND);
@@ -79,11 +79,11 @@ void Button::Draw()
         textX -= (textW / 2.0f);
         textY -= (textH / 2.0f);
 
-        AEGfxPrint(fontId, label, textX, textY, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+        AEGfxPrint(fontId, label, textX, textY, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
     }
 }
 
-bool Button::IsHovered()
+bool Button::IsHovered() const 
 {
 	HWND hwnd = AESysGetWindowHandle(); // Get the window handle from the engine
 	POINT mousePos; // Structure to hold mouse position
@@ -118,14 +118,14 @@ bool Button::IsHovered()
         worldMouseY > y - h / 2.0f && worldMouseY < y + h / 2.0f);
 }
 
-bool Button::IsClicked()
+bool Button::IsClicked() const 
 {
     return IsHovered() && AEInputCheckTriggered(AEVK_LBUTTON);
 }
 
 void Button::LoadResources() {
     if (sprite == nullptr) {
-        sprite = AEGfxTextureLoad("Assets/Button/Default/TransParent center/panel-transparent-center-023.png");
+        sprite = AEGfxTextureLoad("Assets/Button/Default/Panel/panel-011.png");
         if (!sprite) std::cout << "CRITICAL ERROR: Texture Not Found! Check path." << std::endl;
     }
 

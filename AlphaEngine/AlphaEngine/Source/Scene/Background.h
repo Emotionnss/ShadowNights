@@ -5,7 +5,7 @@
 class Background : public GameObject
 {
 public:
-	Background();
+	Background(const char* texturePath = "Assets/Sprites/Background/orig_big.png");
 	~Background();
 
 	Transform2D transform;

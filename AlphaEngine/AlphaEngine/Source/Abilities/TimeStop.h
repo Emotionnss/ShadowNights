@@ -5,7 +5,7 @@
 			player ability that allows the user to stop time in an area around the activated position
 *//*_______________________________________________________________________*/
 #include "../System/MeshManager.h"
-#include "../Player/Transform2D.h"
+#include "../GameObject/Transform2D.h"
 #include "../Player/Player.h"
 #include "../Sprite/Sprite.h"
 #include "../Enemy/BaseEnemy.h"

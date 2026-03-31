@@ -8,7 +8,7 @@
 #pragma once
 #include "AEEngine.h"
 #include "../System/MeshManager.h"
-#include "../Player/Transform2D.h"
+#include "../GameObject/Transform2D.h"
 
 class Slider
 {

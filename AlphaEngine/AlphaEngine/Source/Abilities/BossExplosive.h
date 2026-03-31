@@ -6,7 +6,7 @@
 *//*_______________________________________________________________________*/
 
 #include "../Player/Player.h"
-#include "../Player/Transform2D.h"
+#include "../GameObject/Transform2D.h"
 #include "../System/MeshManager.h"
 #include "../Projectiles/BaseProjectile.h"
 

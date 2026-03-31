@@ -2,7 +2,7 @@
 
 #include "AEEngine.h"
 #include "../System/SingletonTemplate.h"
-#include "GameObject.h"
+#include "../GameObject/GameObject.h"
 #include "../System/Map.h"
 #include "../System/CSVManager.h"
 #include "../Utils/utils.h"

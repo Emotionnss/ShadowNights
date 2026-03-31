@@ -1,5 +1,5 @@
 #pragma once
-#include "../Player/GameObject.h"
+#include "../GameObject/GameObject.h"
 #include "../Sprite/Sprite.h"
 #include "../Projectiles/EnemyProjectile.h"
 #include "../System/SettingsManager.h"

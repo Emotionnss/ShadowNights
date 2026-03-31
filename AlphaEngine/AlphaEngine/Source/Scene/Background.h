@@ -1,5 +1,5 @@
 #pragma once
-#include "../Player/GameObject.h"
+#include "../GameObject/GameObject.h"
 #include "../System/MeshManager.h"
 
 class Background : public GameObject

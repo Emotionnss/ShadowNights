@@ -6,7 +6,7 @@
 *//*_______________________________________________________________________*/
 
 #pragma once
-#include "../Player/Transform2D.h"
+#include "../GameObject/Transform2D.h"
 
 void ShutdownKnifeResources();
 

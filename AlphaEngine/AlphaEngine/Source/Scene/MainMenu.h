@@ -31,4 +31,7 @@ private:
     Button* btnQuit = nullptr;
     Button* btnYes = nullptr;
     Button* btnNo = nullptr;
+
+    AEGfxTexture* logo{};
+    Transform2D logoTfm{};
 };

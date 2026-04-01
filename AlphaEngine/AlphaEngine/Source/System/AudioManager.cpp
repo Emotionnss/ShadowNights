@@ -212,6 +212,7 @@ void AudioManager::PlayMusic(const std::string& name, f32 volume, f32 pitch)
 		AEAudioStopGroup(BGM_LOOP);
 		AEAudioPlay(index->audio, BGM_LOOP, volume, pitch, -1);
 		BGMplaying = true;
+		ResumeMusic();
 	}
 }
 

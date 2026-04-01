@@ -206,17 +206,42 @@ void BaseScene::Update() {
 				BaseEnemy* enemy = enemyList[j];
 				if (enemy->IsDying()) continue;
 
-				AEVec2 enemyPos = enemy->transform.GetPosition();
-				AEVec2 enemyHalf = { fabs(enemy->transform.GetScale().x) / 2.0f, enemy->transform.GetScale().y / 2.0f };
+				//Boss weakpoint collision behaviour
+				BossEnemy* boss = dynamic_cast<BossEnemy*>(enemy);
+				if (boss != nullptr)
+				{
+					if (boss->GetWeakpoint().active)
+					{
+						Weakpoint const& weakpoint{ boss->GetWeakpoint() };
+						AEVec2 bossWeakpointPos = weakpoint.transform.GetPosition();
+						AEVec2 bossWeakpointHalf = { fabs(weakpoint.transform.GetScale().x) / 2.0f, weakpoint.transform.GetScale().y / 2.0f };
 
-				if (AABBOverlap(projPos, projHalf, enemyPos, enemyHalf)) {
-					if (dynamic_cast<SwordProjectile*>(pProj) == nullptr) {
-						enemy->TakeDamage(3);
-						destroyProjectile = true;
-						break;
+						if (AABBOverlap(projPos, projHalf, bossWeakpointPos, bossWeakpointHalf)) {
+							if (dynamic_cast<SwordProjectile*>(pProj) == nullptr) {
+								boss->TakeDamage(3);
+								destroyProjectile = true;
+								break;
+							}
+							else {
+								boss->TakeDamage(5);
+							}
+						}
 					}
-					else {
-						enemy->TakeDamage(5);
+				}
+				else
+				{
+					AEVec2 enemyPos = enemy->transform.GetPosition();
+					AEVec2 enemyHalf = { fabs(enemy->transform.GetScale().x) / 2.0f, enemy->transform.GetScale().y / 2.0f };
+
+					if (AABBOverlap(projPos, projHalf, enemyPos, enemyHalf)) {
+						if (dynamic_cast<SwordProjectile*>(pProj) == nullptr) {
+							enemy->TakeDamage(3);
+							destroyProjectile = true;
+							break;
+						}
+						else {
+							enemy->TakeDamage(5);
+						}
 					}
 				}
 			}

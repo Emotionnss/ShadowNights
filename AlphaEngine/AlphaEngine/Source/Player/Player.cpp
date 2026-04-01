@@ -400,6 +400,11 @@ void Player::UpdateCameraPosition(f32 _dt)
 		float offsetX = (AERandFloat() * 2.f - 1.f) * currentIntensity;
 		float offsetY = (AERandFloat() * 2.f - 1.f) * currentIntensity;
 
+		if (!SettingsManager::GetInstance()->GetCameraShake())
+		{
+			return;
+		}
+
 		cameraPosition.x += offsetX;
 		cameraPosition.y += offsetY;
 	}
@@ -419,6 +424,10 @@ void Player::Update(float deltaTime)
 	if (canMove)
 	{
 		HandleInput();
+	}
+	else
+	{
+		input.x = 0;
 	}
 
 	AEVec2 currentForces{ 0.f, gravity }; // Acceleration

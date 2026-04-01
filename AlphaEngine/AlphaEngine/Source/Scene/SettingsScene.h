@@ -33,6 +33,7 @@ private:
     // Example Content Buttons
     Button* btnToggleMute = nullptr;
     Button* btnToggleFullscreen = nullptr;
+    Button* btnToggleCameraShake = nullptr;
 
     // Scene Specific Parameters
 };

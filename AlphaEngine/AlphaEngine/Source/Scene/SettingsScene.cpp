@@ -27,6 +27,7 @@ void SettingsScene::Load() {
 	// Create Example Content Buttons (Right side of screen) (can change positions/sizes as needed)
 	btnToggleMute = new Button(100.0f, 100.0f, 250.0f, 50.0f, "Mute: OFF");
 	btnToggleFullscreen = new Button(100.0f, 100.0f, 250.0f, 50.0f, "Fullscreen: OFF");
+	btnToggleCameraShake = new Button(100.0f, 100.0f, 250.0f, 50.0f, "Camera Shake: OFF");
 }
 
 void SettingsScene::Init() {
@@ -80,6 +81,12 @@ void SettingsScene::Update() {
 	case SETTINGS_TAB::GAMEPLAY:
 		// TODO: Add keybinding buttons or difficulty toggles here
 		// Ain't no way I doing keybindings yet LMAO
+		if (btnToggleCameraShake->IsClicked()) {
+			SettingsManager::GetInstance()->SetCameraShake();
+		}
+
+		btnToggleCameraShake->SetLabel(SettingsManager::GetInstance()->GetCameraShake() ? "Camera Shake: ON" : "Camera Shake: OFF");
+
 		break;
 	}
 }
@@ -112,6 +119,7 @@ void SettingsScene::Draw() {
 
 	case SETTINGS_TAB::GAMEPLAY:
 		AEGfxPrint(Button::fontId, "Gameplay Settings", 0.0f, 0.6f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+		btnToggleCameraShake->Draw();
 		// TODO: Draw keybind configs here
 		break;
 	}
@@ -130,4 +138,5 @@ void SettingsScene::Unload() {
 
 	delete btnToggleMute;
 	delete btnToggleFullscreen;
+	delete btnToggleCameraShake;
 }

@@ -78,4 +78,5 @@ protected:
     Button* btnToggleMute = nullptr;
     Button* btnToggleFullscreen = nullptr;
     Button* btnSettingsBack = nullptr;
+    Button* btnToggleCameraShake = nullptr;
 };

@@ -77,10 +77,7 @@ void BaseScene::Load() {
 void BaseScene::Init() {
 	player->GetTransform().SetPosition(300.0f, 900.0f);
 
-	if (!audio->GetMusicGroup())
-	{
-		audio->PlayMusic(levelBGM, 1.f);
-	}
+	audio->PlayMusic(levelBGM, 1.f);
 
 	abilityHandler = new AbilityHandler();
 

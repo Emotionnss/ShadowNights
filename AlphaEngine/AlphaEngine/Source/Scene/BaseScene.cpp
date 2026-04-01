@@ -151,7 +151,8 @@ void BaseScene::Update() {
 			map->SetTile(TILE_TYPE::OPEN_DOOR, DoorTilePosition.y, DoorTilePosition.x);
 		}
 
-		if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR) {
+		if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR || 
+			player->GetCollidedYTile().tileType == TILE_TYPE::OPEN_DOOR) {
 			if (nextScene != nullptr) {
 				BaseScene* pNext = nextScene;
 				nextScene = nullptr;

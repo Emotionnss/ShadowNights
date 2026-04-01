@@ -1,3 +1,11 @@
+/*!
+@file       BossEnemy.h
+@author     Yap Yu Xuan Daevon (yuxuandaevon.yap), Bay Yeok Hao (yeokhao.bay)
+@brief      This file contains declarations of functions used by BossEnemy for
+            attacking the player. Also contains definitions of BOSS_STATE enum,
+            PendingAttack enum, Weakpoint struct
+*//*_______________________________________________________________________*/
+
 #pragma once
 #include "BaseEnemy.h"
 #include "../Abilities/BossLaser.h"
@@ -37,9 +45,24 @@ struct Weakpoint
 class BossEnemy : public BaseEnemy
 {
 public:
+    /**
+     @brief Default contructor
+     */
     BossEnemy();
+
+    /**
+     @brief Overriden destructor
+     */
     ~BossEnemy() override;
 
+    /**
+     @brief     Initializes the boss. Overrides Init function from BaseEnemy
+     @param f32 x - x position
+     @param f32 y - y position
+     @param f32 w - width of boss
+     @param f32 h - height of boss
+     @return void
+     */
     void Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName) override;
     void Update(f32 deltaTime) override;
     void Draw() override;
@@ -66,17 +89,69 @@ private:
     const f32 exhaustedTimer = 15.0f;
     const f32 deathTimer = 1.0f;
 
-    //FSM Functions
+    /**
+     @brief Main enemy finite-state machine handler called from Update
+     @param f32 deltaTime - elapsed time since last frame
+     @return void
+     */
     void EnemyFSM(f32 deltaTime);
+
+    /**
+     @brief Transition logic when entering the idling state
+     @param void
+     @return void
+     */
     void EnterIdling();
+
+    /**
+     @brief Transition logic when entering the moving state
+     @param void
+     @return void
+     */
     void EnterMoving();
+
+    /**
+     @brief Update logic for the moving state
+     @param f32 deltaTime - elapsed time since last frame
+     @return bool - true if movement completed / transition should occur, false otherwise
+     */
     bool UpdateMoving(f32 deltaTime);
+
+    /**
+     @brief Transition logic when entering the exhausted state
+     @param void
+     @return void
+     */
     void EnterExhausted();
+
+    /**
+     @brief Transition logic when entering the death state
+     @param void
+     @return void
+     */
     void EnterDeath();
+
+    /**
+     @brief Utility to update and clamp timers used by FSM
+     @param f32 deltaTime - elapsed time since last frame
+     @return bool - true if timer expired, false otherwise
+     */
     bool UpdateTimer(f32 deltaTime);
 
+    /**
+     @brief Activate the boss weakpoint (visuals/mechanics)
+     @param void
+     @return void
+     */
     void ActivateWeakpoint();
+
+    /**
+     @brief Update weakpoint movement and state each frame
+     @param f32 deltaTime - elapsed time since last frame
+     @return void
+     */
     void UpdateWeakpoint(f32 deltaTime);
+
 
     // Attack Logic
     bool isAttacking = false;
@@ -105,6 +180,11 @@ private:
 
     std::vector<BaseEnemy*> pendingSpawns;
 
+    /**
+     @brief Spawn a random enemy as part of boss behavior
+     @param void
+     @return void
+     */
     void SpawnRandomEnemy();
 };
 

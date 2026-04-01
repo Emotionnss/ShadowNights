@@ -341,6 +341,13 @@ void BaseScene::Draw() {
 	}
 	map->RenderMap();
 
+	TutorialScene* tutScene = dynamic_cast<TutorialScene*>(this);
+
+	if (tutScene != nullptr)
+	{
+		tutScene->RenderTutorialText();
+	}
+
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
 	ParticleManager::GetInstance()->Draw(meshManager->GetMesh(SQUARE));

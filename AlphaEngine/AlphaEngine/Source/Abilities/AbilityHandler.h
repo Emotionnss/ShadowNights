@@ -44,7 +44,7 @@ private:
 
 	AudioManager* audioManager{};//audio manager
 
-	bool showUI{};//show ui for cutscene in bossScene
+	bool showUI{true};//show ui for cutscene in bossScene
 public:
 	AbilityHandler();//constructor
 	~AbilityHandler();//destructor

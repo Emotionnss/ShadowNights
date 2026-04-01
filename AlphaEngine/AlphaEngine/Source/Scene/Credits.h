@@ -37,5 +37,10 @@ private:
 
     Sprite* bossSprite{};
     Transform2D bossTfm{};
+
+    AEGfxTexture* logoTex{};
+    Transform2D logoTfm{};
+
+    f32 logoAlpha{0.1f};
 };
 

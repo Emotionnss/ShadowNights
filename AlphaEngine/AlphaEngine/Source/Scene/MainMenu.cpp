@@ -35,20 +35,24 @@ void MainMenu::Load() {
 	bg = new Background("Assets/Sprites/Background/Dark Gothic Castle.png");
 	if (Button::fontId == -1) Button::LoadResources();
 
-	btnPlay = new Button(0.0f, 90.0f, 200.0f, 50.0f, "New Game");
-	btnLoad = new Button(0.0f, 30.0f, 200.0f, 50.0f, "Load Game");
-	btnSettings = new Button(0.0f, -30.0f, 200.0f, 50.0f, "Settings");
-	btnCredits = new Button(0.0f, -90.0f, 200.0f, 50.0f, "Credits");
-	btnQuit = new Button(0.0f, -150.0f, 200.0f, 50.0f, "Quit");
+	btnPlay = new Button(0.0f, 90.0f - 200.f, 200.0f, 50.0f, "New Game");//-200.f cause cheekang dk how to base y value off previous BUTTON LOOKING AT U CHEE KANG
+	btnLoad = new Button(0.0f, 30.0f - 200.f, 200.0f, 50.0f, "Load Game");
+	btnSettings = new Button(0.0f, -30.0f - 200.f, 200.0f, 50.0f, "Settings");
+	btnCredits = new Button(0.0f, -90.0f - 200.f, 200.0f, 50.0f, "Credits");
+	btnQuit = new Button(0.0f, -150.0f - 200.f, 200.0f, 50.0f, "Quit");
 
-	btnSlot1 = new Button(0.0f, 90.0f, 200.0f, 50.0f, "Slot 1");
-	btnSlot2 = new Button(0.0f, 30.0f, 200.0f, 50.0f, "Slot 2");
-	btnSlot3 = new Button(0.0f, -30.0f, 200.0f, 50.0f, "Slot 3");
-	btnBack = new Button(0.0f, -90.0f, 200.0f, 50.0f, "Back");
+	btnSlot1 = new Button(0.0f, 90.0f - 200.f, 200.0f, 50.0f, "Slot 1");
+	btnSlot2 = new Button(0.0f, 30.0f - 200.f, 200.0f, 50.0f, "Slot 2");
+	btnSlot3 = new Button(0.0f, -30.0f - 200.f, 200.0f, 50.0f, "Slot 3");
+	btnBack = new Button(0.0f, -90.0f - 200.f, 200.0f, 50.0f, "Back");
 
 	// Confirmation Buttons
-	btnYes = new Button(-100.0f, -50.0f, 150.0f, 50.0f, "Yes");
-	btnNo = new Button(100.0f, -50.0f, 150.0f, 50.0f, "No");
+	btnYes = new Button(-100.0f, -50.0f - 200.f, 150.0f, 50.0f, "Yes");
+	btnNo = new Button(100.0f, -50.0f - 200.f, 150.0f, 50.0f, "No");
+
+	logo = AEGfxTextureLoad("Assets/Credits/logo.png");
+	logoTfm.SetPosition(0.f, 200.f);
+	logoTfm.SetScale(600.f, 400.f);
 }
 
 void MainMenu::Init() {
@@ -122,8 +126,20 @@ void MainMenu::Draw() {
 		snprintf(line1, sizeof(line1), "Quit to Desktop?");
 		float w1 = 0.0f, h1 = 0.0f;
 		AEGfxGetPrintSize(Button::fontId, line1, 1.0f, &w1, &h1);
-		AEGfxPrint(Button::fontId, line1, -(w1 / 2.0f), 0.15f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(Button::fontId, line1, -(w1 / 2.0f), -0.25f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
+
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+	AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
+
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	AEGfxSetTransparency(1);
+
+	AEGfxTextureSet(logo, 0, 0);
+
+	AEGfxSetTransform(logoTfm.GetMatrix().m);
+	AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 }
 
 void MainMenu::Free() {
@@ -135,7 +151,10 @@ void MainMenu::Free() {
 		delete bg;
 		bg = nullptr;
 	}
-
+	if (logo)
+	{
+		AEGfxTextureUnload(logo);
+	}
 	Button::FreeResources();
 }
 

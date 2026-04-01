@@ -25,6 +25,7 @@ void CreditsScene::Init()
     batSprite = new Sprite(CSVManager::ReadInfo("batenemy"));
     shadowSprite = new Sprite(CSVManager::ReadInfo("shadow1"));
     bossSprite = new Sprite(CSVManager::ReadInfo("boss"));
+    logoTex = AEGfxTextureLoad("Assets/Credits/logo.png");
 
     pSTfm.SetPosition(-500.f, -1000.f);
     pSTfm.SetScale(200.f, 200.f);
@@ -45,36 +46,42 @@ void CreditsScene::Init()
     bossTfm.SetPosition(0.f, -3000.f);
     bossTfm.SetScale(300.f, 300.f);
     bossSprite->PlayAnimation("idle");
+
+    logoTfm.SetScale(600.f, 400.f);
+    logoTfm.SetPosition(0.f, -3500.f);
+
 }
 
 void CreditsScene::Update() {
     if (backBtn->IsClicked()) {
         SceneManager::ChangeScene(new MainMenu()); 
     }
-    scrollSpeed = AEInputCheckCurr(AEVK_LBUTTON) ? 500.f : 100.f;
-    AEVec2 tfm = creditsTfm.GetPosition();
-    tfm.y += scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime());
-    creditsTfm.SetPosition(tfm);
+    scrollSpeed = AEInputCheckCurr(AEVK_LBUTTON) ? 2000.f : 100.f;
+    AEVec2 tfm;
 
-    tfm = pSTfm.GetPosition();
-    tfm.y += scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime());
-    pSTfm.SetPosition(tfm);
+    creditsTfm.SetPosition(creditsTfm.GetPosition().x,creditsTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime() ));
 
-    tfm = archerTfm.GetPosition();
-    tfm.y += scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime());
-    archerTfm.SetPosition(tfm);
+    pSTfm.SetPosition(pSTfm.GetPosition().x, pSTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime()));
 
-    tfm = batTfm.GetPosition();
-    tfm.y += scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime());
-    batTfm.SetPosition(tfm);
+    archerTfm.SetPosition(archerTfm.GetPosition().x, archerTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime()));
 
-    tfm = shadowTfm.GetPosition();
-    tfm.y += scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime());
-    shadowTfm.SetPosition(tfm);
+    batTfm.SetPosition(batTfm.GetPosition().x, batTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime()));
 
-    tfm = bossTfm.GetPosition();
-    tfm.y += scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime());
-    bossTfm.SetPosition(tfm);
+    shadowTfm.SetPosition(shadowTfm.GetPosition().x, shadowTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime()));
+
+    bossTfm.SetPosition(bossTfm.GetPosition().x, bossTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime()));
+
+    if (logoTfm.GetPosition().y <= 190)
+        logoTfm.SetPosition(logoTfm.GetPosition().x, logoTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime()));
+    else
+    {
+        logoTfm.SetPosition(0.f, 200.f);
+        logoAlpha += static_cast<f32>(AEFrameRateControllerGetFrameTime());
+        if (logoAlpha >= 1.f)
+        {
+            SceneManager::ChangeScene(new MainMenu());
+        }
+    }
 
     playerSprite->Update();
     archerSprite->Update();
@@ -92,11 +99,18 @@ void CreditsScene::Draw() {
     AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
 
     AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-    AEGfxSetTransparency(100);
+    AEGfxSetTransparency(1);
 
     AEGfxTextureSet(creditsImage, 0, 0);
 
     AEGfxSetTransform(creditsTfm.GetMatrix().m);
+    AEGfxMeshDraw(meshManager->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+
+    AEGfxSetTransparency(logoAlpha);
+
+    AEGfxTextureSet(logoTex, 0, 0);
+
+    AEGfxSetTransform(logoTfm.GetMatrix().m);
     AEGfxMeshDraw(meshManager->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 
     backBtn->Draw();
@@ -136,6 +150,10 @@ void CreditsScene::Free() {
     {
         delete bossSprite;
         bossSprite = nullptr;
+    }
+    if (logoTex)
+    {
+        AEGfxTextureUnload(logoTex);
     }
 }
 

@@ -71,6 +71,7 @@ void BaseScene::Load() {
 	btnSettings = new Button(0.0f, 0.0f, 200.0f, 50.0f, "Settings");
 	btnToggleMute = new Button(0.0f, 0.0f, 250.0f, 50.0f, "Mute: OFF");
 	btnToggleFullscreen = new Button(0.0f, 0.0f, 250.0f, 50.0f, "Fullscreen: OFF");
+	btnToggleCameraShake = new Button(0.0f, 0.0f, 250.0f, 50.0f, "Camera Shake: OFF");
 	btnSettingsBack = new Button(0.0f, 0.0f, 200.0f, 50.0f, "Back");
 }
 
@@ -150,7 +151,8 @@ void BaseScene::Update() {
 			map->SetTile(TILE_TYPE::OPEN_DOOR, DoorTilePosition.y, DoorTilePosition.x);
 		}
 
-		if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR) {
+		if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR || 
+			player->GetCollidedYTile().tileType == TILE_TYPE::OPEN_DOOR) {
 			if (nextScene != nullptr) {
 				BaseScene* pNext = nextScene;
 				nextScene = nullptr;
@@ -312,7 +314,8 @@ void BaseScene::Update() {
 		else if (menuPage == 4) {
 			btnToggleMute->SetPosition(CamPos.x, CamPos.y + 50.0f);
 			btnToggleFullscreen->SetPosition(CamPos.x, CamPos.y - 20.0f);
-			btnSettingsBack->SetPosition(CamPos.x, CamPos.y - 100.0f);
+			btnToggleCameraShake->SetPosition(CamPos.x, CamPos.y -90.0f);
+			btnSettingsBack->SetPosition(CamPos.x, CamPos.y - 160.0f);
 
 			// Mute logic
 			if (btnToggleMute->IsClicked()) {
@@ -325,7 +328,14 @@ void BaseScene::Update() {
 				bool isFullScreen = AESysIsFullScreen();
 				AESysSetFullScreen(!isFullScreen);
 			}
+
 			btnToggleFullscreen->SetLabel(AESysIsFullScreen() ? "Fullscreen: ON" : "Fullscreen: OFF");
+
+			if (btnToggleCameraShake->IsClicked()) {
+				SettingsManager::GetInstance()->SetCameraShake();
+			}
+
+			btnToggleCameraShake->SetLabel(SettingsManager::GetInstance()->GetCameraShake() ? "Camera Shake: ON" : "Camera Shake: OFF");
 
 			if (btnSettingsBack->IsClicked()) menuPage = 0;
 		}
@@ -340,6 +350,13 @@ void BaseScene::Draw() {
 		bg->Draw(meshManager->GetMesh(TEXTURE_SQUARE));
 	}
 	map->RenderMap();
+
+	TutorialScene* tutScene = dynamic_cast<TutorialScene*>(this);
+
+	if (tutScene != nullptr)
+	{
+		tutScene->RenderTutorialText();
+	}
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
@@ -397,6 +414,7 @@ void BaseScene::Draw() {
 		else if (menuPage == 4) {
 			btnToggleMute->Draw();
 			btnToggleFullscreen->Draw();
+			btnToggleCameraShake->Draw();
 			btnSettingsBack->Draw();
 
 			char title[64];
@@ -495,6 +513,7 @@ void BaseScene::Unload() {
 	delete btnSettings;
 	delete btnToggleMute;
 	delete btnToggleFullscreen;
+	delete btnToggleCameraShake;
 	delete btnSettingsBack;
 
 	player = nullptr;

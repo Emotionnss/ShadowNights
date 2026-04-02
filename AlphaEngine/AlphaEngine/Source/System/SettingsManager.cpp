@@ -44,6 +44,16 @@ void SettingsManager::CheckSettingsInputs()
 	}
 }
 
+bool SettingsManager::GetCameraShake()
+{
+	return cameraShake;
+}
+
+void SettingsManager::SetCameraShake()
+{
+	cameraShake = !cameraShake;
+}
+
 bool SettingsManager::GetPlayerColDebug() const
 {
 	return playerCollisionDebug;

@@ -4,7 +4,7 @@
 
 /*!
 @file       TutorialScene.h
-@author     Lim Chee Kang (l.cheekang)
+@author     Lim Chee Kang (l.cheekang), Yap Yu Xuan Daevon (yuxuandaevon.yap)
 @brief      This file contains definitions of functions and variables
              used for the TutorialScene class, which is the first scene of the game,
              and contains the specific implementation of the scene, such as the
@@ -53,7 +53,7 @@ public:
         {
             AEVec2 scale{};
 
-            s32 count{};
+            s32 count{ max(1, static_cast<int>(data.size()) - 3) };
 
             //Determine scale
             for (std::vector<std::string>::iterator it = data.begin() + 3; it != data.end(); ++it)
@@ -62,10 +62,19 @@ public:
                 AEGfxGetPrintSize(fontId, it->c_str(), 36, &tmpScale.x, &tmpScale.y);
 
                 scale.x = tmpScale.x > scale.x ? tmpScale.x : scale.x;
-                scale.y += tmpScale.y / (1.5f - count++ * 0.15f);
+                if (data.size() <= 3 + 2)
+                {
+                    scale.y += tmpScale.y / 0.7;
+                }
+                else
+                {
+                    scale.y += tmpScale.y * (1.0f + count++ * 0.025f);
+                }
             }
 
-            AEVec2Scale(&scale, &scale, tileSize / 3.f);
+            //AEVec2Scale(&scale, &scale, tileSize / 4.f);
+            scale.x *= tileSize / 3.f;
+            scale.y *= tileSize / 4.f;
 
             TutorialText* text = new TutorialText(
                 AEVec2{ std::stof(data[1]) * tileSize, std::stof(data[2]) * tileSize }, scale, data[0]);
@@ -88,7 +97,6 @@ public:
     void Draw()
     {
         BaseScene::Draw();
-        RenderTutorialText();
     }
 
     void Unload()

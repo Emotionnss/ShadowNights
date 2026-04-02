@@ -4,6 +4,7 @@
 #include "System/Map.h"
 #include "Scene/TutorialScene.h"
 #include "Scene/MainMenu.h"
+#include "Scene/Splashscreen.h"
 #include "System/SettingsManager.h"
 #include <iostream>
 #include <vector>
@@ -31,7 +32,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
     AudioManager* aManager = AudioManager::GetInstance();
 
-    SceneManager::ChangeScene(new MainMenu());
+    SceneManager::ChangeScene(new Splashscreen());
 
     while (gGameRunning) {
 

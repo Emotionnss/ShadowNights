@@ -43,6 +43,7 @@
     <ClCompile Include="Source\Scene\SettingsScene.cpp" />
     <ClCompile Include="Source\GameObject\GameObject.cpp" />
     <ClCompile Include="Source\GameObject\Transform2D.cpp" />
+    <ClCompile Include="Source\Scene\Splashscreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Abilities\BossExplosive.h" />
@@ -87,5 +88,6 @@
     <ClInclude Include="Source\Scene\SettingsScene.h" />
     <ClInclude Include="Source\GameObject\GameObject.h" />
     <ClInclude Include="Source\GameObject\Transform2D.h" />
+    <ClInclude Include="Source\Scene\Splashscreen.h" />
   </ItemGroup>
 </Project>

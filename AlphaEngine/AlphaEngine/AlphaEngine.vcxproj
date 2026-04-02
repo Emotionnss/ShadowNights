@@ -53,6 +53,7 @@
     <ClCompile Include="Source\Utils\utils.cpp" />
     <ClCompile Include="Source\Scene\WinScene.cpp" />
     <ClCompile Include="Source\Scene\TutorialScene.cpp" />
+    <ClCompile Include="Source\Scene\Splashscreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\GameObject\GameObject.h" />
@@ -97,6 +98,7 @@
     <ClInclude Include="Source\Utils\utils.h" />
     <ClInclude Include="Source\Scene\WinScene.h" />
     <ClInclude Include="Source\Scene\TutorialScene.h" />
+    <ClInclude Include="Source\Scene\Splashscreen.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

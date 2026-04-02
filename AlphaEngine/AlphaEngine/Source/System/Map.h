@@ -219,13 +219,6 @@ public:
 	bool LoadMap(std::string fileName);
 
 	/*!
-	@brief	Saves the map by using CSVManager to write to csv
-	@param	std::string fileName - name of the file
-	@return bool
-	*/
-	bool SaveMap(std::string fileName);
-
-	/*!
 	@brief	Render the map by using the data from the map array
 	@param	void
 	@return void

@@ -294,32 +294,6 @@ bool Map::LoadMap(std::string fileName)
 	return true;
 }
 
-
-bool Map::SaveMap(std::string fileName)
-{
-	std::vector<std::vector<s32>> mapData;
-
-	//mapData row and column must be reversed for it to save properly
-	for (s32 i = 0; i < NUM_COLUMN; i++)
-	{
-		std::vector<s32> columnData;
-
-		for (s32 j = 0; j < NUM_ROW; j++)
-		{
-			columnData.push_back(static_cast<s32>(map[j][i].tileType));
-		}
-
-		mapData.push_back(columnData);
-	}
-
-	if (CSVManager::write(fileName, NUM_ROW, NUM_COLUMN, mapData))
-	{
-		return true;
-	}
-
-	return false;
-}
-
 void Map::RenderMap()
 {
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);

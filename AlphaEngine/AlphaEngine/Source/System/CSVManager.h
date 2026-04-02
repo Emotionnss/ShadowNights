@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include "AEEngine.h"
 
 class CSVManager
 {
@@ -18,15 +19,19 @@ public:
 	CSVManager();
 	~CSVManager();
 
-	//Not used currently
-	static bool write(std::string fileName, const int TILE_ROW_NUM, const int TILE_COLUMN_NUM, std::vector<std::vector<int>> data);
+	/**
+	 @brief Write to settings CSV file
+	 @param std::string fileName - name of the file to read
+	 @return std::vector<std::vector<int>> - map data
+	 */
+	static bool WriteSettingsInfo(std::vector<s32> data);
 
 	/**
 	 @brief Read map information from a CSV file
 	 @param std::string fileName - name of the file to read
 	 @return std::vector<std::vector<int>> - map data
 	 */
-	static std::vector<std::vector<int>> ReadMap(std::string fileName);
+	static std::vector<std::vector<s32>> ReadMap(std::string fileName);
 
 	/**
 	 @brief Read information from a CSV file

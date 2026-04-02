@@ -34,7 +34,7 @@ public:
 	s32 GetSettingsBGMVolume();
 	s32 GetSettingsSFXVolume();
 
-	void SaveSettings();
+	void SaveSettings(s32 bgm, s32 sfx);
 
 	bool GetPlayerColDebug() const;
 	void SetPlayerColDebug(bool d);

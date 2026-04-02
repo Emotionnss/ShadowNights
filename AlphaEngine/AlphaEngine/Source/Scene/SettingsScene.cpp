@@ -30,7 +30,7 @@ void SettingsScene::Load() {
 	btnToggleCameraShake = new Button(100.0f, 100.0f, 250.0f, 50.0f, "Camera Shake: OFF");
 
 	sliderBGM = new Slider({ 100.f, 50.f }, audio->GetBGMVolume());
-	sliderSFX = new Slider({ 100.f, 0.f }, audio->GetSFXVolume());
+	sliderSFX = new Slider({ 100.f, -50.f }, audio->GetSFXVolume());
 }
 
 void SettingsScene::Init() {

@@ -1,5 +1,6 @@
 #include "SettingsManager.h"
-
+#include "CSVManager.h"
+#include <vector>
 
 SettingsManager::SettingsManager() :
 	TILE_WIDTH{ 0.f },
@@ -28,9 +29,16 @@ s32 SettingsManager::GetSettingsSFXVolume()
 	return savedSFXVolume;
 }
 
-void SettingsManager::SaveSettings()
+void SettingsManager::SaveSettings(s32 bgm, s32 sfx)
 {
-	
+	std::vector<s32> vec;
+
+	vec.push_back(TILE_WIDTH);
+	vec.push_back(TILE_HEIGHT);
+	vec.push_back(bgm);
+	vec.push_back(sfx);
+
+	CSVManager::WriteSettingsInfo(vec);
 }
 
 void SettingsManager::CheckSettingsInputs()

@@ -45,7 +45,7 @@ AudioManager::~AudioManager()
 	AEAudioUnloadAudioGroup(SFX_LOOP);
 	AEAudioUnloadAudioGroup(SFX_SINGLE);
 
-	settings->SaveSettings();
+	settings->SaveSettings(localBGMVolume * 100, localSFXVolume * 100);
 }
 
 void AudioManager::SetMute()

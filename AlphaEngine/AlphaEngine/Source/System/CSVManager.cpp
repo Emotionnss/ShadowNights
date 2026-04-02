@@ -29,13 +29,12 @@ CSVManager::~CSVManager()
  @param data A vector containing the value of the vector which represents the tile map
  @return boolean variable
  */
-bool CSVManager::write(std::string fileName, const int TILE_ROW_NUM, const int TILE_COLUMN_NUM, std::vector<std::vector<int>> data)
+bool CSVManager::WriteSettingsInfo(std::vector<s32> data)
 {
 	bool writeSucessful = false;
 
 	//Creates an output filestream and opens the file
-	std::string filePath = MAP_FILE_PATH + fileName + ".csv";
-	std::fstream file(filePath, std::fstream::out | std::fstream::trunc);
+	std::fstream file("Assets/Data/SettingsData.csv", std::ios::out);
 
 	// Make sure the file is open
 	try 
@@ -51,44 +50,23 @@ bool CSVManager::write(std::string fileName, const int TILE_ROW_NUM, const int T
 		return false;
 	}
 
-	//Checks if the number of columns is correct
-	if (data.size() == TILE_COLUMN_NUM)
+	int count{};
+
+	for (s32 val : data)
 	{
-		//Sets the iterator for the row to the beginning of x vector
-		std::vector<std::vector<int>>::iterator rowIterator = data.begin();
+		file << val;
 
-		//Checks if the number of rows is correct
-		if ((*rowIterator).size() == TILE_ROW_NUM)
+		if (++count == data.size())
 		{
-			//Writes the values into the file
-			for (rowIterator = data.begin(); rowIterator != data.end(); rowIterator++)
-			{
-				//Set iterator for the column
-				std::vector<int>::iterator columnIterator;
-
-				//Loop through the column values
-				for (columnIterator = (*rowIterator).begin(); columnIterator != (*rowIterator).end(); columnIterator++)
-				{
-					//Insert column value into file
-					file << *columnIterator;
-
-					//Use a tab token to split the values only if its not at the end
-					if (columnIterator != (*rowIterator).end())
-						file << '\t';
-				}
-
-				//Adds endline to file so that it starts from next row
-				file << std::endl;
-			}
+			file << "\n";
 		}
-
-		writeSucessful = true;
+		else
+		{
+			file << ",";
+		}
 	}
 
-	//Close the file
-	file.close();
-
-	return writeSucessful;
+	return true;
 }
 
 std::vector<std::vector<int>> CSVManager::ReadMap(std::string fileName)

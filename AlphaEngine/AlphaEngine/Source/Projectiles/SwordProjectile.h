@@ -14,9 +14,28 @@ void ShutdownSwordResources();
 class SwordProjectile : public BaseProjectile
 {
 public:
-	SwordProjectile(AEVec2 pos, AEVec2 dir);
-	~SwordProjectile();
+	/*!
+	@brief      Constructor with custom parameters
 
+	Constructor that can specify other parameters like position and direction.
+
+	@param		AEVec2 pos - position of the sword projectile
+	@param		AEVec2 dir - direction of the sword projectile
+	*/
+	SwordProjectile(AEVec2 pos, AEVec2 dir);
+	/*!
+	@brief      Destructor
+
+	Destructor that also calls Exit()
+	*/
+	~SwordProjectile();
+	/*!
+	@brief      Update function
+
+	Overriden update function is called every frame by scene
+
+	@param		float deltaTime - dt passed in from scene
+	*/
 	void Update(float deltaTime) override;
 };
 

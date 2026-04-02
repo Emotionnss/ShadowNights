@@ -38,13 +38,48 @@ private:
 	float startupDelay = 0.f;
 
 public:
+	/*!
+	@brief      Constructor that inits all necessary info
+
+	Default constructor that is run when ability is created by boss.
+	*/
 	BossLaser();
+	/*!
+	@brief      Overload constructor with custom parameters
+
+	Custom constructor that can specify other parameters like baseLifespan and startupTime.
+
+	@param		float baseLifespan - custom lifespan of the laser 
+	@param		float startupTime  - custom charging time of laser
+	*/
 	BossLaser(float baseLifespan, float startupTime);
+	/*!
+	@brief      Destructor
+
+	Destructor cleans up all resources and is called when laser has expired
+	*/
 	~BossLaser();
+	/*!
+	@brief      Update function
 
+	Update function is called every frame by scene
+
+	@param		float deltaTime - dt passed in from scene
+	*/
 	void Update(float deltaTime);
-	void Draw();
+	/*!
+	@brief      Draw function
 
+	Draw function is called to render laser every frame
+	*/
+	void Draw();
+	/*!
+	@brief      Triggered function for when laser is activated
+
+	Triggered function is called by boss to enable laser and start charging
+
+	@param		AEVec2 pos - where to place center of laser at
+	*/
 	bool Triggered(AEVec2 pos);
 };
 

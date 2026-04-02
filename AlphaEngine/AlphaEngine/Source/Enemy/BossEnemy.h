@@ -1,3 +1,12 @@
+/*!
+@file       BossEnemy.cpp
+@author     Yap Yu Xuan Daevon (yuxuandaevon.yap), Bay Yeok Hao (yeokhao.bay)
+@brief      This file contains declarations of functions used by BossEnemy for
+            attacking the player. Randomly uses 3 abilities (BossLaser,
+            BossExplosive, SpawnRandomEnemy)
+*//*_______________________________________________________________________*/
+
+
 #pragma once
 #include "BaseEnemy.h"
 #include "../Abilities/BossLaser.h"
@@ -45,11 +54,39 @@ public:
     void Draw() override;
 
     Weakpoint GetWeakpoint() const;
+    /*!
+    @brief      StartCast function
 
+    Queues the next pending ability, and calculates the casting bar
+
+    @param		PendingAttack attackType - attack to queue
+    */
     void StartCast(PendingAttack attackType);
+    /*!
+    @brief      FireLaser function
+
+    Activates boss laser ability
+    */
     void FireLaser();
+    /*!
+    @brief      FireLaser function
+
+    Activates boss explosive ability
+    */
     void FireExplosive();
-    
+    /*!
+    @brief      RandomEnemy function
+
+    Activates spawning of random enemy ability
+    */
+    void SpawnRandomEnemy();
+    /*!
+    @brief      GetPendingSpawns function
+
+    Gets the pending random enemy to be spawned by SpawnRandomEnemy.
+    This function is called inside BossScene to empty the internal vector of enemies
+    into the scene's enemyList vector, so boss does not have to keep track of enemies internally
+    */
     std::vector<BaseEnemy*>& GetPendingSpawns();
 
 private:
@@ -104,7 +141,5 @@ private:
     std::vector<BossExplosive*> bossExplosives;
 
     std::vector<BaseEnemy*> pendingSpawns;
-
-    void SpawnRandomEnemy();
 };
 

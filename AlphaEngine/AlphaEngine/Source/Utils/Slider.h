@@ -24,6 +24,8 @@ private:
 	//This is the value that will be changed by the slider. e.g volume in settings
 	float sliderValue;
 
+	bool held = false;
+
 public:
 	/*!
 	@brief	Constructor
@@ -54,7 +56,7 @@ public:
 	@param	AEVec2 newPosition - the new position to set the thumb to
 	@return void
 	*//*______________________________________________________________*/
-	void UpdateThumbPositionBasedOnPosition(AEVec2 newPosition);
+	void UpdateThumbPositionBasedOnPosition();
 
 	/*!
 	@brief	Updates the thumb position based off the value attached to the slider (used when initializing slider)
@@ -99,9 +101,23 @@ public:
 	void RenderSlider();
 
 	/*!
+	@brief	Check whether slider is being clicked
+	@param	void
+	@return bool
+	*//*______________________________________________________________*/
+	bool IsClicked() const;
+
+	/*!
 	@brief	Check whether slider is being dragged by mouse
 	@param	void
 	@return bool
 	*//*______________________________________________________________*/
-	bool IsHeld() const;
+	bool IsHeld();
+
+	/*!
+	@brief	Get mouse world position
+	@param	void
+	@return AEVec2
+	*//*______________________________________________________________*/
+	AEVec2 GetMouseWorldPosition() const;
 };

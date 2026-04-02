@@ -13,11 +13,11 @@ Slider::Slider() :
 	meshManager{MeshManager::GetInstance()}
 {
 	LoadImages();
-	UpdateThumbPositionBasedOnValue();
 	trackerTransform.SetPosition({});
 	trackerTransform.SetScale(400.f, 25.f);
 	thumbTransform.SetPosition({});
 	thumbTransform.SetScale(40.f, 50.f);
+	UpdateThumbPositionBasedOnValue();
 }
 
 Slider::Slider(AEVec2 position, float value) :
@@ -25,11 +25,11 @@ Slider::Slider(AEVec2 position, float value) :
 	meshManager{ MeshManager::GetInstance() }
 {
 	LoadImages();
-	UpdateThumbPositionBasedOnValue();
 	trackerTransform.SetPosition(position);
 	trackerTransform.SetScale(400.f, 25.f);
 	thumbTransform.SetPosition(position);
 	thumbTransform.SetScale(40.f, 50.f);
+	UpdateThumbPositionBasedOnValue();
 }
 
 Slider::~Slider()
@@ -44,26 +44,27 @@ void Slider::LoadImages(void)
 	tracker = AEGfxTextureLoad("Assets/Slider/tracker.png");
 }
 
-void Slider::UpdateThumbPositionBasedOnPosition(AEVec2 newPosition)
+void Slider::UpdateThumbPositionBasedOnPosition()
 {
-	AEVec2 thumbPosition = newPosition;
+	AEVec2 thumbPosition = GetMouseWorldPosition();
 	float trackerWidth = trackerTransform.GetScale().x;
+	float trackerXPos = trackerTransform.GetPosition().x;
 
 	thumbTransform.SetPosition(thumbPosition);
 
-	ClampThumbPosition();
+	ClampThumbPosition();;
 
-	sliderValue = (((thumbPosition.x - trackerWidth / 2) -  trackerWidth) / trackerWidth) * 100;
+	sliderValue = (thumbTransform.GetPosition().x - (trackerXPos - trackerWidth / 2)) / trackerWidth;
 }
 
 void Slider::UpdateThumbPositionBasedOnValue(void)
 {
-	float trackerScaleX = trackerTransform.GetScale().x;
+	float trackerWidth = trackerTransform.GetScale().x;
 
-	float newXPos = trackerTransform.GetPosition().x - trackerScaleX / 2;
+	float newXPos = trackerTransform.GetPosition().x - trackerWidth / 2;
 
-	newXPos += trackerScaleX * (sliderValue / 100);
-	trackerTransform.SetPosition({newXPos, thumbTransform.GetPosition().y});
+	newXPos += trackerWidth * sliderValue;
+	thumbTransform.SetPosition({newXPos, thumbTransform.GetPosition().y});
 }
 
 void Slider::ClampThumbPosition(void)
@@ -112,7 +113,28 @@ void Slider::RenderSlider()
 	AEGfxMeshDraw(texSquareMesh, AE_GFX_MDM_TRIANGLES);
 }
 
-bool Slider::IsHeld() const
+bool Slider::IsClicked() const
+{
+	AEVec2 mouseWorldPos = GetMouseWorldPosition();
+
+	return IsAreaClicked(trackerTransform.GetPosition().x, trackerTransform.GetPosition().y, trackerTransform.GetScale().x, trackerTransform.GetScale().y, mouseWorldPos.x, mouseWorldPos.y);
+}
+
+bool Slider::IsHeld()
+{
+	if (!held && IsClicked() && AEInputCheckCurr(AEVK_LBUTTON))
+	{
+		held = true;
+	}
+	else if (AEInputCheckReleased(AEVK_LBUTTON))
+	{
+		held = false;
+	}
+
+	return held;
+}
+
+AEVec2 Slider::GetMouseWorldPosition() const
 {
 	HWND hwnd = AESysGetWindowHandle(); // Get the window handle from the engine
 	POINT mousePos; // Structure to hold mouse position
@@ -126,7 +148,7 @@ bool Slider::IsHeld() const
 	float currentWinHeight = static_cast<float>(rect.bottom - rect.top); // Calculate current window height
 
 	// Safety check to prevent dividing by zero when minimizing
-	if (currentWinWidth <= 0.0f || currentWinHeight <= 0.0f) return false;
+	if (currentWinWidth <= 0.0f || currentWinHeight <= 0.0f) return AEVec2{};
 
 	float camX, camY;
 	AEGfxGetCamPosition(&camX, &camY);
@@ -143,8 +165,6 @@ bool Slider::IsHeld() const
 	float worldMouseX = (scaledMouseX - 800.0f) + camX;
 	float worldMouseY = (450.0f - scaledMouseY) + camY;
 
-	bool result = IsAreaClicked(trackerTransform.GetPosition().x, trackerTransform.GetPosition().y, trackerTransform.GetScale().x, trackerTransform.GetScale().y, worldMouseX, worldMouseY);
-
-	return result && AEInputCheckCurr(AEVK_LBUTTON);
+	return AEVec2{ worldMouseX, worldMouseY };
 }
 

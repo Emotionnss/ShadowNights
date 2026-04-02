@@ -1,9 +1,11 @@
 #pragma once
 #include "BaseScene.h"
 #include "../System/Button.h"
+#include "../Utils/Slider.h"
 
 // Enum to track which settings page the player is currently viewing
 enum class SETTINGS_TAB {
+    NONE,
     AUDIO,
     GRAPHICS,
     GAMEPLAY
@@ -22,7 +24,7 @@ public:
     void Unload() override;
 
 private:
-    SETTINGS_TAB currentTab;
+    SETTINGS_TAB currentTab = SETTINGS_TAB::NONE;
 
 	// Navigation Buttons (can change positions/sizes as needed)
     Button* btnAudioTab = nullptr;
@@ -34,6 +36,11 @@ private:
     Button* btnToggleMute = nullptr;
     Button* btnToggleFullscreen = nullptr;
     Button* btnToggleCameraShake = nullptr;
+
+    // Sliders
+    Slider* sliderBGM = nullptr;
+    Slider* sliderSFX = nullptr;
+    int activeSlider = 0;
 
     // Scene Specific Parameters
 };

@@ -207,12 +207,5 @@ private:
     std::vector<BossExplosive*> bossExplosives;
 
     std::vector<BaseEnemy*> pendingSpawns;
-
-    /**
-     @brief Spawn a random enemy as part of boss behavior
-     @param void
-     @return void
-     */
-    void SpawnRandomEnemy();
 };
 

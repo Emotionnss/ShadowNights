@@ -28,6 +28,9 @@ void SettingsScene::Load() {
 	btnToggleMute = new Button(100.0f, 100.0f, 250.0f, 50.0f, "Mute: OFF");
 	btnToggleFullscreen = new Button(100.0f, 100.0f, 250.0f, 50.0f, "Fullscreen: OFF");
 	btnToggleCameraShake = new Button(100.0f, 100.0f, 250.0f, 50.0f, "Camera Shake: OFF");
+
+	sliderBGM = new Slider({ 100.f, 50.f }, audio->GetBGMVolume());
+	sliderSFX = new Slider({ 100.f, 0.f }, audio->GetSFXVolume());
 }
 
 void SettingsScene::Init() {
@@ -63,6 +66,30 @@ void SettingsScene::Update() {
 		}
 
 		btnToggleMute->SetLabel(audio->GetMuteStatus() ? "Mute: ON" : "Mute: OFF");
+
+		if ((activeSlider == 0 || activeSlider == 1) && sliderBGM->IsHeld())
+		{
+			activeSlider = 1;
+			sliderBGM->UpdateThumbPositionBasedOnPosition();
+			audio->SetBGMVolume(sliderBGM->GetSliderValue());
+
+			//std::cout << "Set volume: " << sliderBGM->GetSliderValue() << std::endl;
+		}
+		else
+		{
+			activeSlider = 0;
+		}
+
+		if ((activeSlider == 0 || activeSlider == 2) && sliderSFX->IsHeld())
+		{
+			activeSlider = 2;
+			sliderSFX->UpdateThumbPositionBasedOnPosition();
+			audio->SetSFXVolume(sliderSFX->GetSliderValue());
+		}
+		else
+		{
+			activeSlider = 0;
+		}
 
 		break;
 
@@ -108,7 +135,10 @@ void SettingsScene::Draw() {
 	case SETTINGS_TAB::AUDIO:
 		AEGfxPrint(Button::fontId, "Audio Settings", 0.0f, 0.6f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 		btnToggleMute->Draw();
-		// TODO: Draw volume sliders here
+		
+		//Render sliders
+		sliderBGM->RenderSlider();
+		sliderSFX->RenderSlider();
 		break;
 
 	case SETTINGS_TAB::GRAPHICS:

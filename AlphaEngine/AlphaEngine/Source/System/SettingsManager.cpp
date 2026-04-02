@@ -28,6 +28,11 @@ s32 SettingsManager::GetSettingsSFXVolume()
 	return savedSFXVolume;
 }
 
+void SettingsManager::SaveSettings()
+{
+	
+}
+
 void SettingsManager::CheckSettingsInputs()
 {
 	if (AEInputCheckTriggered(AEVK_F3))

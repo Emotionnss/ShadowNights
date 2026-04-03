@@ -68,7 +68,7 @@ public:
                 }
                 else
                 {
-                    scale.y += tmpScale.y * (1.0f + count++ * 0.085f);
+                    scale.y += tmpScale.y * (1.0f + count++ * 0.085f); 
                 }
             }
 

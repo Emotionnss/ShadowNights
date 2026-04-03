@@ -173,4 +173,7 @@ void SettingsScene::Unload() {
 	delete btnToggleMute;
 	delete btnToggleFullscreen;
 	delete btnToggleCameraShake;
+
+	delete sliderBGM;
+	delete sliderSFX;
 }

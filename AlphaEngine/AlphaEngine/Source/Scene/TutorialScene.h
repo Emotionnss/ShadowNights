@@ -8,7 +8,7 @@
 @brief      This file contains definitions of functions and variables
              used for the TutorialScene class, which is the first scene of the game,
              and contains the specific implementation of the scene, such as the
-			tutorial text that is shown and the map used.
+            tutorial text that is shown and the map used.
 *//*_______________________________________________________________________*/
 
 struct TutorialText
@@ -16,6 +16,12 @@ struct TutorialText
     AEGfxTexture* tex;
     Transform2D transform;
 
+    /*!
+    @brief    Constructor to initialize tutorial text image properties.
+    @param    pos The world position of the text.
+    @param    scale The scale of the text image.
+    @param    name The filename of the tutorial image.
+    *//*______________________________________________________________*/
     TutorialText(AEVec2 pos, AEVec2 scale, std::string name)
     {
         transform.SetPosition(pos);
@@ -23,6 +29,10 @@ struct TutorialText
         std::string filePath = "Assets/Tutorial/" + name + ".png";
         tex = AEGfxTextureLoad(filePath.c_str());
     }
+
+    /*!
+    @brief    Destructor that frees the loaded tutorial texture.
+    *//*______________________________________________________________*/
     ~TutorialText()
     {
         AEGfxTextureUnload(tex);
@@ -32,9 +42,13 @@ struct TutorialText
 class TutorialScene : public BaseScene {
 private:
     std::vector<TutorialText*> tutTexts;
-
     s8 fontId;
+
 public:
+    /*!
+    @brief    Constructor for TutorialScene, sets up map name and parsed tutorial text.
+    @param    slot The save slot to load from, defaults to 0.
+    *//*______________________________________________________________*/
     TutorialScene(int slot = 0) : BaseScene(slot) {
         levelMapName = "TutorialLevel";
         levelBGM = "bgm_level1";
@@ -79,13 +93,14 @@ public:
             TutorialText* text = new TutorialText(
                 AEVec2{ std::stof(data[1]) * tileSize, std::stof(data[2]) * tileSize }, scale, data[0]);
             tutTexts.push_back(text);
-
-            
         }
 
         AEGfxDestroyFont(fontId);
     }
 
+    /*!
+    @brief    Loads the tutorial assets and restores the player's health.
+    *//*______________________________________________________________*/
     void Load()
     {
         BaseScene::Load();
@@ -96,11 +111,17 @@ public:
         }
     }
 
+    /*!
+    @brief    Calls the base draw function to render the tutorial map and entities.
+    *//*______________________________________________________________*/
     void Draw()
     {
         BaseScene::Draw();
     }
 
+    /*!
+    @brief    Cleans up tutorial specific text structures and unloads the scene.
+    *//*______________________________________________________________*/
     void Unload()
     {
         BaseScene::Unload();
@@ -113,6 +134,9 @@ public:
         tutTexts.clear();
     }
 
+    /*!
+    @brief    Iterates through and renders the loaded tutorial text textures onto the map.
+    *//*______________________________________________________________*/
     void RenderTutorialText()
     {
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);

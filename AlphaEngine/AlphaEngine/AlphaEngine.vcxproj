@@ -44,7 +44,6 @@
     <ClCompile Include="Source\System\CSVManager.cpp" />
     <ClCompile Include="Source\System\Map.cpp" />
     <ClCompile Include="Source\System\SettingsManager.cpp" />
-    <ClCompile Include="Source\Scene\TestScene2.cpp" />
     <ClCompile Include="Source\Abilities\TimeStop.cpp" />
     <ClCompile Include="Source\Abilities\TimeSlow.cpp" />
     <ClCompile Include="Source\Projectiles\SwordProjectile.cpp" />
@@ -89,7 +88,6 @@
     <ClInclude Include="Source\System\Map.h" />
     <ClInclude Include="Source\System\SettingsManager.h" />
     <ClInclude Include="Source\System\SingletonTemplate.h" />
-    <ClInclude Include="Source\Scene\TestScene2.h" />
     <ClInclude Include="Source\Abilities\TimeStop.h" />
     <ClInclude Include="Source\Abilities\TimeSlow.h" />
     <ClInclude Include="Source\Projectiles\SwordProjectile.h" />

@@ -534,7 +534,7 @@ void BossEnemy::SpawnRandomEnemy()
 
 	//the boss position is a bit too high for the random enemy to spawn at, so we will spawn it slightly below the boss's current position
     float spawnX = transform.GetPosition().x;
-    float spawnY = transform.GetPosition().y - 100.0f;
+    float spawnY = transform.GetPosition().y + 30;
 
 	// there are some map boundaries we need to respect to prevent the random enemy from spawning inside walls, so we will calculate those first and adjust the spawn coordinates if necessary
     float tileSize = map->GetTileSize();

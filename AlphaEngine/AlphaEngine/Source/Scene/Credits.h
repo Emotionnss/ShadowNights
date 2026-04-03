@@ -41,6 +41,11 @@ private:
     AEGfxTexture* logoTex{};
     Transform2D logoTfm{};
 
+    AEGfxTexture* bgTex{};
+    Transform2D bgTfm{};
+
     f32 logoAlpha{0.1f};
+
+    f32 bgAlpha{};
 };
 

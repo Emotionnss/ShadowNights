@@ -9,6 +9,7 @@
 #include "AEEngine.h"
 
 void CreditsScene::Load() {
+    levelBGM = "creditsBGM";
     meshManager = MeshManager::GetInstance();
     AEGfxReset();
     Button::LoadResources();
@@ -18,8 +19,6 @@ void CreditsScene::Load() {
 
 void CreditsScene::Init() 
 {
-    levelBGM = "CreditsBGM";
-
     creditsImage = AEGfxTextureLoad("Assets/Credits.png");
     creditsTfm.SetPosition(0,static_cast<f32>( - AEGfxGetWindowHeight() * 2));
     creditsTfm.SetScale(1600, 3000);
@@ -30,6 +29,7 @@ void CreditsScene::Init()
     shadowSprite = new Sprite(CSVManager::ReadInfo("shadow1"));
     bossSprite = new Sprite(CSVManager::ReadInfo("boss"));
     logoTex = AEGfxTextureLoad("Assets/Credits/logo.png");
+    bgTex = AEGfxTextureLoad("Assets/Sprites/Background/Dark Gothic Castle.png");
 
     pSTfm.SetPosition(-500.f, -1000.f);
     pSTfm.SetScale(200.f, 200.f);
@@ -54,6 +54,8 @@ void CreditsScene::Init()
     logoTfm.SetScale(600.f, 400.f);
     logoTfm.SetPosition(0.f, -3700.f);
 
+    bgTfm.SetPosition(0.f, 0.f);
+    bgTfm.SetScale(AEGfxGetWindowWidth(), AEGfxGetWindowHeight());
 }
 
 void CreditsScene::Update() {
@@ -61,7 +63,6 @@ void CreditsScene::Update() {
         SceneManager::ChangeScene(new MainMenu()); 
     }
     scrollSpeed = AEInputCheckCurr(AEVK_LBUTTON) ? 2000.f : 100.f;
-    AEVec2 tfm;
 
     creditsTfm.SetPosition(creditsTfm.GetPosition().x,creditsTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime() ));
 
@@ -81,7 +82,8 @@ void CreditsScene::Update() {
     {
         logoTfm.SetPosition(0.f, 200.f);
         logoAlpha += 0.5f * static_cast<f32>(AEFrameRateControllerGetFrameTime());
-        if (logoAlpha >= 1.f)
+        bgAlpha += 0.5f * static_cast<f32>(AEFrameRateControllerGetFrameTime());
+        if (logoAlpha >= 1.f && bgAlpha >=1.f)
         {
             SceneManager::ChangeScene(new MainMenu());
         }
@@ -108,6 +110,13 @@ void CreditsScene::Draw() {
     AEGfxTextureSet(creditsImage, 0, 0);
 
     AEGfxSetTransform(creditsTfm.GetMatrix().m);
+    AEGfxMeshDraw(meshManager->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
+
+    AEGfxTextureSet(bgTex, 0, 0);
+
+    AEGfxSetTransparency(bgAlpha);
+
+    AEGfxSetTransform(bgTfm.GetMatrix().m);
     AEGfxMeshDraw(meshManager->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
 
     AEGfxSetTransparency(logoAlpha);
@@ -158,6 +167,10 @@ void CreditsScene::Free() {
     if (logoTex)
     {
         AEGfxTextureUnload(logoTex);
+    }
+    if (bgTex)
+    {
+        AEGfxTextureUnload(bgTex);
     }
 }
 

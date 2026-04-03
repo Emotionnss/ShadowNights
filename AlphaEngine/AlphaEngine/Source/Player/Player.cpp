@@ -42,7 +42,7 @@ Player::Player()
 	//AEVec2Set(&cameraOffset, 200.f, -50.f); // Set Camera Offset Position
 
 	healthbarOverlay = AEGfxTextureLoad("Assets/Abilities/healthbar.png");
-	healthbarOverlayTfm.SetScale(maxHP * 5.f, 100.f);
+	healthbarOverlayTfm.SetScale(maxHP * 5.f, 125.f);
 	arrowTex = AEGfxTextureLoad("Assets/Weapons/pointer.png");
 	// Sprite Handling
 	sprite = new Sprite(CSVManager::ReadInfo("tempPlayer"));
@@ -575,9 +575,9 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, f32 value, Transform2D matrix)
 
 		AEVec2 CamPos{};
 		AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
-		matrix.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f + 168.f, CamPos.y + 335.f);
+		matrix.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f + 168.f, CamPos.y + 346.f);
 		float safeValue = AEClamp(value, 0.f, maxHP);
-		matrix.SetScale(safeValue * 3.75f, 25.f);
+		matrix.SetScale(safeValue * 3.75f, 28.f);
 
 		healthbarOverlayTfm.SetPosition(CamPos.x - AEGfxGetWindowWidth() / 2.f + 50.f, CamPos.y + 300.f);
 

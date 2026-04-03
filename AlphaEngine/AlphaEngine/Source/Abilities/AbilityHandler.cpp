@@ -131,9 +131,8 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList, float dt)
 	resourceBarTfm.SetScale(17, (resource / maxResource * 280.f));
 
 	//set the resource bar position based on camera so its always top left
-	resourceBarTfm.SetPosition(camPos.x - AEGfxGetWindowWidth() / 2.f + 203, camPos.y + AEGfxGetWindowHeight() / 2.f - 125.f);
-	barOverlayTfm.SetPosition(camPos.x - AEGfxGetWindowWidth() / 2.f + 20, camPos.y);
-	barBgTfm.SetPosition(camPos.x - AEGfxGetWindowWidth() / 2.f + 168, camPos.y + AEGfxGetWindowHeight()/2.f - 150.f);
+	resourceBarTfm.SetPosition(camPos.x - AEGfxGetWindowWidth() / 2.f + 213, camPos.y + AEGfxGetWindowHeight() / 2.f - 119.f);
+	barBgTfm.SetPosition(camPos.x - AEGfxGetWindowWidth() / 2.f + 178, camPos.y + AEGfxGetWindowHeight()/2.f - 145.f);
 
 	//set the positions of the icons based on the camera
 	a1Tfm.SetPosition(camPos.x + AEGfxGetWindowWidth() / 2.f - a1Tfm.GetScale().x * 3.f, camPos.y - AEGfxGetWindowHeight() / 2.f);

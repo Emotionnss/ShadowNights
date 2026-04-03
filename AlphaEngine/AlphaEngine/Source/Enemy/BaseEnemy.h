@@ -126,7 +126,7 @@ public:
     void ResolveY(AEVec2& position);
 
     bool isBoss = false;
-
+    
 protected:
     Sprite* sprite = nullptr;
 

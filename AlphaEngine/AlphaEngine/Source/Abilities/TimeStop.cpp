@@ -16,7 +16,7 @@ TimeStop::TimeStop()//constructor
     spriteName{ "timestop" }//spritename in sprite excelsheet
 {
     zoneSprite = new Sprite(CSVManager::ReadInfo(spriteName));//create new sprite for the timestop zone
-    zoneSprite->PlayAnimation("spawn", 1, 1.f);
+    zoneSprite->PlayAnimation("spawn", 0, 1.f);
 }
 
 TimeStop::~TimeStop()//destructor
@@ -118,7 +118,7 @@ bool TimeStop::ToggleTime(AEVec2 position)//toggle the ability
         active = true;//activate
         SetZonePos(position);//set the position of the zone
         AudioManager::GetInstance()->PlaySFXOneShot("time_stop_end");
-        zoneSprite->PlayAnimation("spawn", 1, 1.f);
+        zoneSprite->PlayAnimation("spawn", 0, 1.f);
     }
     return active;//return its activity
 }

@@ -13,6 +13,7 @@ void BossScene::Init() {
     boss->isBoss = true;
 	levelID = 2;
     //AudioManager::GetInstance()->PlaySFXOneShot("");
+    boss->SpawnHealthBar();
 }
 
 void BossScene::Update() {
@@ -25,7 +26,6 @@ void BossScene::Update() {
     }
 
     BaseScene::Update();
-
     f32 dt = (f32)AEFrameRateControllerGetFrameTime();
 
 

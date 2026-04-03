@@ -38,6 +38,17 @@ BossEnemy::~BossEnemy()
     for (BaseEnemy* e : pendingSpawns)
         delete e;
     pendingSpawns.clear();
+
+    if (barOverlaySprite)
+    {
+        delete barOverlaySprite;
+        barOverlaySprite = nullptr;
+    }
+    if (barSprite)
+    {
+        delete barSprite;
+        barSprite = nullptr;
+    }
 }
 
 void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
@@ -86,6 +97,19 @@ void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
     pendingAttack = PendingAttack::NONE;
 
     attackCooldown = 3.f;
+
+    barOverlaySprite = new Sprite(CSVManager::ReadInfo("horiBossOverlay"));
+    if (barOverlaySprite)
+    {
+        std::cout << "yes healthbar\n";
+    }
+    barSprite = new Sprite(CSVManager::ReadInfo("horiBossBar"));
+    if (barOverlaySprite)
+    {
+        std::cout << "yes healthbar\n";
+    }
+    healthbarOverlayTfm.SetScale(1128.f, 100.f);
+    healthbarOverlayTfm.SetPosition(AEGfxGetWindowWidth() / 2.f, AEGfxGetWindowHeight() / 2.f);
 }
 
 void BossEnemy::Update(f32 deltaTime)
@@ -200,6 +224,11 @@ void BossEnemy::Update(f32 deltaTime)
     {
         e->Update(deltaTime);
     }
+
+
+    barSprite->Update();
+    barOverlaySprite->Update();
+
 }
 
 void BossEnemy::Draw()
@@ -256,12 +285,11 @@ void BossEnemy::Draw()
                 camPos.x,
                 camPos.y - 300.f
             );
-            healthbarTransform.SetScale((static_cast<float>(health) / static_cast<float>(maxHealth)) * 1000.f, 50.f);
+            healthbarTransform.SetScale((static_cast<float>(health) / static_cast<float>(maxHealth)) * 1128.f, 100.f);
+            healthbarOverlayTfm.SetPosition(camPos.x,camPos.y - 300.f);
         }
-
-        AEGfxSetTransform(healthbarTransform.GetMatrix().m);
-        AEGfxMeshDraw(MeshManager::GetInstance()->GetMesh(SQUARE), AE_GFX_MDM_TRIANGLES);
-        AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+        barSprite->Render(healthbarTransform);
+        barOverlaySprite->Render(healthbarOverlayTfm);
     }
 
     for (EnemyProjectile* p : enemyProjectiles)
@@ -577,4 +605,10 @@ void BossEnemy::SpawnRandomEnemy()
         randEnemy->SetVelocity(0, 0);
         pendingSpawns.push_back(randEnemy);
     }
+}
+
+void BossEnemy::SpawnHealthBar()
+{
+    barOverlaySprite->PlayAnimation("spawn", 0,1.f);
+    barSprite->PlayAnimation("spawn", 0,1.f);
 }

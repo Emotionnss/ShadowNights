@@ -30,3 +30,5 @@ tempPlayer,hurt,5,3
 tempPlayer,death,3,16
 tempPlayer,attack,2,10
 anchorSpawn,spawn,0,8
+horiBossOverlay,spawn,0,10
+horiBossBar,spawn,0,10

@@ -25,7 +25,7 @@ TemporalAnchor::TemporalAnchor() ://default constructor
 	anchorSprite->PlayAnimation("spawn", -1, 0.5f);//make it play an animation on enter
 
 	anchorSpawnSprite = new Sprite(CSVManager::ReadInfo("anchorSpawn"));
-	anchorSpawnSprite->PlayAnimation("spawn", 1, spawnTime);
+	anchorSpawnSprite->PlayAnimation("spawn", 0, spawnTime);
 
 	ghostTfm.SetScale(player->GetTransform().GetScale().x, player->GetTransform().GetScale().y);//initialize the ghost's scale to match the player
 }
@@ -139,7 +139,7 @@ bool TemporalAnchor::Anchor(AEVec2 anchPos)
 		spawning = true;//start spawning anim
 		savedHealth = player->GetHealth();//save the amount of health the player currently has
 		anchorPos = anchPos;//set anchor pos
-		anchorSpawnSprite->PlayAnimation("spawn", 1, spawnTime);//spawn
+		anchorSpawnSprite->PlayAnimation("spawn", 0, spawnTime);//spawn
 	}
 	return abilityAnchoring;
 }

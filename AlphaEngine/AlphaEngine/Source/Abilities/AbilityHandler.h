@@ -33,7 +33,7 @@ private:
 	AEVec2 camPos{};//position of camera for resource bar
 
 	AEGfxTexture* a1Tex , *a2Tex , *a3Tex,*resourceBarOverlay,*barBG;//UI textures
-	Transform2D a1Tfm{},a2Tfm,a3Tfm,barTfm,barOverlayTfm,barBgTfm;//UI transforms
+	Transform2D a1Tfm{},a2Tfm,a3Tfm,barTfm,barBgTfm;//UI transforms
 	bool timeStopped{};//stopped time ?
 	bool timeSlowed{};//slowed time ? 
 

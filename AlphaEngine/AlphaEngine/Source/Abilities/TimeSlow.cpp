@@ -62,7 +62,7 @@ bool TimeSlow::ToggleSlow(std::vector<BaseEnemy*> enemyList)
 	{
 		AudioManager::GetInstance()->PlaySFXOneShot("time_slow_end",1);
 		startDespawn = true;//start despawning
-		timeSlowSprite->PlayAnimation("despawn", 1, despawningTime);//play despawn animation
+		timeSlowSprite->PlayAnimation("despawn", 0, despawningTime);//play despawn animation
 		active = false;
 		for (BaseEnemy* enemy : enemyList)//unslow every enemy and their projectile
 		{
@@ -79,7 +79,7 @@ bool TimeSlow::ToggleSlow(std::vector<BaseEnemy*> enemyList)
 	}
 	else
 	{
-		timeSlowSprite->PlayAnimation("spawn", 1, 0.6f);//play spawning animation
+		timeSlowSprite->PlayAnimation("spawn", 0, 0.6f);//play spawning animation
 		startDespawn = false;//not despawning
 		active = true;//is active
 		AudioManager::GetInstance()->PlaySFXOneShot("time_slow_start");

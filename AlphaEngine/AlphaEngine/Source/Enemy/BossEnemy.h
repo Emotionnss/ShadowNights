@@ -103,6 +103,7 @@ public:
     */
     std::vector<BaseEnemy*>& GetPendingSpawns();
 
+    void SpawnHealthBar();
 private:
     Weakpoint weakpoint;
 
@@ -180,6 +181,9 @@ private:
      */
     void UpdateWeakpoint(f32 deltaTime);
 
+    Transform2D healthbarOverlayTfm;
+    Sprite* barOverlaySprite = nullptr;
+    Sprite* barSprite = nullptr;
 
     // Attack Logic
     bool isAttacking = false;

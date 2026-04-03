@@ -55,7 +55,7 @@ void CreditsScene::Init()
     logoTfm.SetPosition(0.f, -3700.f);
 
     bgTfm.SetPosition(0.f, 0.f);
-    bgTfm.SetScale(AEGfxGetWindowWidth(), AEGfxGetWindowHeight());
+    bgTfm.SetScale(static_cast<f32>(AEGfxGetWindowWidth()), static_cast<f32>(AEGfxGetWindowHeight()));
 }
 
 void CreditsScene::Update() {

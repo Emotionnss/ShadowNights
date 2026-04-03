@@ -1,14 +1,16 @@
-ame,5,4
-shadow1,15,12
-shadow1 - Idle_test,3,4
-shadowspritesheettest,15,12
-timestop,1,12
-shadoworb,1,6
-batenemy,4,16
-sniperenemy,3,14
-boss,3,7
-timeslow2test,2,9
-bosslaser,2,6
-anchor,1,11
-tempPlayer,8,16
-anchorSpawn,1,9
+ ame,5,4,,
+shadow1,15,12,,
+shadow1 - Idle_test,3,4,,
+shadowspritesheettest,15,12,,
+timestop,1,12,,
+shadoworb,1,6,,
+batenemy,4,16,,
+sniperenemy,3,14,,
+boss,3,7,,
+timeslow2test,2,9,,
+bosslaser,2,6,,
+anchor,1,11,,
+tempPlayer,8,16,,
+anchorSpawn,1,9,,         
+horiBossOverlay,1,11,,
+horiBossBar,1,11,,

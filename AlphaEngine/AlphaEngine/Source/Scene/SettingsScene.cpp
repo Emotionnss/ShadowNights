@@ -29,8 +29,8 @@ void SettingsScene::Load() {
 	btnToggleFullscreen = new Button(100.0f, 100.0f, 250.0f, 50.0f, "Fullscreen: OFF");
 	btnToggleCameraShake = new Button(100.0f, 100.0f, 250.0f, 50.0f, "Camera Shake: OFF");
 
-	sliderBGM = new Slider({ 100.f, 50.f }, audio->GetBGMVolume());
-	sliderSFX = new Slider({ 100.f, -50.f }, audio->GetSFXVolume());
+	sliderBGM = new Slider({ 100.f, -25.f }, audio->GetBGMVolume());
+	sliderSFX = new Slider({ 100.f, -150.f }, audio->GetSFXVolume());
 }
 
 void SettingsScene::Init() {
@@ -139,6 +139,10 @@ void SettingsScene::Draw() {
 		//Render sliders
 		sliderBGM->RenderSlider();
 		sliderSFX->RenderSlider();
+
+		AEGfxPrint(Button::fontId, "BGM", 0.1f, 0.01f, 2.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxPrint(Button::fontId, "SFX", 0.1f, -0.25f, 2.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+
 		break;
 
 	case SETTINGS_TAB::GRAPHICS:

@@ -62,13 +62,13 @@ public:
                 AEGfxGetPrintSize(fontId, it->c_str(), 36, &tmpScale.x, &tmpScale.y);
 
                 scale.x = tmpScale.x > scale.x ? tmpScale.x : scale.x;
-                if (data.size() <= 3 + 2)
+                if (data.size() <= 5)
                 {
-                    scale.y += tmpScale.y / 0.7;
+                    scale.y += tmpScale.y / 0.95f;
                 }
                 else
                 {
-                    scale.y += tmpScale.y * (1.0f + count++ * 0.025f);
+                    scale.y += tmpScale.y * (1.0f + count++ * 0.085f);
                 }
             }
 
@@ -79,6 +79,8 @@ public:
             TutorialText* text = new TutorialText(
                 AEVec2{ std::stof(data[1]) * tileSize, std::stof(data[2]) * tileSize }, scale, data[0]);
             tutTexts.push_back(text);
+
+            
         }
 
         AEGfxDestroyFont(fontId);

@@ -1,3 +1,10 @@
+/*!
+@file       SettingsManager.cpp
+@author     Yap Yu Xuan, Daevon (yuxuandaevon.yap),
+@brief      This file contains the definitions to manage the settings
+			used in the game
+*//*_______________________________________________________________________*/
+
 #include "SettingsManager.h"
 #include "CSVManager.h"
 #include <vector>
@@ -8,6 +15,7 @@ SettingsManager::SettingsManager() :
 	savedBGMVolume{ 0 },
 	savedSFXVolume{ 0 }
 {
+
 }
 
 SettingsManager::SettingsManager(std::vector<std::string> settingsInfo) :

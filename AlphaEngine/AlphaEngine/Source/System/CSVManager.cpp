@@ -31,8 +31,6 @@ CSVManager::~CSVManager()
  */
 bool CSVManager::WriteSettingsInfo(std::vector<s32> data)
 {
-	bool writeSucessful = false;
-
 	//Creates an output filestream and opens the file
 	std::fstream file("Assets/Data/SettingsData.csv", std::ios::out);
 

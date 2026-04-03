@@ -30,7 +30,11 @@ void MainMenu::Load() {
 
 	meshManager = MeshManager::GetInstance();
 	audio = AudioManager::GetInstance();
-	audio->PlayMusic("menu_music", 1.0f);
+
+	if (audio->GetCurrentMusicClip().name != "menu_music")
+	{
+		audio->PlayMusic("menu_music");
+	}
 
 	bg = new Background("Assets/Sprites/Background/Dark Gothic Castle.png");
 	if (Button::fontId == -1) Button::LoadResources();

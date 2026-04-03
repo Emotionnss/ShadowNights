@@ -28,14 +28,12 @@ public:
 
 	void ResolveX(AEVec2& position);
 	void ResolveY(AEVec2& position);
-	//void ComputeCollision(AEVec2& position);
 
 	void Update(float deltaTime) override;
 
 	void Draw(AEGfxVertexList* mesh);
 	void DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matrix);
 
-	// I hate whoever forced me to do this
 	void TakeDamage(float damage);
 
 	void SetHealth(float val);
@@ -90,7 +88,9 @@ private:
 
 	f32 damagedTimer;
 
-	//AEVec2 cameraPosition, cameraOffset;
+	bool canDoubleJump;
+	f32 coyoteTime;
+
 	AEVec2 cameraPosition, cameraOffset;
 
 	Map* map;

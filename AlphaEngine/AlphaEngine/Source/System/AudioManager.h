@@ -38,6 +38,9 @@ private:
 
 	std::vector<AudioClip> AudioClipList;
 
+	AudioClip currentMusic;
+	AudioClip currentSFX;
+
 	SettingsManager* settings = nullptr;
 
 	void Trim(std::string& str); // Used to parse CSV
@@ -67,6 +70,7 @@ public:
 	void StopEffect();
 
 	bool GetEffectGroup() const;
+	AudioClip GetCurrentEffectClip() const;
 
 	/*!
 	@brief	Plays audio with loop
@@ -77,6 +81,7 @@ public:
 	void StopMusic();
 
 	bool GetMusicGroup() const;
+	AudioClip GetCurrentMusicClip() const;
 
 	void  SetBGMVolume(float volume);
 	void  SetSFXVolume(float volume);

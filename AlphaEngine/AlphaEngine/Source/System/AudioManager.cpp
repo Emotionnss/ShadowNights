@@ -182,6 +182,8 @@ void AudioManager::PlayEffect(const std::string& name, f32 volume, f32 pitch)
 		AEAudioStopGroup(SFX_LOOP);
 		AEAudioPlay(index->audio, SFX_LOOP, volume, pitch, -1);
 		SFXplaying = true;
+		currentSFX = *index;
+		ResumeEffect();
 	}
 }
 
@@ -206,6 +208,11 @@ bool AudioManager::GetEffectGroup() const
 	return SFXplaying;
 }
 
+AudioClip AudioManager::GetCurrentEffectClip() const
+{
+	return currentSFX;
+}
+
 void AudioManager::PlayMusic(const std::string& name, f32 volume, f32 pitch)
 {
 	const AudioClip* index = GetAudioClip(name);
@@ -214,6 +221,7 @@ void AudioManager::PlayMusic(const std::string& name, f32 volume, f32 pitch)
 		AEAudioStopGroup(BGM_LOOP);
 		AEAudioPlay(index->audio, BGM_LOOP, volume, pitch, -1);
 		BGMplaying = true;
+		currentMusic = *index;
 		ResumeMusic();
 	}
 }
@@ -235,6 +243,11 @@ void AudioManager::StopMusic()
 bool AudioManager::GetMusicGroup() const
 {
 	return BGMplaying;
+}
+
+AudioClip AudioManager::GetCurrentMusicClip() const
+{
+	return currentMusic;
 }
 
 void AudioManager::SetBGMVolume(float volume)

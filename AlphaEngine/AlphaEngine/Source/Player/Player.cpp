@@ -10,10 +10,10 @@ Player::Player()
 	, speed{ 4000.f }
 	, maxHP{ 100.f }
 	, currentHP{ maxHP }
-	, maxSpeed{ 800.f }
+	, maxSpeed{ 500.f }
 	, friction{ 0.75f }
 	, size{ 70.f }
-	, jumpForce{ 1000.f }
+	, jumpForce{ 725.f }
 	, gravity{ -1400.f }
 	, isGrounded{ false }
 	, damagedTimer{ 0.f }
@@ -24,6 +24,8 @@ Player::Player()
 	, shakeIntensity{ 0.f }
 	, shakeDuration{ 0.f }
 	, shakeTimer{ 0.f }
+	, canDoubleJump{ false }
+	, coyoteTime{ 1.f }
 {
 	SetStatic(false);
 	GetTransform().SetScale(size, size); // Set Scale of transform
@@ -119,10 +121,19 @@ void Player::HandleInput()
 	}
 
 	// Jumping
-	if (AEInputCheckTriggered(AEVK_SPACE) && isGrounded)
+	if (AEInputCheckTriggered(AEVK_SPACE) && (isGrounded || coyoteTime > 0.f || canDoubleJump))
 	{
+		if (isGrounded || coyoteTime > 0.f)
+		{
+			coyoteTime = 0.f; // Consume coyote time
+			isGrounded = false;
+		}
+		else
+		{
+			canDoubleJump = false;
+		}
+
 		SetVelocity(GetVelocity().x, jumpForce);
-		isGrounded = false;
 	}
 	else if (!AEInputCheckCurr(AEVK_SPACE) && GetVelocity().y > 0)
 	{
@@ -296,6 +307,7 @@ void Player::ResolveY(AEVec2& position)
 					position.y = surfaceY + halfSize.y;
 					SetVelocity(GetVelocity().x, 0.f);
 					isGrounded = true;
+					canDoubleJump = true;
 					SetCollidedYTile(tile);
 				}
 				continue;
@@ -318,7 +330,7 @@ void Player::ResolveY(AEVec2& position)
 			{
 				position.y += (dy > 0.f) ? py : -py;
 				SetVelocity(GetVelocity().x, 0.f);
-				if (dy > 0.f) isGrounded = true;
+				if (dy > 0.f) isGrounded = true, canDoubleJump = true;;
 			}
 		}
 	}
@@ -463,6 +475,20 @@ void Player::Update(float deltaTime)
 
 	// Set Final Position
 	GetTransform().SetPosition(currentPosition.x, currentPosition.y);
+
+	if (isGrounded)
+	{
+		coyoteTime = 1.f;
+	}
+	else if (coyoteTime > 0.f)
+	{
+		std::cout << coyoteTime << std::endl;
+		coyoteTime -= deltaTime * 10.f;
+		if (coyoteTime < 0.f)
+		{
+			coyoteTime = 0.f;
+		}
+	}
 
 	AimArrow(playerToMouseVectorNormalized); // Updates Aim Arrow after player position
 	AimRotation(playerToMouseVectorNormalized); // Checks player facing direction

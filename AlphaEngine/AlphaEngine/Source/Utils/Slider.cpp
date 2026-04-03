@@ -52,8 +52,9 @@ void Slider::UpdateThumbPositionBasedOnPosition()
 
 	thumbTransform.SetPosition(thumbPosition);
 
-	ClampThumbPosition();;
+	ClampThumbPosition();
 
+	//Calculate slider value based on new thumb position
 	sliderValue = (thumbTransform.GetPosition().x - (trackerXPos - trackerWidth / 2)) / trackerWidth;
 }
 

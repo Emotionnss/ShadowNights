@@ -120,7 +120,7 @@ private:
 	//Stores nodes that have already been checked
 	std::vector<Node*> closedList;
 
-	//ADT's to store tile and texture info
+	//STL's to store tile and texture info
 	std::vector<TILE_TYPE> tileTypesVector;
 	std::map<TILE_TYPE, AEGfxTexture*> imageMap;
 

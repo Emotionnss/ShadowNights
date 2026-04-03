@@ -1,6 +1,6 @@
 /*!
 @file       SettingsManager.cpp
-@author     Yap Yu Xuan, Daevon (yuxuandaevon.yap),
+@author     Yap Yu Xuan, Daevon (yuxuandaevon.yap),  Chng Wei Sheng Bennett (chng.w)
 @brief      This file contains the definitions to manage the settings
 			used in the game
 *//*_______________________________________________________________________*/

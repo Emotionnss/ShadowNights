@@ -76,11 +76,15 @@ public:
                 AEGfxGetPrintSize(fontId, it->c_str(), 36, &tmpScale.x, &tmpScale.y);
 
                 scale.x = tmpScale.x > scale.x ? tmpScale.x : scale.x;
-                if (data.size() <= 5)
+                if (data.size() <= 5 || data[0] == "Jump")
                 {
                     scale.y += tmpScale.y / 0.95f;
                 }
-                else
+                else if (data.size() >= 7)
+                {
+                    scale.y += tmpScale.y * (1.0f + count++ * 0.05f); 
+				}
+                else 
                 {
                     scale.y += tmpScale.y * (1.0f + count++ * 0.085f); 
                 }

@@ -1,5 +1,5 @@
-WASD,5,2,Press SD to move
-Jump,8,5,Press SPACEBAR to jump,Hold SPACEBAR to jump higher
+WASD,5,3,Press SD to move
+Jump,8,5,Press SPACEBAR to jump,Hold SPACEBAR to jump higher,Double tap SPACEBAR to double jump
 Attack,23,9,Methods to attack enemies:,Left Click to throw a knife,Right Click to shoot a wave
 Timestop,35,6.5,Press E to use Timestop,It stops enemies and projectiles,in an area (including yours)
 Timeslow,51,3.5,Press Q to use Timeslow,It slows down projectiles around you

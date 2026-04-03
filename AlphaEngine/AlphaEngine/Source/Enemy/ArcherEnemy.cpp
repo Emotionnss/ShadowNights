@@ -61,6 +61,7 @@ void ArcherEnemy::Update(float deltaTime)
 
         if (shootTimer <= 0.0f)
         {
+            AudioManager::GetInstance()->PlaySFXOneShot("archer_attack");
             Shoot();
             shootTimer = fireRate;
         }
@@ -69,6 +70,7 @@ void ArcherEnemy::Update(float deltaTime)
         if (shootTimer > fireRate - 0.5f)
         {
             PlayAnim("archerattack");
+            
         }
         else
         {

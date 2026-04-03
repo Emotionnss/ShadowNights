@@ -6,6 +6,7 @@
 *//*_______________________________________________________________________*/
 #include "TimeSlow.h"
 #include <iostream>
+
 TimeSlow::TimeSlow()//default constructor
 	:player{ Player::GetInstance() },
 	active{ false },//bool on if the ability is active
@@ -59,6 +60,7 @@ bool TimeSlow::ToggleSlow(std::vector<BaseEnemy*> enemyList)
 {
 	if (active == true)//if the ability is already active
 	{
+		AudioManager::GetInstance()->PlaySFXOneShot("time_slow_end",1);
 		startDespawn = true;//start despawning
 		timeSlowSprite->PlayAnimation("despawn", 1, despawningTime);//play despawn animation
 		active = false;
@@ -80,6 +82,7 @@ bool TimeSlow::ToggleSlow(std::vector<BaseEnemy*> enemyList)
 		timeSlowSprite->PlayAnimation("spawn", 1, 0.6f);//play spawning animation
 		startDespawn = false;//not despawning
 		active = true;//is active
+		AudioManager::GetInstance()->PlaySFXOneShot("time_slow_start");
 		for (BaseProjectile* proj : player->GetProjectileList())//slow all projectiles thrown
 		{
 			proj->slowed = true;

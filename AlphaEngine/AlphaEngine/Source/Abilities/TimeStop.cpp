@@ -110,11 +110,14 @@ bool TimeStop::ToggleTime(AEVec2 position)//toggle the ability
     if (active == true)//if its active
     {
         active = false;//deactivate it
+        zoneSprite->PlayAnimation("despawn");
+        AudioManager::GetInstance()->PlaySFXOneShot("time_stop_start");
     }
     else if (active == false)//if not active
     {
         active = true;//activate
         SetZonePos(position);//set the position of the zone
+        AudioManager::GetInstance()->PlaySFXOneShot("time_stop_end");
         zoneSprite->PlayAnimation("spawn", 1, 1.f);
     }
     return active;//return its activity

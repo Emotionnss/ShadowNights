@@ -1,9 +1,19 @@
-bgm_level1,7. Chant of the Fallen.mp3,TRUE
-player_attack,ANIMAL-LION_GEN-HDF-01134.wav,FALSE
-player_move,playerMovement.wav,FALSE
-time_reverse,reversing2.wav,FALSE
-player_hurt,hurt.wav,FALSE
-boss_laser_spawning,laserSpawn.wav,FALSE
-player_slash,swordSlash.wav,FALSE
-door_open,door_opening.wav,FALSE
-menu_music,21. The Silent Lake.mp3,TRUE
+bgm_level1,Level1_BGM.mp3,TRUE
+player_attack,player_attacking.mp3,FALSE
+player_move,playerMovement.mp3,FALSE
+time_reverse,reversing.mp3,FALSE
+player_hurt,hurt.mp3,FALSE
+boss_laser_spawning,laserSpawn.mp3,FALSE
+player_slash,swordSlash.mp3,FALSE
+door_open,door_opening.mp3,FALSE
+menu_music,main_menuBGM.mp3,TRUE
+time_slow_start,TimeSlowStart.mp3,FALSE
+time_slow_end,TimeSlowEnd.mp3,FALSE
+archer_attack,bow.mp3,FALSE
+bat_attack,bat_attack.mp3,FALSE
+boss_BGM,boss_BGM.mp3,TRUE
+lose_BGM,lose_BGM.mp3,TRUE
+win_BGM,win_BGM.mp3,TRUE
+time_stop_start,TimeStopStart.mp3,FALSE
+time_stop_end,TimeStopEnd.mp3,FALSE
+creditsBGM,Credits_BGM.mp3,TRUE

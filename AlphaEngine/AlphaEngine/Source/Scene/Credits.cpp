@@ -13,13 +13,17 @@ void CreditsScene::Load() {
     AEGfxReset();
     Button::LoadResources();
     backBtn = new Button(-700.f,400.f, 200.0f, 50.0f, "Back");
+    AudioManager::GetInstance()->PlayMusic(levelBGM);
 }
 
 void CreditsScene::Init() 
 {
+    levelBGM = "CreditsBGM";
+
     creditsImage = AEGfxTextureLoad("Assets/Credits.png");
     creditsTfm.SetPosition(0,static_cast<f32>( - AEGfxGetWindowHeight() * 2));
     creditsTfm.SetScale(1600, 3000);
+
     playerSprite = new Sprite(CSVManager::ReadInfo("tempPlayer"));
     archerSprite = new Sprite(CSVManager::ReadInfo("sniperenemy"));
     batSprite = new Sprite(CSVManager::ReadInfo("batenemy"));
@@ -43,12 +47,12 @@ void CreditsScene::Init()
     shadowTfm.SetScale(200.f, 200.f);
     shadowSprite->PlayAnimation("idle");
 
-    bossTfm.SetPosition(0.f, -3000.f);
+    bossTfm.SetPosition(0.f, -3200.f);
     bossTfm.SetScale(300.f, 300.f);
     bossSprite->PlayAnimation("idle");
 
     logoTfm.SetScale(600.f, 400.f);
-    logoTfm.SetPosition(0.f, -3500.f);
+    logoTfm.SetPosition(0.f, -3700.f);
 
 }
 
@@ -76,7 +80,7 @@ void CreditsScene::Update() {
     else
     {
         logoTfm.SetPosition(0.f, 200.f);
-        logoAlpha += static_cast<f32>(AEFrameRateControllerGetFrameTime());
+        logoAlpha += 0.5f * static_cast<f32>(AEFrameRateControllerGetFrameTime());
         if (logoAlpha >= 1.f)
         {
             SceneManager::ChangeScene(new MainMenu());

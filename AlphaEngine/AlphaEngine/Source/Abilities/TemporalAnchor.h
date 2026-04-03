@@ -45,12 +45,78 @@ private:
 
     AEVec2 anchorPos{};//anchor position
 public:
+    /*!
+    @brief      Constructor
+
+    This function constructs a TemporalAnchor object
+
+    @param      void
+    @return     void
+    */
     TemporalAnchor();
+    /*!
+    @brief      Destructor
+
+    This function destroys a TemporalAnchor object
+
+    @param      void
+    @return     void
+    */
     ~TemporalAnchor();
+    /*!
+    @brief      Update
+
+    This function updates a TemporalAnchor object
+
+    @param      f32 deltatime
+    @return     void
+    */
     void Update(f32 dt);
+    /*!
+    @brief      Anchor
+
+    This function toggles the Temporal Anchor ability , spawning the anchor at the player's position after a short delay
+
+    @param      AEVec2 anchpos - the position to put the anchor at
+    @return     void
+    */
     bool Anchor(AEVec2 anchPos);
+    /*!
+    @brief      Anchor
+
+    This function returns if the player has the Temporal Anchor ability is currently active 
+
+    @param      void
+    @return     void
+    */
     bool Anchor()const;
+    /*!
+    @brief      Draw
+
+    This function is responsible for all the rendering of sprites, textures ,animations ,etc.
+
+    @param      void
+    @return     void
+    */
     void Draw();
+    /*!
+    @brief      SaveGhost
+
+    This function creates saves the position of the player and the UV of the player's sprite at that instance 
+    and pushes it back into the vector
+
+    @param      AEVec2 UVs - The UV of the spritesheet the player is currently showing
+                AEVec2 playerPos - the position of the player in that instance
+    @return     void
+    */
     void SaveGhost(AEVec2 UVs, AEVec2 playerPos);
+    /*!
+    @brief      Reversing
+
+    This function returns if the player is currently reversing back to the anchor
+
+    @param      void
+    @return     void
+    */
     bool Reversing() const;
 };

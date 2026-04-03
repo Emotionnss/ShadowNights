@@ -215,6 +215,7 @@ void BatEnemy::Update(float deltaTime)
 
 void BatEnemy::Shoot()
 {
+    AudioManager::GetInstance()->PlaySFXOneShot("bat_attack");
     Player* player = Player::GetInstance();
     AEVec2 myPos = transform.GetPosition();
     AEVec2 playerPos = player->GetTransform().GetPosition();

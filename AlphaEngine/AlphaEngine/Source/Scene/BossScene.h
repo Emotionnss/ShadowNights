@@ -6,7 +6,7 @@ class BossScene : public BaseScene {
 public:
     BossScene(int slot = 0) : BaseScene(slot) {
         levelMapName = "Bossmap";
-        levelBGM = "bgm_level1";
+        levelBGM = "boss_BGM";
         levelID = 2;
     }
 

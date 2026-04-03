@@ -21,12 +21,12 @@ LoseScene::LoseScene(int idToRestart) {
     restartLevelID = idToRestart;
     player = Player::GetInstance();
     player->SetHealth(100);
+    levelBGM = "lose_BGM";
 }
 
 void LoseScene::Load() {
     AEGfxReset();
     Button::LoadResources();
-
     btnRestart = new Button(0.0f, 40.0f, 200.0f, 50.0f, "Try Again");
     btnLoad = new Button(0.0f, -30.0f, 200.0f, 50.0f, "Load Game");
     btnMenu = new Button(0.0f, -100.0f, 200.0f, 50.0f, "Main Menu");
@@ -35,6 +35,7 @@ void LoseScene::Load() {
     btnSlot2 = new Button(0.0f, -30.0f, 200.0f, 50.0f, "Slot 2");
     btnSlot3 = new Button(0.0f, -100.0f, 200.0f, 50.0f, "Slot 3");
     btnBack = new Button(0.0f, -170.0f, 200.0f, 50.0f, "Back");
+    AudioManager::GetInstance()->PlayMusic(levelBGM);
 }
 
 void LoseScene::Init() {

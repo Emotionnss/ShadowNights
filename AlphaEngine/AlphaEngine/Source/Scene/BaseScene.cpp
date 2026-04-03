@@ -163,7 +163,10 @@ void BaseScene::Update() {
 		if (AEInputCheckTriggered(AEVK_0)) {
 			SceneManager::ChangeScene(new BossScene());
 		}
-
+		if (AEInputCheckTriggered(AEVK_9))
+		{
+			SceneManager::ChangeScene(new Level1Scene());
+		}
 		for (BaseEnemy* enemy : enemyList) {
 			std::vector<EnemyProjectile*>& enemyProjs = enemy->GetProjectiles();
 			for (auto it = enemyProjs.begin(); it != enemyProjs.end(); ) {

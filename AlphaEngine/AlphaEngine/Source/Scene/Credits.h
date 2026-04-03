@@ -22,7 +22,7 @@ private:
     AEGfxTexture* creditsImage;//credits image
     Transform2D creditsTfm;//transform for the image scroll
 
-    //various sprites used as background VFXs
+    //various sprites and their transforms used as background VFXs
     Sprite* playerSprite{};
     Transform2D pSTfm{};
 

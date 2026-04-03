@@ -13,12 +13,14 @@
 *//*_______________________________________________________________________*/
 
 void WinScene::Load() {
+    levelBGM = "win_BGM";
     AEGfxReset();
     Button::LoadResources();
     btnMenu = new Button(0.0f, -100.0f, 200.0f, 50.0f, "Main Menu");
+    AudioManager::GetInstance()->PlayMusic(levelBGM);
 }
 
-void WinScene::Init() {}
+void WinScene::Init() { }
 
 void WinScene::Update() {
     if (btnMenu->IsClicked()) {

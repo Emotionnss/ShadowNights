@@ -282,17 +282,21 @@ bool BaseEnemy::HasLineOfSight(AEVec2 targetPos)
     return true;
 }
 
-bool BaseEnemy::CheckProjectileCollision(BaseProjectile* proj, Map* map)
+bool BaseEnemy::CheckProjectileCollision(BaseProjectile* proj, Map* collisionMap)
 {
-    for (s32 i = 0; i < map->GetNumCol(); ++i)
-        for (s32 j = 0; j < map->GetNumRow(); ++j)
+    // 1. Changed map-> to collisionMap-> on these two lines
+    for (s32 i = 0; i < collisionMap->GetNumCol(); ++i)
+        for (s32 j = 0; j < collisionMap->GetNumRow(); ++j)
         {
-            Tile const& tmp = map->GetTileFromTilePos(i, j);
+            // 2. Added static_cast<f32> to i and j to fix the data loss warning
+            Tile const& tmp = collisionMap->GetTileFromTilePos(static_cast<f32>(i), static_cast<f32>(j));
+
             AEVec2 projHalf = { proj->transform.GetScale().x * 0.5f, proj->transform.GetScale().y * 0.5f };
             AEVec2 tileHalf = { tmp.transform.GetScale().x * 0.5f, tmp.transform.GetScale().y * 0.5f };
 
             if (AABBOverlap(proj->transform.GetPosition(), projHalf, tmp.transform.GetPosition(), tileHalf) && proj->collidesWithTiles)
-                return map->CheckTile(tmp.tileType);
+                // 3. Changed map-> to collisionMap-> here as well!
+                return collisionMap->CheckTile(tmp.tileType);
         }
     return false;
 }

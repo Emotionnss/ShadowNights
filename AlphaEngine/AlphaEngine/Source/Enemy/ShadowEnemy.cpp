@@ -57,7 +57,6 @@ void ShadowEnemy::Update(float deltaTime)
     float dist = sqrt(dx * dx + dy * dy);
 
     float attackRadius = 300.0f;
-    float aggroRadius = 300.0f;
 
     float visualWidth = fabs(transform.GetScale().x);
     float visualHeight = transform.GetScale().y;

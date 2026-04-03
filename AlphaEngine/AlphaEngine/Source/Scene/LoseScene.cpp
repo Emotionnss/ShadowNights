@@ -26,6 +26,10 @@ LoseScene::LoseScene(int idToRestart) {
 
 void LoseScene::Load() {
     AEGfxReset();
+
+    meshManager = MeshManager::GetInstance();
+    bg = new Background("Assets/Sprites/Background/Redmoon.png"); 
+
     Button::LoadResources();
     btnRestart = new Button(0.0f, 40.0f, 200.0f, 50.0f, "Try Again");
     btnLoad = new Button(0.0f, -30.0f, 200.0f, 50.0f, "Load Game");
@@ -76,7 +80,10 @@ void LoseScene::Update() {
 
 void LoseScene::Draw() {
     AEGfxSetCamPosition(0.0f, 0.0f);
-    AEGfxSetBackgroundColor(0.3f, 0.0f, 0.0f);
+
+    if (bg && meshManager) {
+        bg->Draw(meshManager->GetMesh(TEXTURE_SQUARE));
+    }
 
     if (menuPage == 0) {
         btnRestart->Draw();
@@ -97,13 +104,14 @@ void LoseScene::Draw() {
         float w = 0.0f, h = 0.0f;
         AEGfxGetPrintSize(Button::fontId, loseMsg, 1.5f, &w, &h);
 
-        AEGfxPrint(Button::fontId, loseMsg, -(w / 2.0f), 0.35f, 1.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+        AEGfxPrint(Button::fontId, loseMsg, -(w / 2.0f), 0.25f, 1.5f, 1.0f, 1.0f, 1.0f, 1.0f);
     }
 }
 
 void LoseScene::Free() {
     delete btnRestart; delete btnLoad; delete btnMenu;
     delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;
+
     BaseScene::Free();
     Button::FreeResources();
 }

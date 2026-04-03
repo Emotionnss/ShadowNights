@@ -46,8 +46,6 @@ void ArcherEnemy::Update(float deltaTime)
     AEVec2 playerPos = player->GetTransform().GetPosition();
 
     float dx = playerPos.x - myPos.x;
-    float dy = playerPos.y - myPos.y;
-    float dist = sqrt(dx * dx + dy * dy);
 
     float visualWidth = fabs(transform.GetScale().x);
     float visualHeight = transform.GetScale().y;

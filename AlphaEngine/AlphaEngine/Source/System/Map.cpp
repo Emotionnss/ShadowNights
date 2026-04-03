@@ -174,7 +174,6 @@ Tile& Map::GetTileFromTilePos(f32 xPos, f32 yPos) const
 	xPos = xPos >= NUM_COLUMN ? NUM_COLUMN - 1 : xPos;
 	yPos = yPos >= NUM_ROW ? NUM_ROW - 1 : yPos;
 
-	// --- THE FIX: Prevent negative map coordinates! ---
 	xPos = xPos < 0 ? 0 : xPos;
 	yPos = yPos < 0 ? 0 : yPos;
 

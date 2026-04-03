@@ -18,24 +18,69 @@
 @brief      This file contains definitions of functions and variables
             used for the BaseScene class, which is the parent class
             of all scenes in the game, and contains common variables and
-			functions used across all scenes
+            functions used across all scenes
 *//*_______________________________________________________________________*/
 
 class BaseScene {
 public:
+    /*!
+    @brief    Constructor for BaseScene.
+    @param    slot The save slot to load from, defaults to 0 (new game).
+    *//*______________________________________________________________*/
     BaseScene(int slot = 0);
 
+    /*!
+    @brief    Virtual destructor to ensure proper cleanup of derived scenes.
+    *//*______________________________________________________________*/
     virtual ~BaseScene();
 
+    /*!
+    @brief    Loads the necessary assets, background, and UI for the scene.
+    *//*______________________________________________________________*/
     virtual void Load();
+
+    /*!
+    @brief    Initializes scene variables, entities, and camera positions.
+    *//*______________________________________________________________*/
     virtual void Init();
+
+    /*!
+    @brief    Updates scene logic, entity behaviors, and UI interactions.
+    *//*______________________________________________________________*/
     virtual void Update();
+
+    /*!
+    @brief    Renders all background elements, entities, and UI to the screen.
+    *//*______________________________________________________________*/
     virtual void Draw();
+
+    /*!
+    @brief    Frees dynamically allocated memory used during the scene.
+    *//*______________________________________________________________*/
     virtual void Free();
+
+    /*!
+    @brief    Unloads assets and textures from the graphics memory.
+    *//*______________________________________________________________*/
     virtual void Unload();
 
+    /*!
+    @brief    Saves the player's current progress to a specified slot.
+    @param    slot The save file index to write to (1, 2, or 3).
+    *//*______________________________________________________________*/
     void SaveGame(int slot);
+
+    /*!
+    @brief    Loads the player's saved progress from a specified slot.
+    @param    slot The save file index to read from (1, 2, or 3).
+    *//*______________________________________________________________*/
     void LoadGame(int slot);
+
+    /*!
+    @brief    Checks if a valid save file exists for the given slot.
+    @param    slot The save file index to check.
+    @return   True if the file exists, false otherwise.
+    *//*______________________________________________________________*/
     bool FileExists(int slot) const;
 
 protected:

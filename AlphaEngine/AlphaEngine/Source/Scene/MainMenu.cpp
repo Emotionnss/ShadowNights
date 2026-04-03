@@ -39,20 +39,25 @@ void MainMenu::Load() {
 	bg = new Background("Assets/Sprites/Background/Dark Gothic Castle.png");
 	if (Button::fontId == -1) Button::LoadResources();
 
-	btnPlay = new Button(0.0f, 90.0f - 200.f, 200.0f, 50.0f, "New Game");//-200.f cause cheekang dk how to base y value off previous BUTTON LOOKING AT U CHEE KANG
-	btnLoad = new Button(0.0f, 30.0f - 200.f, 200.0f, 50.0f, "Load Game");
-	btnSettings = new Button(0.0f, -30.0f - 200.f, 200.0f, 50.0f, "Settings");
-	btnCredits = new Button(0.0f, -90.0f - 200.f, 200.0f, 50.0f, "Credits");
-	btnQuit = new Button(0.0f, -150.0f - 200.f, 200.0f, 50.0f, "Quit");
+	float startY = -110.0f;
+	float spacing = 60.0f;
+	float width = 200.0f;
+	float height = 50.0f;
 
-	btnSlot1 = new Button(0.0f, 90.0f - 200.f, 200.0f, 50.0f, "Slot 1");
-	btnSlot2 = new Button(0.0f, 30.0f - 200.f, 200.0f, 50.0f, "Slot 2");
-	btnSlot3 = new Button(0.0f, -30.0f - 200.f, 200.0f, 50.0f, "Slot 3");
-	btnBack = new Button(0.0f, -90.0f - 200.f, 200.0f, 50.0f, "Back");
+	btnPlay = new Button(0.0f, startY, width, height, "New Game");
+	btnLoad = new Button(0.0f, startY - spacing, width, height, "Load Game");
+	btnSettings = new Button(0.0f, startY - (spacing * 2), width, height, "Settings");
+	btnCredits = new Button(0.0f, startY - (spacing * 3), width, height, "Credits");
+	btnQuit = new Button(0.0f, startY - (spacing * 4), width, height, "Quit");
 
-	// Confirmation Buttons
-	btnYes = new Button(-100.0f, -50.0f - 200.f, 150.0f, 50.0f, "Yes");
-	btnNo = new Button(100.0f, -50.0f - 200.f, 150.0f, 50.0f, "No");
+	btnSlot1 = new Button(0.0f, startY, width, height, "Slot 1");
+	btnSlot2 = new Button(0.0f, startY - spacing, width, height, "Slot 2");
+	btnSlot3 = new Button(0.0f, startY - (spacing * 2), width, height, "Slot 3");
+	btnBack = new Button(0.0f, startY - (spacing * 3), width, height, "Back");
+
+	// Confirmation Buttons (Pushed slightly further down)
+	btnYes = new Button(-100.0f, startY - (spacing * 2.5f), 150.0f, height, "Yes");
+	btnNo = new Button(100.0f, startY - (spacing * 2.5f), 150.0f, height, "No");
 
 	logo = AEGfxTextureLoad("Assets/Credits/logo.png");
 	logoTfm.SetPosition(0.f, 200.f);
@@ -61,18 +66,40 @@ void MainMenu::Load() {
 
 void MainMenu::Init() {
 	menuPage = 0;
+	animT = 0.0f;
 }
 
 void MainMenu::Update() {
+	f32 dt = (f32)AEFrameRateControllerGetFrameTime();
+	if (dt > 0.033f) dt = 0.01667f;
+
+	if (animT < 1.0f) {
+		animT += dt * 1.5f;
+		if (animT > 1.0f) animT = 1.0f;
+	}
+
+	float ease = 1.0f - pow(1.0f - animT, 3.0f);
+	float fromRight = 800.0f * (1.0f - ease);
+	float fromLeft = -800.0f * (1.0f - ease);
+
+	// --- USE THE SAME CLEAN SPACING FOR ANIMATIONS ---
+	float startY = -110.0f;
+	float spacing = 60.0f;
+
 	if (menuPage == 0) {
+		btnPlay->SetPosition(fromRight, startY);
+		btnLoad->SetPosition(fromLeft, startY - spacing);
+		btnSettings->SetPosition(fromRight, startY - (spacing * 2));
+		btnCredits->SetPosition(fromLeft, startY - (spacing * 3));
+		btnQuit->SetPosition(fromRight, startY - (spacing * 4));
+
 		if (btnPlay->IsClicked()) {
-			DeleteSave(1);
-			DeleteSave(2);
-			DeleteSave(3);
+			DeleteSave(1); DeleteSave(2); DeleteSave(3);
 			SceneManager::ChangeScene(new TutorialScene());
 		}
 		if (btnLoad->IsClicked()) {
 			menuPage = 2;
+			animT = 0.0f;
 			btnSlot1->SetLabel(FileExists(1) ? "Load Slot 1" : "Empty");
 			btnSlot2->SetLabel(FileExists(2) ? "Load Slot 2" : "Empty");
 			btnSlot3->SetLabel(FileExists(3) ? "Load Slot 3" : "Empty");
@@ -80,24 +107,38 @@ void MainMenu::Update() {
 		if (btnSettings->IsClicked()) {
 			SceneManager::ChangeScene(new SettingsScene());
 		}
-		if (btnCredits->IsClicked())
-		{
+		if (btnCredits->IsClicked()) {
 			SceneManager::ChangeScene(new CreditsScene());
 		}
 		if (btnQuit->IsClicked()) {
 			menuPage = 3;
+			animT = 0.0f;
 		}
 	}
 	else if (menuPage == 1 || menuPage == 2) {
-		if (btnBack->IsClicked()) menuPage = 0;
+		btnSlot1->SetPosition(fromRight, startY);
+		btnSlot2->SetPosition(fromLeft, startY - spacing);
+		btnSlot3->SetPosition(fromRight, startY - (spacing * 2));
+		btnBack->SetPosition(fromLeft, startY - (spacing * 3));
+
+		if (btnBack->IsClicked()) {
+			menuPage = 0;
+			animT = 0.0f;
+		}
 
 		if (btnSlot1->IsClicked() && FileExists(1)) SceneManager::ChangeScene(new TutorialScene(1));
 		if (btnSlot2->IsClicked() && FileExists(2)) SceneManager::ChangeScene(new TutorialScene(2));
 		if (btnSlot3->IsClicked() && FileExists(3)) SceneManager::ChangeScene(new TutorialScene(3));
 	}
 	else if (menuPage == 3) {
+		btnYes->SetPosition(-100.0f, startY - (spacing * 2.5f));
+		btnNo->SetPosition(100.0f, startY - (spacing * 2.5f));
+
 		if (btnYes->IsClicked()) gGameRunning = false;
-		if (btnNo->IsClicked()) menuPage = 0;
+		if (btnNo->IsClicked()) {
+			menuPage = 0;
+			animT = 0.0f;
+		}
 	}
 }
 

@@ -15,12 +15,16 @@
 void WinScene::Load() {
     levelBGM = "win_BGM";
     AEGfxReset();
+
+    meshManager = MeshManager::GetInstance();
+    bg = new Background("Assets/Sprites/Background/Bluemoon.png");
+
     Button::LoadResources();
     btnMenu = new Button(0.0f, -100.0f, 200.0f, 50.0f, "Main Menu");
     AudioManager::GetInstance()->PlayMusic(levelBGM);
 }
 
-void WinScene::Init() { }
+void WinScene::Init() {}
 
 void WinScene::Update() {
     if (btnMenu->IsClicked()) {
@@ -31,22 +35,29 @@ void WinScene::Update() {
 void WinScene::Draw() {
     AEGfxSetCamPosition(0.0f, 0.0f);
 
-    AEGfxSetBackgroundColor(0.3f, 0.2f, 0.05f);
+    if (bg && meshManager) {
+        bg->Draw(meshManager->GetMesh(TEXTURE_SQUARE));
+    }
 
     char winMsg[64];
     snprintf(winMsg, sizeof(winMsg), "BOSS DEFEATED!");
 
     float w = 0.0f, h = 0.0f;
-    AEGfxGetPrintSize(Button::fontId, winMsg, 1.0f, &w, &h);
+    AEGfxGetPrintSize(Button::fontId, winMsg, 1.5f, &w, &h);
 
-    
-    AEGfxPrint(Button::fontId, winMsg, -(w / 2.0f), 0.15f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
+    AEGfxPrint(Button::fontId, winMsg, -(w / 2.0f), 0.15f, 1.5f, 1.0f, 1.0f, 1.0f, 1.0f);
 
     btnMenu->Draw();
 }
 
 void WinScene::Free() {
     delete btnMenu;
+
+    if (bg) {
+        delete bg;
+        bg = nullptr;
+    }
+    
     Button::FreeResources();
 }
 

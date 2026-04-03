@@ -66,6 +66,9 @@ bool CSVManager::WriteSettingsInfo(std::vector<s32> data)
 		}
 	}
 
+	//Close the file
+	file.close();
+
 	return true;
 }
 

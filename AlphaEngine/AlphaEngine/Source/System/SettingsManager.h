@@ -1,6 +1,6 @@
 /*!
 @file       SettingsManager.h
-@author     Yap Yu Xuan, Daevon (yuxuandaevon.yap), 
+@author     Yap Yu Xuan, Daevon (yuxuandaevon.yap), Chng Wei Sheng Bennett (chng.w)
 @brief      This file contains the declarations to manage the settings
 			used in the game
 *//*_______________________________________________________________________*/

@@ -42,6 +42,6 @@ private:
     Slider* sliderSFX = nullptr;
     int activeSlider = 0;
 
-    // Scene Specific Parameters
+    // Scene Specific Parameterss
 };
 

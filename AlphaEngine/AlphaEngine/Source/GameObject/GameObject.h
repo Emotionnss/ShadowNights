@@ -13,6 +13,9 @@
 
 class GameObject {
 public:
+	Sprite* sprite;
+	Transform2D transform;
+
 	/*!
 	@brief	Constructor
 	*/
@@ -85,9 +88,6 @@ public:
 	@return	Returns the boolean of isStatic
 	*/
 	bool const GetStatic() const { return isStatic; }
-
-	Sprite* sprite;
-	Transform2D transform;
 
 protected:
 	AEVec2 velocity, acceleration;

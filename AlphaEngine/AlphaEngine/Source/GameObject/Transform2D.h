@@ -80,15 +80,15 @@ public:
 	void SetRotation(float r);
 
 private:
+	bool needUpdate;
+	f32 rotation;
+	AEVec2 position, scale;
+	AEMtx33 transform;
+
 	/*!
 	@brief	Private function that uses AlphaEngine matrix functions
 			to concat the matrix of the object
 			Only updates when needUpdate bool is true
 	*/
 	void UpdateMatrix();
-
-	bool needUpdate;
-	f32 rotation;
-	AEVec2 position, scale;
-	AEMtx33 transform;
 };

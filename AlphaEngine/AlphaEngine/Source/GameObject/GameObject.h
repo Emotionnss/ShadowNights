@@ -57,7 +57,7 @@ public:
 	@brief	Returns the local AEVec2 acceleration
 	@return Acceleration of AEVec2
 	*/
-	const AEVec2 GetAcceleration() { return acceleration; };
+	const AEVec2 GetAcceleration() const { return acceleration; };
 
 	/*!
 	@brief	Set the local velocity based on arguments
@@ -84,7 +84,7 @@ public:
 	@brief	Retrieves isStatic boolean information
 	@return	Returns the boolean of isStatic
 	*/
-	bool const GetStatic() { return isStatic; }
+	bool const GetStatic() const { return isStatic; }
 
 	Sprite* sprite;
 	Transform2D transform;

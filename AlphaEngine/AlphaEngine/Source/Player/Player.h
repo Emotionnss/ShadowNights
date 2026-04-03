@@ -173,7 +173,7 @@ private:
 	Direction playerDirection = RIGHT;
 
 	Transform2D healthbar, healthbarOverlayTfm, arrowTfm{};
-	AEGfxTexture* healthBarBG, healthbarOverlay, arrowTex{};
+	AEGfxTexture* healthBarBG, * healthbarOverlay, * arrowTex{};
 
 	AEVec2 input, playerToMouseVector, playerToMouseVectorNormalized;
 	AEVec2 cameraPosition, cameraOffset;

@@ -77,6 +77,7 @@ void BaseScene::Load() {
 
 void BaseScene::Init() {
 	player->GetTransform().SetPosition(300.0f, 900.0f);
+	player->TriggerCameraShake(0.f, 0.f);
 
 	audio->PlayMusic(levelBGM, 1.f);
 
@@ -151,7 +152,7 @@ void BaseScene::Update() {
 			map->SetTile(TILE_TYPE::OPEN_DOOR, DoorTilePosition.y, DoorTilePosition.x);
 		}
 
-		if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR || 
+		if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR ||
 			player->GetCollidedYTile().tileType == TILE_TYPE::OPEN_DOOR) {
 			if (nextScene != nullptr) {
 				BaseScene* pNext = nextScene;
@@ -317,7 +318,7 @@ void BaseScene::Update() {
 		else if (menuPage == 4) {
 			btnToggleMute->SetPosition(CamPos.x, CamPos.y + 50.0f);
 			btnToggleFullscreen->SetPosition(CamPos.x, CamPos.y - 20.0f);
-			btnToggleCameraShake->SetPosition(CamPos.x, CamPos.y -90.0f);
+			btnToggleCameraShake->SetPosition(CamPos.x, CamPos.y - 90.0f);
 			btnSettingsBack->SetPosition(CamPos.x, CamPos.y - 160.0f);
 
 			// Mute logic
@@ -487,7 +488,9 @@ bool BaseScene::FileExists(int slot) const {
 
 void BaseScene::Free() {
 	if (abilityHandler)
+	{
 		delete abilityHandler;
+	}
 
 	if (player != nullptr)
 	{

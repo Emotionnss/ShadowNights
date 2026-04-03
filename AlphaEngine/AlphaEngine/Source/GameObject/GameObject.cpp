@@ -1,5 +1,12 @@
 #include "GameObject.h"
 #include <iostream>
+/*!
+@file       GameObject.cpp
+@author     Chng Wei Sheng Bennett (chng.w)
+@brief      This file contains the virtual class definitions of gameobject
+			that has a Transform2D and Sprite to represent a gameobject in
+			the game with init, update and draw virtual functions.
+*//*_______________________________________________________________________*/
 
 GameObject::GameObject()
 	: isStatic(true), friction(0.0f), sprite(nullptr)

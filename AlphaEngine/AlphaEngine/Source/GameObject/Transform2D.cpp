@@ -1,7 +1,7 @@
 /*!
 @file       Transform2D.cpp
 @author     Chng Wei Sheng Bennett (chng.w)
-@brief      This file contains definitions of functionst that help
+@brief      This file contains definitions of functions that help
 			concat the matrix for 2D transformations.
 *//*_______________________________________________________________________*/
 
@@ -35,12 +35,12 @@ AEVec2 Transform2D::GetScale() const
 	return scale;
 }
 
-float Transform2D::GetRotation() const
+f32 Transform2D::GetRotation() const
 {
 	return rotation;
 }
 
-void Transform2D::SetPosition(float x, float y)
+void Transform2D::SetPosition(f32 x, f32 y)
 {
 	position = { x, y };
 	needUpdate = true;

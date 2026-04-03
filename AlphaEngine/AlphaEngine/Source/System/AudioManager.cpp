@@ -1,5 +1,11 @@
 #include "AudioManager.h"
-
+/*!
+@file       AudioManager.cpp
+@author     Chng Wei Sheng Bennett (chng.w)
+@brief      This file contains definitions of functions and variables
+			used for the Audio in the game such as playing Sound Effects
+			or Music.
+*//*_______________________________________________________________________*/
 AudioManager::AudioManager()
 	: localBGMVolume{ 1.0f }
 	, localSFXVolume{ 1.0f }
@@ -98,11 +104,11 @@ void AudioManager::ParseCSV(const std::string& csvPath)
 		std::stringstream ss(line);
 		std::string name, filename, isMusicStr;
 
-		// Column A � clip name
+		// Column A - clip name
 		if (!std::getline(ss, name, ',')) continue;
-		// Column B � audio filename
+		// Column B - audio filename
 		if (!std::getline(ss, filename, ',')) continue;
-		// Column C � is music (true/false)
+		// Column C - is music (true/false)
 		if (!std::getline(ss, isMusicStr, ',')) continue;
 
 		Trim(name);
@@ -250,13 +256,13 @@ AudioClip AudioManager::GetCurrentMusicClip() const
 	return currentMusic;
 }
 
-void AudioManager::SetBGMVolume(float volume)
+void AudioManager::SetBGMVolume(f32 volume)
 {
 	localBGMVolume = volume;
 	AEAudioSetGroupVolume(BGM_LOOP, localBGMVolume);
 }
 
-void AudioManager::SetSFXVolume(float volume)
+void AudioManager::SetSFXVolume(f32 volume)
 {
 	localSFXVolume = volume;
 	AEAudioSetGroupVolume(SFX_LOOP, localSFXVolume);

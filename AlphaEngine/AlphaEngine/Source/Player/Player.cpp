@@ -1,3 +1,11 @@
+/*!
+@file       Player.cpp
+@author     Chng Wei Sheng Bennett (chng.w)
+@brief      This file contains the definitions of functions that help
+			the player GameObject function with Camera System implemented
+			as well.
+*//*_______________________________________________________________________*/
+
 #include "Player.h"
 #include "../particle/ParticleManager.h"
 #include <iostream>
@@ -60,7 +68,7 @@ Player::~Player()
 		AEGfxTextureUnload(arrowTex);
 }
 
-void Player::SetHealth(float val)
+void Player::SetHealth(f32 val)
 {
 	currentHP = val;
 }
@@ -549,7 +557,7 @@ void Player::Update(float deltaTime)
 	}
 }
 
-void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matrix)
+void Player::DrawHealthBar(AEGfxVertexList* mesh, f32 value, Transform2D matrix)
 {
 	if (canMove)
 	{
@@ -589,9 +597,11 @@ void Player::DrawHealthBar(AEGfxVertexList* mesh, float value, Transform2D matri
 	}
 }
 
-void Player::TakeDamage(float damage)
+void Player::TakeDamage(f32 damage)
 {
 	AudioManager::GetInstance()->PlaySFXOneShot("player_hurt");
+
+	TriggerCameraShake(5.f, 0.5f);
 
 	float x = (currentHP - damage < 0) ? 0 : (currentHP - damage);
 	SetHealth(x);

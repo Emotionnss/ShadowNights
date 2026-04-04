@@ -38,9 +38,20 @@ void TimeSlow::Update(float dt)//update
 		if (!startDespawn)//not despawning yet
 			despawningTimer = despawningTime;//dont let it tick down
 
-		AEGfxSetBackgroundColor(0,255, 10);
+		
 		timeSlowTransform.SetPosition(player->GetTransform().GetPosition());//set the slow sprite onto our player
-
+		for (BaseProjectile* proj : player->GetProjectileList())//slow all projectiles thrown
+		{
+			proj->slowed = true;
+		}
+		for (BaseEnemy* enemy : enemyList)//slow all enemies and their projectiles
+		{
+			enemy->Slowed(true);
+			for (BaseProjectile* proj : enemy->GetProjectiles())
+			{
+				proj->slowed = true;
+			}
+		}
 	}
 	if (startDespawn)//despawning sequence
 	{
@@ -52,12 +63,25 @@ void TimeSlow::Update(float dt)//update
 		{
 			startDespawn = false;
 		}
+		for (BaseEnemy* enemy : enemyList)//unslow every enemy and their projectile
+		{
+			enemy->Slowed(false);
+			for (BaseProjectile* proj : enemy->GetProjectiles())
+			{
+				proj->slowed = false;
+			}
+		}
+		for (BaseProjectile* proj : player->GetProjectileList())//unslow all projectile thrown by player
+		{
+			proj->slowed = false;
+		}
 	}
 	timeSlowSprite->Update();
 }
 
 bool TimeSlow::ToggleSlow(std::vector<BaseEnemy*> enemyList)
 {
+	this->enemyList = enemyList;
 	if (active == true)//if the ability is already active
 	{
 		AudioManager::GetInstance()->PlaySFXOneShot("time_slow_end",1);

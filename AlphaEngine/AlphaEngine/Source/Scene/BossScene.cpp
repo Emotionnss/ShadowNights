@@ -18,6 +18,7 @@ void BossScene::Init() {
     levelID = 2;
 
     if (isLoading) {
+
         // If we loaded a save file mid-fight, the intro cutscene is skipped completely.
         cutsceneDuration = -1.f;
         canPause = true;
@@ -145,6 +146,7 @@ void BossScene::SaveGame(int slot) {
 void BossScene::LoadGame(int slot) {
     // Let BaseScene reload the world
     BaseScene::LoadGame(slot);
+    player->TriggerCameraShake(0.f, 0.f);
 
     // Re-find the boss immediately so we can apply data to it
     boss = nullptr;

@@ -25,6 +25,7 @@
 
 extern void ShutdownSwordResources(); //Declare external functions to free projectile resources
 extern void ShutdownKnifeResources(); // (These are defined in their respective .cpp files, but are called in BaseScene's Free function to ensure they are cleaned up regardless of the current scene)
+static int activeSaveSlot = 0;
 
 BaseScene::BaseScene(int slot) : loadFromSlot(slot) {} //Constructor that sets the loadFromSlot variable, which is used to determine which save file to load from when the scene starts
 
@@ -131,7 +132,7 @@ void BaseScene::Init() {
 }
 
 void BaseScene::Update() {
-	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
+	if (canPause && AEInputCheckTriggered(AEVK_ESCAPE)) {
 		isPaused = !isPaused;
 		menuPage = 0;
 	}
@@ -305,13 +306,16 @@ void BaseScene::Update() {
 
 			if (btnResume->IsClicked()) isPaused = false; //If the resume button is clicked, unpause the game
 
-			//If the save menu button is clicked, switch to the save menu page and update the slot button labels to indicate whether each slot is currently used or empty. If the load menu button is clicked, switch to the load menu page and update the slot button labels to indicate whether each slot is currently used or empty (with different text than the save menu to indicate that these slots will be loaded from rather than saved to)
 			if (btnSaveMenu->IsClicked()) {
+				// 1. Always open the Save Menu list
 				menuPage = 1;
-				btnSlot1->SetLabel(FileExists(1) ? "Slot 1 (Used)" : "Slot 1 (Empty)");
-				btnSlot2->SetLabel(FileExists(2) ? "Slot 2 (Used)" : "Slot 2 (Empty)");
-				btnSlot3->SetLabel(FileExists(3) ? "Slot 3 (Used)" : "Slot 3 (Empty)");
+
+				// 2. Label the slots clearly so you know what you are overwriting
+				btnSlot1->SetLabel(activeSaveSlot == 1 ? "Slot 1 (Active)" : (FileExists(1) ? "Slot 1 (Used)" : "Slot 1 (Empty)"));
+				btnSlot2->SetLabel(activeSaveSlot == 2 ? "Slot 2 (Active)" : (FileExists(2) ? "Slot 2 (Used)" : "Slot 2 (Empty)"));
+				btnSlot3->SetLabel(activeSaveSlot == 3 ? "Slot 3 (Active)" : (FileExists(3) ? "Slot 3 (Used)" : "Slot 3 (Empty)"));
 			}
+
 			//if the load menu button is clicked, switch to the load menu page and update the slot button labels to indicate whether each slot is currently used or empty (with different text than the save menu to indicate that these slots will be loaded from rather than saved to)
 			if (btnLoadMenu->IsClicked()) {
 				menuPage = 2;
@@ -323,23 +327,26 @@ void BaseScene::Update() {
 			if (btnExit->IsClicked()) menuPage = 3; //If the exit button is clicked, switch to the confirmation prompt page to confirm whether the player really wants to quit to the main menu, since doing so will lose all unsaved progress
 		}
 		//If the player is currently on the save menu page or the load menu page, display the slot buttons and the back button, and check for clicks on those buttons to perform the appropriate actions (e.g. saving/loading to/from the selected slot, going back to the main pause menu, etc.)
-		else if (menuPage == 1 || menuPage == 2) { 
+		else if (menuPage == 1 || menuPage == 2) {
 			btnSlot1->SetPosition(CamPos.x, CamPos.y + 100.0f);
 			btnSlot2->SetPosition(CamPos.x, CamPos.y + 30.0f);
 			btnSlot3->SetPosition(CamPos.x, CamPos.y - 40.0f);
 			btnBack->SetPosition(CamPos.x, CamPos.y - 110.0f);
 
 			if (btnBack->IsClicked()) menuPage = 0;
-			if (btnSlot1->IsClicked()) { if (menuPage == 1) SaveGame(1); else LoadGame(1); menuPage = 0; }
-			if (btnSlot2->IsClicked()) { if (menuPage == 1) SaveGame(2); else LoadGame(2); menuPage = 0; }
-			if (btnSlot3->IsClicked()) { if (menuPage == 1) SaveGame(3); else LoadGame(3); menuPage = 0; }
+			if (btnSlot1->IsClicked()) { if (menuPage == 1) { SaveGame(1); activeSaveSlot = 1; } else LoadGame(1); menuPage = 0; }
+			if (btnSlot2->IsClicked()) { if (menuPage == 1) { SaveGame(2); activeSaveSlot = 2; } else LoadGame(2); menuPage = 0; }
+			if (btnSlot3->IsClicked()) { if (menuPage == 1) { SaveGame(3); activeSaveSlot = 3; } else LoadGame(3); menuPage = 0; }
 		}
 		//If the player is currently on the confirmation prompt page, display the yes and no buttons, and check for clicks on those buttons to perform the appropriate actions (i.e. if yes is clicked, change to the main menu scene; if no is clicked, go back to the main pause menu)
 		else if (menuPage == 3) {
 			btnYes->SetPosition(CamPos.x - 100.0f, CamPos.y - 50.0f);
 			btnNo->SetPosition(CamPos.x + 100.0f, CamPos.y - 50.0f);
 
-			if (btnYes->IsClicked()) SceneManager::ChangeScene(new MainMenu());
+			if (btnYes->IsClicked()) {
+				activeSaveSlot = 0; // Clear memory when quitting to main menu
+				SceneManager::ChangeScene(new MainMenu());
+			}
 			if (btnNo->IsClicked()) menuPage = 0;
 		}
 		//If the player is currently on the settings menu page, display the toggle mute, toggle fullscreen, toggle camera shake, and back buttons, and check for clicks on those buttons to perform the appropriate actions (e.g. toggling mute, toggling fullscreen, toggling camera shake, going back to the main pause menu, etc.). Also update the labels of the toggle buttons to reflect the current state of each setting
@@ -483,9 +490,21 @@ void BaseScene::SaveGame(int slot) {
 		// Write Player Data + Mana
 		f << levelID << " " << pos.x << " " << pos.y << " " << player->GetHealth() << " " << currentMana << "\n";
 
-		// Write the remaining enemies and their health!
-		f << enemyList.size() << "\n";
+		// Only count enemies that are actually alive
+		int aliveCount = 0;
 		for (BaseEnemy* enemy : enemyList) {
+			if (enemy != nullptr && !enemy->IsDying() && enemy->GetHealth() > 0) {
+				aliveCount++;
+			}
+		}
+
+		// Write the true amount of living enemies
+		f << aliveCount << "\n";
+
+		for (BaseEnemy* enemy : enemyList) {
+			// Skip nulls, and skip enemies that are currently in their death animation
+			if (enemy == nullptr || enemy->IsDying() || enemy->GetHealth() <= 0) continue;
+
 			int typeID = 0;
 
 			// Figure out what type of enemy this is
@@ -493,8 +512,6 @@ void BaseScene::SaveGame(int slot) {
 			else if (dynamic_cast<ArcherEnemy*>(enemy)) typeID = 2;
 			else if (dynamic_cast<ShadowEnemy*>(enemy)) typeID = 3;
 			else if (dynamic_cast<BossEnemy*>(enemy)) typeID = 4;
-
-			if (enemy == nullptr) continue;
 
 			AEVec2 ePos = enemy->transform.GetPosition();
 			f << typeID << " " << ePos.x << " " << ePos.y << " " << enemy->GetHealth() << "\n";
@@ -508,6 +525,7 @@ void BaseScene::SaveGame(int slot) {
 void BaseScene::LoadGame(int slot) {
 	std::string path = "save_slot_" + std::to_string(slot) + ".txt";
 	std::ifstream f(path);
+	activeSaveSlot = slot;
 	if (f.is_open()) {
 
 		int savedLevelID;

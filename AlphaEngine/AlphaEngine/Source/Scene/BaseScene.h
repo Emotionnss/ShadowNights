@@ -103,7 +103,8 @@ protected:
     std::vector<BaseEnemy*> enemyList;
 
     bool isPaused = false;
-	int menuPage = 0; //Used to determine which menu page the player is currently on when the game is paused (0 = main pause menu, 1 = save menu, 2 = load menu, 3 = settings menu, 4 = confirmation prompt)
+    bool canPause = true; // Allows blocking the pause menu during cutscenes
+    int menuPage = 0; //Used to determine which menu page the player is currently on when the game is paused (0 = main pause menu, 1 = save menu, 2 = load menu, 3 = settings menu, 4 = confirmation prompt)
     float popupTimer = 0.0f;
 
     int levelID = 1;

@@ -59,6 +59,8 @@ void BossScene::Draw() {
 }
 
 void BossScene::Free() {
+    player->SetMoveable(true);
+    abilityHandler->ShowUI(true);
     BaseScene::Free();
     boss = nullptr;
 }

@@ -22,7 +22,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // 1. Initialize
-    if (AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, false, NULL) == 0) {
+    if (AESysInit(hInstance, nCmdShow, 1600, 900, 0, 60, false, NULL) == 0) {
         return 0;
     }
 

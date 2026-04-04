@@ -13,10 +13,11 @@
 			 resources.
 *//*_______________________________________________________________________*/
 
-AEGfxTexture* Button::sprite = nullptr;
+AEGfxTexture* Button::sprite = nullptr; 
 AEGfxVertexList* Button::pMesh = nullptr;
 s8 Button::fontId = -1;
 
+// Static function to free the shared resources used by all buttons
 Button::Button(float x, float y, float width, float height, const char* text)
     : x(x), y(y), w(width), h(height)
 {
@@ -27,19 +28,21 @@ Button::Button(float x, float y, float width, float height, const char* text)
     }
 }
 
+// Function to update the button's position
 void Button::SetLabel(const char* text) {
     if (text) {
         snprintf(label, sizeof(label), "%s", text);
     }
 }
 
+// Function to render the button, including its background and centered text
 void Button::Draw() const
 {
     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
     AEGfxSetBlendMode(AE_GFX_BM_BLEND);
     AEGfxSetTransparency(1.0f);
 
-    if (sprite == nullptr) {
+	if (sprite == nullptr) { // If the texture failed to load, render a red rectangle as a placeholder
         AEGfxSetRenderMode(AE_GFX_RM_COLOR);
         AEGfxSetColorToMultiply(1.0f, 0.0f, 0.0f, 1.0f);
     }
@@ -59,13 +62,13 @@ void Button::Draw() const
         AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
     }
 
-    AEMtx33 identity;
-    AEMtx33Identity(&identity);
-    AEGfxSetTransform(identity.m);
+	AEMtx33 identity; // Reset transform to draw text in screen space
+	AEMtx33Identity(&identity); // Set to identity matrix to draw text in screen space
+	AEGfxSetTransform(identity.m); // Set transform to identity for text rendering
 
-    if (fontId != -1) {
+	if (fontId != -1) { // If the font loaded successfully, render the button label
         float camX, camY;
-        AEGfxGetCamPosition(&camX, &camY);
+		AEGfxGetCamPosition(&camX, &camY); // Get camera position to adjust text position accordingly
 
         float relX = x - camX;
         float relY = y - camY;
@@ -74,7 +77,7 @@ void Button::Draw() const
         float textY = relY / 450.0f; 
 
         float textW, textH;
-        AEGfxGetPrintSize(fontId, label, 1.0f, &textW, &textH);
+		AEGfxGetPrintSize(fontId, label, 1.0f, &textW, &textH); // Get the size of the text to center it properly
 
         textX -= (textW / 2.0f);
         textY -= (textH / 2.0f);
@@ -85,8 +88,8 @@ void Button::Draw() const
 
 bool Button::IsHovered() const 
 {
-	HWND hwnd = AESysGetWindowHandle(); // Get the window handle from the engine
-	POINT mousePos; // Structure to hold mouse position
+	HWND hwnd = AESysGetWindowHandle(); // Get the window handle from the engine HWND is used to interact with the Windows API for getting mouse position and window dimensions
+	POINT mousePos; // Structure to hold mouse position POINT is a simple struct with x and y fields for screen coordinates
 	GetCursorPos(&mousePos); // Get mouse position in screen coordinates
 	ScreenToClient(hwnd, &mousePos); // Convert to client area coordinates
 
@@ -118,15 +121,17 @@ bool Button::IsHovered() const
         worldMouseY > y - h / 2.0f && worldMouseY < y + h / 2.0f);
 }
 
+// Function to check if the button is clicked (hovered and left mouse button triggered)
 bool Button::IsClicked() const 
 {
-    return IsHovered() && AEInputCheckTriggered(AEVK_LBUTTON);
+	return IsHovered() && AEInputCheckTriggered(AEVK_LBUTTON); // Check if left mouse button was clicked while hovering
 }
 
-void Button::LoadResources() {
+// Static function to load the shared resources used by all buttons
+void Button::LoadResources() { // Load the button texture, font, and mesh if they haven't been loaded already
     if (sprite == nullptr) {
-        sprite = AEGfxTextureLoad("Assets/Button/Default/Panel/panel-011.png");
-        if (!sprite) std::cout << "CRITICAL ERROR: Texture Not Found! Check path." << std::endl;
+		sprite = AEGfxTextureLoad("Assets/Button/Default/Panel/panel-011.png"); // Load the button background texture
+		if (!sprite) std::cout << "CRITICAL ERROR: Texture Not Found! Check path." << std::endl; // Log an error if the texture failed to load
     }
 
     if (fontId == -1) {
@@ -139,6 +144,7 @@ void Button::LoadResources() {
     }
 }
 
+// Static function to free the shared resources used by all buttons
 void Button::FreeResources() {
     if (sprite) {
         AEGfxTextureUnload(sprite);

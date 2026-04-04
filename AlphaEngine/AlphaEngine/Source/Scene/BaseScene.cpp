@@ -23,11 +23,12 @@
 			functions used across all scenes
 *//*_______________________________________________________________________*/
 
-extern void ShutdownSwordResources();
-extern void ShutdownKnifeResources();
+extern void ShutdownSwordResources(); //Declare external functions to free projectile resources
+extern void ShutdownKnifeResources(); // (These are defined in their respective .cpp files, but are called in BaseScene's Free function to ensure they are cleaned up regardless of the current scene)
 
-BaseScene::BaseScene(int slot) : loadFromSlot(slot) {}
+BaseScene::BaseScene(int slot) : loadFromSlot(slot) {} //Constructor that sets the loadFromSlot variable, which is used to determine which save file to load from when the scene starts
 
+//BaseScene destructor, used to clean up the nextScene pointer if it has been set by a derived scene
 BaseScene::~BaseScene() {
 	if (nextScene != nullptr) {
 		delete nextScene;
@@ -35,6 +36,7 @@ BaseScene::~BaseScene() {
 	}
 }
 
+//BaseScene Load function, used to load assets and initialize variables that are common across all scenes, such as the player, map, mesh manager, audio manager, and background. Also loads the map based on the levelMapName variable, which is set by derived scenes in their constructors
 void BaseScene::Load() {
 	AEGfxReset();
 	meshManager = MeshManager::GetInstance();
@@ -54,6 +56,7 @@ void BaseScene::Load() {
 		}
 	}
 
+	//load all buttons
 	Button::LoadResources();
 	btnResume = new Button(0.0f, 0.0f, 200.0f, 50.0f, "Resume");
 	btnSaveMenu = new Button(0.0f, 0.0f, 200.0f, 50.0f, "Save Game");
@@ -76,40 +79,42 @@ void BaseScene::Load() {
 }
 
 void BaseScene::Init() {
-	player->GetTransform().SetPosition(300.0f, 900.0f);
-	player->TriggerCameraShake(0.f, 0.f);
+	player->GetTransform().SetPosition(300.0f, 900.0f); //Set the player's initial position in the scene
+	player->TriggerCameraShake(0.f, 0.f); //Set the player's camera shake to 0 at the start of the scene, to prevent any shake from carrying over from previous scenes
 
-	audio->PlayMusic(levelBGM, 1.f);
+	audio->PlayMusic(levelBGM, 1.f); //Play the level's background music, with a fade-in time of 1 second
 
-	abilityHandler = new AbilityHandler();
+	abilityHandler = new AbilityHandler(); //Initialize the ability handler, which is used to manage the player's abilities and their interactions with enemies
 
-	isPaused = false;
-	menuPage = 0;
-	popupTimer = 0.0f;
+	isPaused = false; //Initialize the paused state to false, since the game starts unpaused
+	menuPage = 0; //Initialize the menu page to 0, which corresponds to the main pause menu (other pages include save menu, load menu, settings menu, and confirmation prompt)
+	popupTimer = 0.0f; //Initialize the popup timer to 0, which is used to control how long the "Game Saved!" message is displayed on screen after saving the game
 
+	// Iterate through the map and spawn enemies based on the tile types, then set those tiles to NONE to prevent respawning
 	s32 maxRows = map->GetNumRow();
 	for (s32 i = 0; i < maxRows; ++i) {
 
 		s32 maxCols = map->GetNumCol();
 		for (s32 j = 0; j < maxCols; ++j) {
 
+			//Get the world position of the current tile, which is used as the spawn position for any enemies that need to be spawned on that tile
 			AEVec2 pos = map->GetTileWorldPos(map->GetTilePos(map->GetMap()[i][j].transform.GetPosition().x, map->GetMap()[i][j].transform.GetPosition().y));
 
-			if (map->GetMap()[i][j].tileType == TILE_TYPE::BAT_ENEMY) {
+			if (map->GetMap()[i][j].tileType == TILE_TYPE::BAT_ENEMY) { //If the tile type is a bat enemy, spawn a new BatEnemy at that position, initialize it, and add it to the enemy list, then set the tile to NONE to prevent respawning
 				BaseEnemy* batEnemy = new BatEnemy();
 				batEnemy->Init(pos.x, pos.y, 85.f, 60.f, "batenemy");
 				batEnemy->SetVelocity(0, 0);
 				enemyList.push_back(batEnemy);
 				map->GetMap()[i][j].tileType = TILE_TYPE::NONE;
 			}
-			else if (map->GetMap()[i][j].tileType == TILE_TYPE::ARCHER_ENEMY) {
+			else if (map->GetMap()[i][j].tileType == TILE_TYPE::ARCHER_ENEMY) { //If the tile type is an archer enemy, spawn a new ArcherEnemy at that position, initialize it, and add it to the enemy list, then set the tile to NONE to prevent respawning
 				BaseEnemy* archerEnemy = new ArcherEnemy();
 				archerEnemy->Init(pos.x, pos.y, 85.f, 60.f, "sniperenemy");
 				archerEnemy->SetVelocity(0, 0);
 				enemyList.push_back(archerEnemy);
 				map->GetMap()[i][j].tileType = TILE_TYPE::NONE;
 			}
-			else if (map->GetMap()[i][j].tileType == TILE_TYPE::SHADOW_ENEMY) {
+			else if (map->GetMap()[i][j].tileType == TILE_TYPE::SHADOW_ENEMY) { //If the tile type is a shadow enemy, spawn a new ShadowEnemy at that position, initialize it, and add it to the enemy list, then set the tile to NONE to prevent respawning
 				BaseEnemy* shadowEnemy = new ShadowEnemy();
 				shadowEnemy->Init(pos.x, pos.y, 85.f, 60.f, "shadow1");
 				shadowEnemy->SetVelocity(0, 0);
@@ -152,12 +157,24 @@ void BaseScene::Update() {
 			map->SetTile(TILE_TYPE::OPEN_DOOR, DoorTilePosition.y, DoorTilePosition.x);
 		}
 
-		if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR ||
-			player->GetCollidedYTile().tileType == TILE_TYPE::OPEN_DOOR) {
-			if (nextScene != nullptr) {
-				BaseScene* pNext = nextScene;
-				nextScene = nullptr;
-				SceneManager::ChangeScene(pNext);
+		// door transition logic - only allow transitioning to the next scene if the player is colliding with the door tile and is physically close enough to it, to prevent accidental transitions from far away
+		if (player->GetCollidedXTile().tileType == TILE_TYPE::OPEN_DOOR) {
+
+			// Get the world position of the door and the player
+			AEVec2 doorPos = map->GetMap()[(int)DoorTilePosition.x][(int)DoorTilePosition.y].transform.GetPosition();
+			AEVec2 playerPos = player->GetTransform().GetPosition();
+
+			// get the distance squared between the player and the door (using distance squared to avoid the costly square root operation, since we only need to compare it against a threshold distance squared)
+			float distSq = (playerPos.x - doorPos.x) * (playerPos.x - doorPos.x) +
+				(playerPos.y - doorPos.y) * (playerPos.y - doorPos.y);
+
+			// only allow scene transition if the player is within a certain distance of the door (in this case, 100 units, which corresponds to a distance squared of 10000), to prevent accidental transitions when the player is far away but still colliding with the door tile
+			if (distSq < 10000.0f) {
+				if (nextScene != nullptr) {
+					BaseScene* pNext = nextScene;
+					nextScene = nullptr;
+					SceneManager::ChangeScene(pNext);
+				}
 			}
 		}
 

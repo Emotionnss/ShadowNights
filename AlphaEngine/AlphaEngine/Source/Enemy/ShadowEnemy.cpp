@@ -22,6 +22,7 @@ ShadowEnemy::~ShadowEnemy()
 {
 }
 
+/// Initializes the shadow enemy with position, size, and sprite, and sets up its specific properties such as attack timers and initial animation.
 void ShadowEnemy::Init(float x, float y, float w, float h, std::string spriteName)
 {
     BaseEnemy::Init(x, y, w, h, spriteName);
@@ -37,6 +38,7 @@ void ShadowEnemy::Init(float x, float y, float w, float h, std::string spriteNam
     PlayAnim("walkright");
 }
 
+/// Updates the shadow enemy's logic, including checking for proximity to the player, handling attack and surprise timers, performing line of sight checks, and resolving collisions with the map.
 void ShadowEnemy::Update(float deltaTime)
 {
     BaseEnemy::Update(deltaTime);

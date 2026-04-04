@@ -99,5 +99,16 @@ public:
 	@return   void
 	*//*______________________________________________________________*/
 	void ShowUI(bool show);
+
+	/*!
+	@brief    Retrieves the current ability resource (mana) amount.
+	*//*______________________________________________________________*/
+	f32 GetResource() const { return resource; }
+
+	/*!
+	@brief    Overrides the current ability resource (mana) amount.
+	@param    val The new mana value to set.
+	*//*______________________________________________________________*/
+	void SetResource(f32 val) { resource = val; }
 };
 

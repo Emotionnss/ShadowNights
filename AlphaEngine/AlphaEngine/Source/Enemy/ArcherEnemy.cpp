@@ -22,6 +22,7 @@ ArcherEnemy::~ArcherEnemy()
 {
 }
 
+/// Initializes the archer enemy with position, size, and sprite, and sets up its specific properties such as fire rate and initial animation.
 void ArcherEnemy::Init(float x, float y, float w, float h, std::string spriteName)
 {
     BaseEnemy::Init(x, y, w, h, spriteName);
@@ -34,6 +35,7 @@ void ArcherEnemy::Init(float x, float y, float w, float h, std::string spriteNam
     shootTimer = fireRate;
 }
 
+/// Updates the archer enemy's logic, including checking for line of sight to the player, handling shooting timers, and performing collision resolution with the map.
 void ArcherEnemy::Update(float deltaTime)
 {
     BaseEnemy::Update(deltaTime);
@@ -53,6 +55,7 @@ void ArcherEnemy::Update(float deltaTime)
     if (dx > 0) transform.SetScale(visualWidth, visualHeight);
     else        transform.SetScale(-visualWidth, visualHeight);
 
+	// Check if player is within aggro radius and line of sight
     if (HasLineOfSight(playerPos))
     {
         shootTimer -= deltaTime;
@@ -64,7 +67,7 @@ void ArcherEnemy::Update(float deltaTime)
             shootTimer = fireRate;
         }
 
-        // 2. Animation Logic
+        // Animation Logic
         if (shootTimer > fireRate - 0.5f)
         {
             PlayAnim("archerattack");
@@ -89,18 +92,22 @@ void ArcherEnemy::Update(float deltaTime)
     position.x += velocity.x * deltaTime;
     position.y += velocity.y * deltaTime;
 
+	//tile collision resolution
     float colliderWidth = 40.0f;
     float colliderHeight = 60.0f;
     AEVec2 halfSize{ colliderWidth / 2.f, colliderHeight / 2.f };
 
+	// Calculate the left, right, bottom, and top edges of the enemy's bounding box based on its position and half size, which will be used for collision detection with the map tiles
     float left = position.x - halfSize.x;
     float right = position.x + halfSize.x;
     float bottom = position.y - halfSize.y;
     float top = position.y + halfSize.y;
 
+	// Get the tile positions of the corners of the enemy's bounding box, which will be used to determine which tiles to check for collisions with
     AEVec2 minTile = map->GetTilePos(left, bottom);
     AEVec2 maxTile = map->GetTilePos(right, top);
 
+	// Calculate the range of tiles that the enemy's bounding box overlaps with, by taking the minimum and maximum tile positions of the corners of the bounding box, and converting them to integers to get the tile indices
     int xMinTile = static_cast<int>((std::min)(minTile.x, maxTile.x));
     int xMaxTile = static_cast<int>((std::max)(minTile.x, maxTile.x));
     int yMinTile = static_cast<int>((std::min)(minTile.y, maxTile.y));
@@ -108,6 +115,7 @@ void ArcherEnemy::Update(float deltaTime)
 
     isGrounded = false;
 
+	// Check for collisions with tiles in the range of tiles that the enemy's bounding box overlaps with
     for (int y = yMinTile; y <= yMaxTile; ++y)
     {
         for (int x = xMinTile; x <= xMaxTile; ++x)
@@ -152,11 +160,13 @@ void ArcherEnemy::Update(float deltaTime)
     if (sprite) sprite->Update();
 }
 
+// Renders the archer enemy to the screen, including its sprite and any active projectiles it has fired.
 void ArcherEnemy::Draw()
 {
     BaseEnemy::Draw();
 }
 
+// Executes the shooting behavior, spawning a projectile aimed at the player, and adding it to the list of active projectiles for this enemy.
 void ArcherEnemy::Shoot()
 {
     Player* player = Player::GetInstance();
@@ -172,7 +182,7 @@ void ArcherEnemy::Shoot()
     EnemyProjectile* newProj = new EnemyProjectile(myPos, bulletDir);
     newProj->slowed = this->slowed;
 
-    newProj->isHoming = true;
+	newProj->isHoming = true; // Set the projectile to be homing, so it will adjust its direction towards the player over time
     newProj->SetLifespan(4.0f);
 
     enemyProjectiles.push_back(newProj);

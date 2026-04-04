@@ -28,7 +28,7 @@ Button::Button(float x, float y, float width, float height, const char* text)
     }
 }
 
-// Function to update the button's position
+// buttons label
 void Button::SetLabel(const char* text) {
     if (text) {
         snprintf(label, sizeof(label), "%s", text);

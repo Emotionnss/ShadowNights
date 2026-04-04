@@ -126,6 +126,18 @@ public:
     void ResolveY(AEVec2& position);
 
     bool isBoss = false;
+
+    /*!
+    @brief    Retrieves the current health of the enemy.
+    @return   The current health value.
+    *//*______________________________________________________________*/
+    int GetHealth() const { return health; }
+
+    /*!
+    @brief    Sets or overrides the current health of the enemy.
+    @param    hp The new health value to apply.
+    *//*______________________________________________________________*/
+    void SetHealth(int hp) { health = hp; }
     
 protected:
     Sprite* sprite = nullptr;

@@ -17,6 +17,7 @@
              load from a save, or return to the main menu.
 *//*_______________________________________________________________________*/
 
+//Constructor that sets the restartLevelID variable, which is used to determine which level to reload when the player clicks the "Try Again" button. Also resets the player's health to 100 and sets the levelBGM to the lose music.
 LoseScene::LoseScene(int idToRestart) {
     restartLevelID = idToRestart;
     player = Player::GetInstance();
@@ -24,6 +25,7 @@ LoseScene::LoseScene(int idToRestart) {
     levelBGM = "lose_BGM";
 }
 
+//Helper function to check if a save file exists for a given slot, used to determine if the load buttons should be active or not
 void LoseScene::Load() {
     AEGfxReset();
 
@@ -42,10 +44,12 @@ void LoseScene::Load() {
     AudioManager::GetInstance()->PlayMusic(levelBGM);
 }
 
+//Initializes the menuPage variable to 0, which is used to determine which menu page to show when the player clicks the "Load Game" button (0 = main lose menu, 1 = load menu)
 void LoseScene::Init() {
     menuPage = 0;
 }
 
+//Handles button interactions for the main lose menu and the load menu. In the main lose menu, clicking "Try Again" will reload the level the player died in, clicking "Load Game" will switch to the load menu, and clicking "Main Menu" will return to the main menu. In the load menu, clicking "Back" will return to the main lose menu, and clicking on a save slot will load that save if it exists.
 void LoseScene::Update() {
     if (menuPage == 0) {
         if (btnRestart->IsClicked()) {
@@ -78,6 +82,7 @@ void LoseScene::Update() {
     }
 }
 
+//Draws the lose screen background, buttons, and "YOU DIED" text to the screen. The buttons and text are only drawn if their respective resources have been loaded successfully.
 void LoseScene::Draw() {
     AEGfxSetCamPosition(0.0f, 0.0f);
 
@@ -108,6 +113,7 @@ void LoseScene::Draw() {
     }
 }
 
+//Frees the memory allocated for the buttons in the lose screen, and also calls the Free function of the BaseScene and Button classes to ensure proper cleanup of resources.
 void LoseScene::Free() {
     delete btnRestart; delete btnLoad; delete btnMenu;
     delete btnSlot1; delete btnSlot2; delete btnSlot3; delete btnBack;

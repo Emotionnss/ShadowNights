@@ -21,6 +21,7 @@ BatEnemy::~BatEnemy()
 {
 }
 
+/// Initializes the bat enemy with position, size, and sprite, and sets up its specific properties such as aggro radius, movement speed, and initial animation.
 void BatEnemy::Init(float x, float y, float w, float h, std::string spriteName)
 {
     BaseEnemy::Init(x, y, w, h, spriteName);
@@ -36,6 +37,7 @@ void BatEnemy::Init(float x, float y, float w, float h, std::string spriteName)
     PlayAnim("batidle");
 }
 
+/// Updates the bat enemy's logic, including chasing the player using A* pathfinding, handling shooting timers, and performing collision resolution with the map.
 void BatEnemy::Update(float deltaTime)
 {
     BaseEnemy::Update(deltaTime);
@@ -213,6 +215,7 @@ void BatEnemy::Update(float deltaTime)
     if (sprite) sprite->Update();
 }
 
+/// Executes the shooting behavior, spawning a projectile that is aimed towards the player with some random spread, and plays the corresponding sound effect.
 void BatEnemy::Shoot()
 {
     AudioManager::GetInstance()->PlaySFXOneShot("bat_attack");

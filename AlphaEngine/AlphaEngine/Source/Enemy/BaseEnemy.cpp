@@ -12,6 +12,7 @@
 			functions used across all enemy types.
 *//*_______________________________________________________________________*/
 
+// BaseEnemy constructor, initializes default values for the enemy's properties such as velocity, sprite, and pointers to the settings manager and map singletons.
 BaseEnemy::BaseEnemy()
 {
     isStatic = false;
@@ -22,6 +23,7 @@ BaseEnemy::BaseEnemy()
     map = Map::GetInstance();
 }
 
+// BaseEnemy destructor, used to clean up the sprite and projectiles of the enemy, as well as setting pointers to the settings manager and map to nullptr (these are singletons, so they will be cleaned up in their own destructors when the program ends)
 BaseEnemy::~BaseEnemy()
 {
     if (sprite) {
@@ -38,6 +40,7 @@ BaseEnemy::~BaseEnemy()
     map = nullptr;
 }
 
+// Initializes the base enemy with position, size, sprite, and default properties such as movement speed, health, and animation state.
 void BaseEnemy::Init(float x, float y, float w, float h, std::string spriteName)
 {
     transform.SetPosition(x, y);
@@ -78,6 +81,7 @@ bool BaseEnemy::IsReadyToDelete() const
     return isDying && (deathTimer <= 0.0f);
 }
 
+// Updates the base enemy's projectiles, death timer, and animation state. Also handles collision detection for projectiles and removes them if they collide with the map or exceed their lifespan. If the enemy is in the process of dying, updates the death timer and animation accordingly.
 void BaseEnemy::Update(float deltaTime)
 {
     if (!stopped)
@@ -110,6 +114,7 @@ void BaseEnemy::Update(float deltaTime)
     }
 }
 
+// Renders the base enemy to the screen, including its sprite and health bar, as well as any active projectiles it has fired. Also includes debug rendering for pathfinding if enabled in settings.
 void BaseEnemy::Draw()
 {
     float alpha = 1.0f;
@@ -302,6 +307,7 @@ bool BaseEnemy::CheckProjectileCollision(BaseProjectile* proj, Map* collisionMap
 }
 
 
+//these functions are based on the player collision resolution functions, but with some adjustments to make the enemy movement feel better and less "sticky" to walls, such as adding a small buffer when checking for collisions to prevent the enemy from getting caught on corners or thin walls
 void BaseEnemy::ResolveX(AEVec2& position)
 {
     AEVec2 halfSize = { fabsf(transform.GetScale().x) * 0.3f, fabsf(transform.GetScale().y) * 0.5f };
@@ -316,6 +322,7 @@ void BaseEnemy::ResolveX(AEVec2& position)
     int yMin = static_cast<int>((std::min)(minTile.y, maxTile.y));
     int yMax = static_cast<int>((std::max)(minTile.y, maxTile.y));
 
+	// Loop through the tiles that the enemy is overlapping with
     for (int y = yMin; y <= yMax; ++y) {
         for (int x = xMin; x <= xMax; ++x) {
             if (x < 0 || y < 0 || y >= map->GetNumRow() || x >= map->GetNumCol()) continue;
@@ -324,9 +331,11 @@ void BaseEnemy::ResolveX(AEVec2& position)
             TILE_TYPE type = tile.tileType;
             if (!map->CheckTile(type)) continue;
 
+			// Ignore platforms and backgrounds for horizontal collisions to prevent "stickiness"
             if (type == TILE_TYPE::BACKGROUND || type == TILE_TYPE::LEFT_PLATFORM ||
                 type == TILE_TYPE::PLATFORM || type == TILE_TYPE::RIGHT_PLATFORM) continue;
 
+			// Check for collision with the tile
             AEVec2 tilePos = tile.transform.GetPosition();
             float dx = position.x - tilePos.x;
             float px = (halfSize.x + tileHalf.x) - fabsf(dx);
@@ -348,6 +357,7 @@ void BaseEnemy::ResolveX(AEVec2& position)
     }
 }
 
+// Similar to ResolveX, but with adjustments to allow smoother landing on platforms and prevent getting caught on corners when falling
 void BaseEnemy::ResolveY(AEVec2& position)
 {
     AEVec2 halfSize = { fabsf(transform.GetScale().x) * 0.3f, fabsf(transform.GetScale().y) * 0.5f };

@@ -63,6 +63,7 @@ public:
 
         f32 tileSize = SettingsManager::GetInstance()->TILE_HEIGHT;
 
+		//Iterate through the parsed tutorial data and create TutorialText objects for each entry, calculating the appropriate scale based on the text size and number of lines
         for (std::vector<std::string> data : tutorialData)
         {
             AEVec2 scale{};

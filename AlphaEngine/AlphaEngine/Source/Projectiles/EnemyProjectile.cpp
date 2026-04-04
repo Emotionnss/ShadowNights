@@ -4,6 +4,7 @@
 #include "../Player/Player.h"
 #include "../particle/ParticleManager.h"
 
+//this constructor initializes the projectile's speed, scale, position, lifespan, and sprite based on the provided position and direction parameters. It also sets up the homing behavior if needed.
 EnemyProjectile::EnemyProjectile(AEVec2 pos, AEVec2 dir)
     : BaseProjectile(pos, dir, true)
 {

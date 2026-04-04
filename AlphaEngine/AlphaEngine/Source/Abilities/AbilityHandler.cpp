@@ -219,4 +219,3 @@ void AbilityHandler::ShowUI(bool show)
 {
 	showUI = show;
 }
-

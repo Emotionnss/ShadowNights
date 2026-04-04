@@ -33,23 +33,31 @@ void BossScene::Update() {
     }
 
     BaseScene::Update();
-    f32 dt = (f32)AEFrameRateControllerGetFrameTime();
 
-
-    if (cutsceneDuration >= 0.f && boss)
-    {
-        AEGfxSetCamPosition(boss->transform.GetPosition().x, boss->transform.GetPosition().y);
-        cutsceneDuration -= 1 * dt;
-        if (cutsceneDuration < 0.f)
+    // During the cutscene, the camera will be locked onto the boss and the player cannot move until the cutscene ends. Once the cutscene ends, control is returned to the player and the UI is shown again.
+    if (!isPaused) {
+		// Cutscene timer logic
+        f32 dt = (f32)AEFrameRateControllerGetFrameTime();
+        
+		// If the cutscene duration is greater than or equal to 0 and the boss exists, lock the camera onto the boss's position and decrement the cutscene timer by the delta time. Once the cutscene timer reaches 0, allow the player to move again and show the UI.
+        if (cutsceneDuration >= 0.f && boss)
         {
-            player->SetMoveable(true);
-            abilityHandler->ShowUI(true);
-        }
-    }
+            AEGfxSetCamPosition(boss->transform.GetPosition().x, boss->transform.GetPosition().y);
+            cutsceneDuration -= dt;
 
-    if (boss && boss->IsReadyToDelete()) {
-        SceneManager::ChangeScene(new WinScene());
-        return;
+			// During the cutscene, we want to make sure the player cannot move and the UI is hidden, so we set those states every frame just in case
+            if (cutsceneDuration < 0.f)
+            {
+                player->SetMoveable(true);
+                abilityHandler->ShowUI(true);
+            }
+        }
+
+		// If the boss exists and is ready to be deleted (which means its death animation has finished), transition to the WinScene
+        if (boss && boss->IsReadyToDelete()) {
+            SceneManager::ChangeScene(new WinScene());
+            return;
+        }
     }
 }
 

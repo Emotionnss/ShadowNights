@@ -97,10 +97,13 @@ void MainMenu::Update() {
 		btnCredits->SetPosition(fromLeft, startY - (spacing * 3));
 		btnQuit->SetPosition(fromRight, startY - (spacing * 4));
 
+		//start a new game by deleting any existing save files and switching to the tutorial scene
 		if (btnPlay->IsClicked()) {
 			DeleteSave(1); DeleteSave(2); DeleteSave(3);
 			SceneManager::ChangeScene(new TutorialScene());
 		}
+
+		// If the Load button is clicked, switch to the load menu page and update the slot buttons to show whether each slot is empty or has a save file
 		if (btnLoad->IsClicked()) {
 			menuPage = 2;
 			animT = 0.0f;
@@ -108,12 +111,18 @@ void MainMenu::Update() {
 			btnSlot2->SetLabel(FileExists(2) ? "Load Slot 2" : "Empty");
 			btnSlot3->SetLabel(FileExists(3) ? "Load Slot 3" : "Empty");
 		}
+
+		// If the Settings button is clicked, switch to the settings scene
 		if (btnSettings->IsClicked()) {
 			SceneManager::ChangeScene(new SettingsScene());
 		}
+
+		// If the Credits button is clicked, switch to the credits scene
 		if (btnCredits->IsClicked()) {
 			SceneManager::ChangeScene(new CreditsScene());
 		}
+
+		// If the Quit button is clicked, switch to the quit confirmation page
 		if (btnQuit->IsClicked()) {
 			menuPage = 3;
 			animT = 0.0f;

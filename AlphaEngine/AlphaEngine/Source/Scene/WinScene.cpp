@@ -12,6 +12,7 @@
              to the main menu.
 *//*_______________________________________________________________________*/
 
+//this scene is shown when the player defeats the boss, and contains a button to return to the main menu. The background and music are also changed to reflect the victory.
 void WinScene::Load() {
     levelBGM = "win_BGM";
     AEGfxReset();
@@ -24,14 +25,17 @@ void WinScene::Load() {
     AudioManager::GetInstance()->PlayMusic(levelBGM);
 }
 
+//Initializes the win scene, currently does not have any variables to initialize, but is defined for consistency with other scenes and potential future use
 void WinScene::Init() {}
 
+//Handles button interaction for the main menu button, which returns the player to the main menu when clicked
 void WinScene::Update() {
     if (btnMenu->IsClicked()) {
         SceneManager::ChangeScene(new MainMenu());
     }
 }
 
+//Renders the win scene background and a victory message, as well as the main menu button
 void WinScene::Draw() {
     AEGfxSetCamPosition(0.0f, 0.0f);
 
@@ -50,6 +54,7 @@ void WinScene::Draw() {
     btnMenu->Draw();
 }
 
+//Frees memory allocated for the main menu button and the background, and also calls the Button class's FreeResources function to free the shared button resources
 void WinScene::Free() {
     delete btnMenu;
 

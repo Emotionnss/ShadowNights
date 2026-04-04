@@ -124,7 +124,7 @@ void BaseScene::Init() {
 		}
 	}
 
-	if (loadFromSlot > 0) {
+	if (loadFromSlot > 0) { //If the loadFromSlot variable is greater than 0, which means we need to load from a save file, call the LoadGame function with the specified slot, then reset loadFromSlot to 0 to prevent accidentally loading again if the scene is reloaded for any reason
 		LoadGame(loadFromSlot);
 		loadFromSlot = 0;
 	}
@@ -178,14 +178,14 @@ void BaseScene::Update() {
 			}
 		}
 
-		if (AEInputCheckTriggered(AEVK_0)) {
+		if (AEInputCheckTriggered(AEVK_0)) { //debugging shortcut to skip directly to the boss scene
 			SceneManager::ChangeScene(new BossScene());
 		}
-		if (AEInputCheckTriggered(AEVK_9))
+		if (AEInputCheckTriggered(AEVK_9)) //debugging shortcut to skip directly to the first level scene
 		{
 			SceneManager::ChangeScene(new Level1Scene());
 		}
-		for (BaseEnemy* enemy : enemyList) {
+		for (BaseEnemy* enemy : enemyList) { //Iterate through all enemies and check for collisions between their projectiles and the player, applying damage and destroying projectiles as necessary. Also checks if the player is currently using the Reverse ability, in which case they are invulnerable to enemy projectiles and will not take damage or have projectiles destroyed on collision
 			std::vector<EnemyProjectile*>& enemyProjs = enemy->GetProjectiles();
 			for (auto it = enemyProjs.begin(); it != enemyProjs.end(); ) {
 				EnemyProjectile* proj = *it;
@@ -206,6 +206,7 @@ void BaseScene::Update() {
 			}
 		}
 
+		//Check if the player's health has dropped to 0 or below, and if so, check if they are currently anchored. If they are anchored, trigger the anchor to teleport them back to safety. If they are not anchored, transition to the lose scene for the current level
 		if (player->GetHealth() <= 0) {
 			if (abilityHandler->Anchored()) {
 				abilityHandler->TriggerAnchor();
@@ -215,6 +216,7 @@ void BaseScene::Update() {
 			}
 		}
 
+		//Iterate through all of the player's projectiles and check for collisions with enemies, applying damage and destroying projectiles as necessary. Also checks for collisions with boss weakpoints if the enemy is a boss, and applies different damage values based on whether the projectile is a sword or not
 		std::vector<BaseProjectile*>& projs = player->projectileList;
 		for (auto it = projs.begin(); it != projs.end(); ) {
 			BaseProjectile* pProj = *it;
@@ -231,7 +233,7 @@ void BaseScene::Update() {
 				BossEnemy* boss = dynamic_cast<BossEnemy*>(enemy);
 				if (boss != nullptr)
 				{
-					if (boss->GetWeakpoint().active)
+					if (boss->GetWeakpoint().active) //Only check for weakpoint collision if the weakpoint is currently active
 					{
 						Weakpoint const& weakpoint{ boss->GetWeakpoint() };
 						AEVec2 bossWeakpointPos = weakpoint.transform.GetPosition();
@@ -267,6 +269,7 @@ void BaseScene::Update() {
 				}
 			}
 
+			//If the projectile has collided with an enemy and needs to be destroyed, or if its lifespan has dropped to 0 or below, delete the projectile and remove it from the player's projectile list. Otherwise, move on to the next projectile in the list
 			if (destroyProjectile || pProj->GetLifespan() <= 0.f) {
 				delete pProj;
 				it = projs.erase(it);
@@ -276,6 +279,7 @@ void BaseScene::Update() {
 			}
 		}
 
+		//Iterate through the enemy list and check for any enemies that are ready to be deleted (i.e. their death animation has finished), and if so, delete them and remove them from the enemy list
 		for (auto it = enemyList.begin(); it != enemyList.end(); ) {
 			if ((*it)->IsReadyToDelete()) {
 				delete* it;
@@ -291,6 +295,7 @@ void BaseScene::Update() {
 		AEVec2 CamPos = { 0.0f, 0.0f };
 		AEGfxGetCamPosition(&CamPos.x, &CamPos.y);
 
+		//Display a different set of buttons depending on which menu page the player is currently on, and check for clicks on those buttons to perform the appropriate actions (e.g. resuming the game, saving/loading, changing settings, confirming exit, etc.)
 		if (menuPage == 0) {
 			btnResume->SetPosition(CamPos.x, CamPos.y + 120.0f);
 			btnSaveMenu->SetPosition(CamPos.x, CamPos.y + 50.0f);
@@ -298,23 +303,27 @@ void BaseScene::Update() {
 			btnSettings->SetPosition(CamPos.x, CamPos.y - 90.0f);
 			btnExit->SetPosition(CamPos.x, CamPos.y - 160.0f);
 
-			if (btnResume->IsClicked()) isPaused = false;
+			if (btnResume->IsClicked()) isPaused = false; //If the resume button is clicked, unpause the game
+
+			//If the save menu button is clicked, switch to the save menu page and update the slot button labels to indicate whether each slot is currently used or empty. If the load menu button is clicked, switch to the load menu page and update the slot button labels to indicate whether each slot is currently used or empty (with different text than the save menu to indicate that these slots will be loaded from rather than saved to)
 			if (btnSaveMenu->IsClicked()) {
 				menuPage = 1;
 				btnSlot1->SetLabel(FileExists(1) ? "Slot 1 (Used)" : "Slot 1 (Empty)");
 				btnSlot2->SetLabel(FileExists(2) ? "Slot 2 (Used)" : "Slot 2 (Empty)");
 				btnSlot3->SetLabel(FileExists(3) ? "Slot 3 (Used)" : "Slot 3 (Empty)");
 			}
+			//if the load menu button is clicked, switch to the load menu page and update the slot button labels to indicate whether each slot is currently used or empty (with different text than the save menu to indicate that these slots will be loaded from rather than saved to)
 			if (btnLoadMenu->IsClicked()) {
 				menuPage = 2;
 				btnSlot1->SetLabel(FileExists(1) ? "Load Slot 1" : "Empty");
 				btnSlot2->SetLabel(FileExists(2) ? "Load Slot 2" : "Empty");
 				btnSlot3->SetLabel(FileExists(3) ? "Load Slot 3" : "Empty");
 			}
-			if (btnSettings->IsClicked()) menuPage = 4;
-			if (btnExit->IsClicked()) menuPage = 3;
+			if (btnSettings->IsClicked()) menuPage = 4; //If the settings button is clicked, switch to the settings menu page
+			if (btnExit->IsClicked()) menuPage = 3; //If the exit button is clicked, switch to the confirmation prompt page to confirm whether the player really wants to quit to the main menu, since doing so will lose all unsaved progress
 		}
-		else if (menuPage == 1 || menuPage == 2) {
+		//If the player is currently on the save menu page or the load menu page, display the slot buttons and the back button, and check for clicks on those buttons to perform the appropriate actions (e.g. saving/loading to/from the selected slot, going back to the main pause menu, etc.)
+		else if (menuPage == 1 || menuPage == 2) { 
 			btnSlot1->SetPosition(CamPos.x, CamPos.y + 100.0f);
 			btnSlot2->SetPosition(CamPos.x, CamPos.y + 30.0f);
 			btnSlot3->SetPosition(CamPos.x, CamPos.y - 40.0f);
@@ -325,6 +334,7 @@ void BaseScene::Update() {
 			if (btnSlot2->IsClicked()) { if (menuPage == 1) SaveGame(2); else LoadGame(2); menuPage = 0; }
 			if (btnSlot3->IsClicked()) { if (menuPage == 1) SaveGame(3); else LoadGame(3); menuPage = 0; }
 		}
+		//If the player is currently on the confirmation prompt page, display the yes and no buttons, and check for clicks on those buttons to perform the appropriate actions (i.e. if yes is clicked, change to the main menu scene; if no is clicked, go back to the main pause menu)
 		else if (menuPage == 3) {
 			btnYes->SetPosition(CamPos.x - 100.0f, CamPos.y - 50.0f);
 			btnNo->SetPosition(CamPos.x + 100.0f, CamPos.y - 50.0f);
@@ -332,6 +342,7 @@ void BaseScene::Update() {
 			if (btnYes->IsClicked()) SceneManager::ChangeScene(new MainMenu());
 			if (btnNo->IsClicked()) menuPage = 0;
 		}
+		//If the player is currently on the settings menu page, display the toggle mute, toggle fullscreen, toggle camera shake, and back buttons, and check for clicks on those buttons to perform the appropriate actions (e.g. toggling mute, toggling fullscreen, toggling camera shake, going back to the main pause menu, etc.). Also update the labels of the toggle buttons to reflect the current state of each setting
 		else if (menuPage == 4) {
 			btnToggleMute->SetPosition(CamPos.x, CamPos.y + 50.0f);
 			btnToggleFullscreen->SetPosition(CamPos.x, CamPos.y - 20.0f);
@@ -350,6 +361,7 @@ void BaseScene::Update() {
 				AESysSetFullScreen(!isFullScreen);
 			}
 
+			// Update the fullscreen button label based on the new fullscreen state after toggling
 			btnToggleFullscreen->SetLabel(AESysIsFullScreen() ? "Fullscreen: ON" : "Fullscreen: OFF");
 
 			if (btnToggleCameraShake->IsClicked()) {
@@ -358,11 +370,13 @@ void BaseScene::Update() {
 
 			btnToggleCameraShake->SetLabel(SettingsManager::GetInstance()->GetCameraShake() ? "Camera Shake: ON" : "Camera Shake: OFF");
 
+			//If the back button is clicked, go back to the main pause menu
 			if (btnSettingsBack->IsClicked()) menuPage = 0;
 		}
 	}
 }
 
+//BaseScene Draw function, used to render the background, map, enemies, player, ability effects, and pause menu (if the game is currently paused) to the screen. Also renders the "Game Saved!" popup message for a short time after saving the game
 void BaseScene::Draw() {
 
 	if (!meshManager) return;
@@ -386,7 +400,7 @@ void BaseScene::Draw() {
 		enemy->Draw();
 	}
 
-	if (abilityHandler) abilityHandler->Draw();
+	if (abilityHandler && !isPaused) abilityHandler->Draw();
 	player->Draw(meshManager->GetMesh(CORNER_SQUARE));
 
 	if (isPaused) {
@@ -456,12 +470,36 @@ void BaseScene::Draw() {
 	}
 }
 
+//BaseScene SaveGame function, used to save the current game state to a text file corresponding to the specified save slot. The saved data includes the current level ID, the player's position, and the player's health. After saving, sets the popup timer to display the "Game Saved!" message for a short time
 void BaseScene::SaveGame(int slot) {
 	std::string path = "save_slot_" + std::to_string(slot) + ".txt";
 	std::ofstream f(path);
 	if (f.is_open()) {
 		AEVec2 pos = player->GetTransform().GetPosition();
-		f << levelID << " " << pos.x << " " << pos.y << " " << player->GetHealth();
+
+		// Safely get mana (defaults to 100 if abilityHandler isn't loaded yet)
+		float currentMana = abilityHandler ? abilityHandler->GetResource() : 100.0f;
+
+		// Write Player Data + Mana
+		f << levelID << " " << pos.x << " " << pos.y << " " << player->GetHealth() << " " << currentMana << "\n";
+
+		// Write the remaining enemies and their health!
+		f << enemyList.size() << "\n";
+		for (BaseEnemy* enemy : enemyList) {
+			int typeID = 0;
+
+			// Figure out what type of enemy this is
+			if (dynamic_cast<BatEnemy*>(enemy)) typeID = 1;
+			else if (dynamic_cast<ArcherEnemy*>(enemy)) typeID = 2;
+			else if (dynamic_cast<ShadowEnemy*>(enemy)) typeID = 3;
+			else if (dynamic_cast<BossEnemy*>(enemy)) typeID = 4;
+
+			if (enemy == nullptr) continue;
+
+			AEVec2 ePos = enemy->transform.GetPosition();
+			f << typeID << " " << ePos.x << " " << ePos.y << " " << enemy->GetHealth() << "\n";
+		}
+
 		f.close();
 		popupTimer = 2.0f;
 	}
@@ -473,36 +511,75 @@ void BaseScene::LoadGame(int slot) {
 	if (f.is_open()) {
 
 		int savedLevelID;
-		float x, y, hp;
+		float x, y, hp, mana;
 
-		if (f >> savedLevelID >> x >> y >> hp) {
+		// Read Player Data + Mana
+		if (f >> savedLevelID >> x >> y >> hp >> mana) {
 
 			player->GetTransform().SetPosition(x, y);
 			player->SetHealth(hp);
 			isPaused = false;
 
 			if (savedLevelID != this->levelID) {
+				// Change to the correct scene and pass the slot so it loads when it initializes
+				if (savedLevelID == 1) SceneManager::ChangeScene(new Level1Scene(slot));
+				else if (savedLevelID == 0) SceneManager::ChangeScene(new TutorialScene(slot));
+				else if (savedLevelID == 2) SceneManager::ChangeScene(new BossScene(slot));
+			}
+			else {
+				// 1. Delete the default enemies spawned by the map
+				for (BaseEnemy* enemy : enemyList) {
+					delete enemy;
+				}
+				enemyList.clear();
 
-				if (savedLevelID == 1) {
-					SceneManager::ChangeScene(new BaseScene(slot));
+				// 2. Read the saved enemies and spawn them exactly where they were
+				int numEnemies = 0;
+				if (f >> numEnemies) {
+					for (int i = 0; i < numEnemies; ++i) {
+						int typeID;
+						float eX, eY;
+						int eHP;
+						f >> typeID >> eX >> eY >> eHP;
+
+						BaseEnemy* newEnemy = nullptr;
+						if (typeID == 1) { newEnemy = new BatEnemy(); newEnemy->Init(eX, eY, 85.f, 60.f, "batenemy"); }
+						else if (typeID == 2) { newEnemy = new ArcherEnemy(); newEnemy->Init(eX, eY, 85.f, 60.f, "sniperenemy"); }
+						else if (typeID == 3) { newEnemy = new ShadowEnemy(); newEnemy->Init(eX, eY, 85.f, 60.f, "shadow1"); }
+						else if (typeID == 4) { newEnemy = new BossEnemy(); newEnemy->Init(eX, eY, 85.f, 60.f, "boss"); }
+
+						if (newEnemy) {
+							newEnemy->SetHealth(eHP);
+							enemyList.push_back(newEnemy);
+						}
+					}
 				}
-				else if (savedLevelID == 0) {
-					SceneManager::ChangeScene(new TutorialScene(slot));
+
+				// cancel any active time-freezes and set the loaded mana
+				if (abilityHandler) {
+					delete abilityHandler;
+					abilityHandler = new AbilityHandler();
+
+					//Give the fresh handler your saved mana
+					abilityHandler->SetResource(mana);
 				}
-				else if (savedLevelID == 2) {
-					SceneManager::ChangeScene(new BossScene(slot));
-				}
+
+				// Wipe active particles and thrown projectiles from the screen
+				ParticleManager::GetInstance()->ClearAll();
+				player->ClearProjectileList();
 			}
 		}
 		f.close();
 	}
 }
 
+//BaseScene FileExists function, used to check if a save file corresponding to the specified slot exists and can be opened successfully. Returns true if the file exists and can be opened, false otherwise
 bool BaseScene::FileExists(int slot) const {
 	std::ifstream f("save_slot_" + std::to_string(slot) + ".txt");
 	return f.good();
 }
 
+//BaseScene Free function, used to clean up dynamically allocated memory for the ability handler, player projectiles, enemies, background, and particle manager when the scene is being unloaded. Also calls external functions to free resources for sword and knife projectiles, since those resources are shared across all scenes and need to be freed regardless of which scene is currently active
 void BaseScene::Free() {
 	if (abilityHandler)
 	{
@@ -527,6 +604,7 @@ void BaseScene::Free() {
 	ParticleManager::GetInstance()->ClearAll();
 }
 
+//BaseScene Unload function, used to clean up dynamically allocated memory for buttons and other resources that are used in the pause menu, as well as resetting pointers to the player, ability handler, and mesh manager to nullptr, and clearing the enemy list. Also calls external functions to free resources for sword and knife projectiles, since those resources are shared across all scenes and need to be freed regardless of which scene is currently active
 void BaseScene::Unload() {
 
 	delete btnResume; delete btnSaveMenu; delete btnLoadMenu; delete btnExit;

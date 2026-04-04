@@ -9,11 +9,42 @@
 
 class CreditsScene : public BaseScene {
 public:
+    /*!
+    @brief    Loads the Credits scene
+    @param    void
+    @return   void
+    *//*______________________________________________________________*/
     void Load() override;
+    /*!
+    @brief    Initializes the Credits scene
+    @param    void
+    @return   void
+    *//*______________________________________________________________*/
     void Init() override;
+    /*!
+    @brief    Updates the Credits scene
+    @param    void
+    @return   void
+    *//*______________________________________________________________*/
     void Update() override;
+    /*!
+    @brief    Renders the Credits scene
+    @param    void
+    @return   void
+    *//*______________________________________________________________*/
     void Draw() override;
+    /*!
+    @brief    Frees the variables of the Credits scene
+    @param    void
+    @return   void
+    *//*______________________________________________________________*/
     void Free() override;
+
+    /*!
+    @brief    Unloads the Credits scene
+    @param    void
+    @return   void
+    *//*______________________________________________________________*/
     void Unload() override;
 
 private:
@@ -44,6 +75,7 @@ private:
     AEGfxTexture* bgTex{};
     Transform2D bgTfm{};
 
+    //alphas of the logo and background to allow for cool fade in effect hehehehehe
     f32 logoAlpha{0.1f};
 
     f32 bgAlpha{};

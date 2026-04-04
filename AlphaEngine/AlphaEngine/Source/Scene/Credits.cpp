@@ -9,28 +9,32 @@
 #include "AEEngine.h"
 
 void CreditsScene::Load() {
-    levelBGM = "creditsBGM";
-    meshManager = MeshManager::GetInstance();
-    AEGfxReset();
-    Button::LoadResources();
-    backBtn = new Button(-700.f,400.f, 200.0f, 50.0f, "Back");
-    AudioManager::GetInstance()->PlayMusic(levelBGM);
+    levelBGM = "creditsBGM";//the name of the BGM for the level , variable is used bc overrided from basescene
+    meshManager = MeshManager::GetInstance();//get the meshmanagers instance
+    AEGfxReset();//reset the visuals
+    Button::LoadResources();//load resources from the button class
+    backBtn = new Button(-700.f,400.f, 200.0f, 50.0f, "Back");//initialize a back button
+    AudioManager::GetInstance()->PlayMusic(levelBGM);//play BGM
 }
 
 void CreditsScene::Init() 
 {
-    creditsImage = AEGfxTextureLoad("Assets/Credits.png");
-    creditsTfm.SetPosition(0,static_cast<f32>( - AEGfxGetWindowHeight() * 2));
-    creditsTfm.SetScale(1600, 3000);
+    creditsImage = AEGfxTextureLoad("Assets/Credits/Credits.png");//load the credits png
+    creditsTfm.SetPosition(0,static_cast<f32>( - AEGfxGetWindowHeight() * 2));//set its position
+    creditsTfm.SetScale(1600, 3000);//set its scale to the pixel sizes of the image
 
+    //initialize all the sprites with its respective spritesheets
     playerSprite = new Sprite(CSVManager::ReadInfo("tempPlayer"));
     archerSprite = new Sprite(CSVManager::ReadInfo("sniperenemy"));
     batSprite = new Sprite(CSVManager::ReadInfo("batenemy"));
     shadowSprite = new Sprite(CSVManager::ReadInfo("shadow1"));
     bossSprite = new Sprite(CSVManager::ReadInfo("boss"));
+
+    //load texture of the bg and the logo
     logoTex = AEGfxTextureLoad("Assets/Credits/logo.png");
     bgTex = AEGfxTextureLoad("Assets/Sprites/Background/Dark Gothic Castle.png");
 
+    //set all the sprite positions and scales and make them loop an animation while scrolling
     pSTfm.SetPosition(-500.f, -1000.f);
     pSTfm.SetScale(200.f, 200.f);
     playerSprite->PlayAnimation("walk_forward");
@@ -59,11 +63,14 @@ void CreditsScene::Init()
 }
 
 void CreditsScene::Update() {
+    //check if the back button is clicked, if so
     if (backBtn->IsClicked()) {
-        SceneManager::ChangeScene(new MainMenu()); 
+        SceneManager::ChangeScene(new MainMenu()); //change back to the main menu
     }
-    scrollSpeed = AEInputCheckCurr(AEVK_LBUTTON) ? 2000.f : 100.f;
+    //set the scroll speed depending on if the user wants to fast forward
+    scrollSpeed = AEInputCheckCurr(AEVK_LBUTTON) ? 500.f : 100.f;
 
+    //automatic scroll up for the credits and all the sprites
     creditsTfm.SetPosition(creditsTfm.GetPosition().x,creditsTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime() ));
 
     pSTfm.SetPosition(pSTfm.GetPosition().x, pSTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime()));
@@ -76,19 +83,24 @@ void CreditsScene::Update() {
 
     bossTfm.SetPosition(bossTfm.GetPosition().x, bossTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime()));
 
+    //if the logo is not at position yet
     if (logoTfm.GetPosition().y <= 190)
-        logoTfm.SetPosition(logoTfm.GetPosition().x, logoTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime()));
-    else
     {
+        //scroll it up
+        logoTfm.SetPosition(logoTfm.GetPosition().x, logoTfm.GetPosition().y + scrollSpeed * static_cast<f32>(AEFrameRateControllerGetFrameTime()));
+    }
+    else//if it is at position
+    {
+        //set its position straight
         logoTfm.SetPosition(0.f, 200.f);
-        logoAlpha += 0.5f * static_cast<f32>(AEFrameRateControllerGetFrameTime());
-        bgAlpha += 0.5f * static_cast<f32>(AEFrameRateControllerGetFrameTime());
-        if (logoAlpha >= 1.f && bgAlpha >=1.f)
+        logoAlpha += 0.5f * static_cast<f32>(AEFrameRateControllerGetFrameTime());//increase the alpha of the logo
+        bgAlpha += 0.5f * static_cast<f32>(AEFrameRateControllerGetFrameTime());//increase the alpha of the bg
+        if (logoAlpha >= 1.f && bgAlpha >=1.f)//once both of fully visible
         {
-            SceneManager::ChangeScene(new MainMenu());
+            SceneManager::ChangeScene(new MainMenu());//change scenes
         }
     }
-
+    //update all the sprites
     playerSprite->Update();
     archerSprite->Update();
     batSprite->Update();
@@ -99,7 +111,7 @@ void CreditsScene::Update() {
 void CreditsScene::Draw() {
     AEGfxSetCamPosition(0.0f, 0.0f);
     //AEGfxSetBackgroundColor(0.8f, 0.6f, 0.1f);
-
+    //drawing of the credits image
     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
     AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
     AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
@@ -111,21 +123,21 @@ void CreditsScene::Draw() {
 
     AEGfxSetTransform(creditsTfm.GetMatrix().m);
     AEGfxMeshDraw(meshManager->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
-
+    //drawing of the background texture
     AEGfxTextureSet(bgTex, 0, 0);
 
     AEGfxSetTransparency(bgAlpha);
 
     AEGfxSetTransform(bgTfm.GetMatrix().m);
     AEGfxMeshDraw(meshManager->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
-
+    //drawing of the logo
     AEGfxSetTransparency(logoAlpha);
 
     AEGfxTextureSet(logoTex, 0, 0);
 
     AEGfxSetTransform(logoTfm.GetMatrix().m);
     AEGfxMeshDraw(meshManager->GetMesh(TEXTURE_SQUARE), AE_GFX_MDM_TRIANGLES);
-
+    //draw the button and the sprites
     backBtn->Draw();
     playerSprite->Render(pSTfm);
     archerSprite->Render(archerTfm);
@@ -135,8 +147,10 @@ void CreditsScene::Draw() {
 }
 
 void CreditsScene::Free() {
-    delete backBtn;
-    Button::FreeResources();
+    delete backBtn;//delete button
+    Button::FreeResources();//free resources
+
+    //if the texture or sprite is loaded, unload and delete them.
     if (creditsImage)
         AEGfxTextureUnload(creditsImage);
     if (playerSprite)

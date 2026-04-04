@@ -32,16 +32,63 @@ private:
 	Sprite* zoneCenterSprite = nullptr;
 	Sprite* centerDespawn = nullptr;
 public:
+	/*!
+	@brief    Default constructor
+	*//*______________________________________________________________*/
+	TimeStop();
 
-	TimeStop();//time stop constructor
-	~TimeStop();//destructor
-	void Update(std::vector<BaseEnemy*> enemyList,float deltaTime);//update
-	bool ToggleTime(AEVec2 position);//toggle the ability off & on 
+	/*!
+	@brief    Default destructor
+	*//*______________________________________________________________*/
+	~TimeStop();
+
+	/*!
+	@brief    Updates the object every frame
+	@param	  The list of enemies to affect
+	@param	  Time inbetween each frame
+	@return   void
+	*//*______________________________________________________________*/
+	void Update(std::vector<BaseEnemy*> enemyList,float deltaTime);
+
+	/*!
+	@brief    Toggles the abilitys activity
+	@param    The position of the center of the Ability
+	@return   bool, true if active, false if not
+	*//*______________________________________________________________*/
+	bool ToggleTime(AEVec2 position);
+
+	/*!
+	@brief    Temporary stop in time, not reliant on the actual ability
+	@param    the boolean to set the activity to
+	@return   void
+	*//*______________________________________________________________*/
 	void TempStop(bool active);
 
-	bool TimeStopped() const; //returns if the ablity is active
-	f32 GetScale() const;//returns the scale of the ability
-	void SetZonePos(AEVec2 position);//the position of zone
-	void Draw();//renderings
+	/*!
+	@brief    Returns if the ability is currently active
+	@param    void
+	@return	  bool,true if active, false if not
+	*//*______________________________________________________________*/
+	bool TimeStopped() const;
+
+	/*!
+	@brief    Returns the scale of the zone of the ability
+	@param    void
+	@return   f32, the scale of the zone
+	*//*______________________________________________________________*/
+	f32 GetScale() const;
+	/*!
+	@brief    Sets the position of the zone
+	@param    The position to set the center of the zone to
+	@return   void
+	*//*______________________________________________________________*/
+	void SetZonePos(AEVec2 position);
+
+	/*!
+	@brief    Renders the ability's visuals
+	@param void
+	@return void
+	*//*______________________________________________________________*/
+	void Draw();
 };
 

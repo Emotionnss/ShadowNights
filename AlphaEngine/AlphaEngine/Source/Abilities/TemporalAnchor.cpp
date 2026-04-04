@@ -187,9 +187,8 @@ void TemporalAnchor::Draw()
 
 void TemporalAnchor::SaveGhost(AEVec2 UVs, AEVec2 playerPos)//for saving the ghosts
 {
-	Ghosts ghost{ UVs,playerPos };
-	ghostVect.push_back(ghost);
-	/*std::cout << "saving UV" << UVs.x << " " << UVs.y << " vector size" << ghostVect.size() << '\n';*/
+	Ghosts ghost{ UVs,playerPos };//create an object of ghost
+	ghostVect.push_back(ghost);//push back
 }
 
 bool TemporalAnchor::Reversing() const//returns if the player is reversing back in time

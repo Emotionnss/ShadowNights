@@ -46,13 +46,58 @@ private:
 
 	bool showUI{true};//show ui for cutscene in bossScene
 public:
-	AbilityHandler();//constructor
-	~AbilityHandler();//destructor
-	void AbilityUpdate(std::vector<BaseEnemy*> enemylist,float deltaTime);///update
-	void Draw();//render
-	bool Anchored()const;//anchored getter
-	bool Reverse() const;//reversing getter
-	void TriggerAnchor();//anchor trigger
-	void ShowUI(bool show);//showui setter
+	/*!
+	@brief    Default constructor
+	*//*______________________________________________________________*/
+	AbilityHandler();
+
+	/*!
+	@brief    Default destructor
+	*//*______________________________________________________________*/
+	~AbilityHandler();
+
+	/*!
+	@brief    Updates the object every frame
+	@param	  The list of enemies to affect
+	@param	  Time inbetween each frame
+	@return	  void
+	*//*______________________________________________________________*/
+	void AbilityUpdate(std::vector<BaseEnemy*> enemylist,float deltaTime);
+
+	/*!
+	@brief    Renders the ability's visuals
+	@param	  void
+	@return   void
+	*//*______________________________________________________________*/
+	void Draw();
+
+	/*!
+	@brief    Returns if the Temporal Anchor ability is currently active
+	@param    void
+	@return   bool,true if active, else false
+	*//*______________________________________________________________*/
+	bool Anchored()const;
+
+	/*!
+	@brief    Returns if the Temporal Anchor ability is currently being activated . and the player is already reversing
+	@param	  void
+	@return	  bool, true if currently reversing, else false
+	*//*______________________________________________________________*/
+	bool Reverse() const;
+
+	/*!
+	@brief    Toggles the Temporal Anchor ability
+	@param void
+    @return void
+	*//*______________________________________________________________*/
+	void TriggerAnchor();
+
+
+	/*!
+	@brief    Determines if the UI regarding abilities should be shown.
+	@param	  bool whether or not to be shown
+	@return   void
+	*//*______________________________________________________________*/
+	void ShowUI(bool show);
 };
 

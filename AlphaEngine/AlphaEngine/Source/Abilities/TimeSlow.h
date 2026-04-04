@@ -21,7 +21,7 @@ private:
     f32 despawningTime{};//despawning timers
     f32 despawningTimer{};
     Transform2D timeSlowTransform{};//transform the sprite
-    std::vector<BaseEnemy*> enemyList;
+    std::vector<BaseEnemy*> enemies;
 public:
 
     /*!

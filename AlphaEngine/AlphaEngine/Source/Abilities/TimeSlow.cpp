@@ -44,7 +44,7 @@ void TimeSlow::Update(float dt)//update
 		{
 			proj->slowed = true;
 		}
-		for (BaseEnemy* enemy : enemyList)//slow all enemies and their projectiles
+		for (BaseEnemy* enemy : enemies)//slow all enemies and their projectiles
 		{
 			enemy->Slowed(true);
 			for (BaseProjectile* proj : enemy->GetProjectiles())
@@ -63,7 +63,7 @@ void TimeSlow::Update(float dt)//update
 		{
 			startDespawn = false;
 		}
-		for (BaseEnemy* enemy : enemyList)//unslow every enemy and their projectile
+		for (BaseEnemy* enemy : enemies)//unslow every enemy and their projectile
 		{
 			enemy->Slowed(false);
 			for (BaseProjectile* proj : enemy->GetProjectiles())
@@ -81,7 +81,7 @@ void TimeSlow::Update(float dt)//update
 
 bool TimeSlow::ToggleSlow(std::vector<BaseEnemy*> enemyList)
 {
-	this->enemyList = enemyList;
+	this->enemies = enemyList;
 	if (active == true)//if the ability is already active
 	{
 		AudioManager::GetInstance()->PlaySFXOneShot("time_slow_end",1);

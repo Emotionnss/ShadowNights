@@ -49,7 +49,33 @@ public:
     *//*______________________________________________________________*/
     void Free() override;
 
+    /*!
+    @brief    Saves a complete "snapshot" of the boss encounter to a file slot.
+
+    This override first calls BaseScene::SaveGame to handle player health and mana,
+    then appends boss-specific data to the file. It records the exact positions
+    of all active lasers, explosives, and projectiles, along with the Boss's
+    current AI state and weakpoint timer.
+
+    @param    slot The save file index (1, 2, or 3) to append the boss data to.
+    *//*______________________________________________________________*/
+    void SaveGame(int slot) override;
+
+    /*!
+    @brief    Loads a boss encounter snapshot and reconstructs the active battle.
+
+    This function restores the fight to its exact saved state. It re-spawns
+    all projectiles and lasers at their saved coordinates and manually
+    resyncs the Boss's animations and AI phases to ensure the fight resumes
+    seamlessly without graphical glitches.
+
+    @param    slot The save file index to retrieve the snapshot from.
+    *//*______________________________________________________________*/
+    void LoadGame(int slot) override;
+
 private:
     BossEnemy* boss = nullptr;
+
+    // Controls how long the camera locks onto the boss before the fight begins
     float cutsceneDuration = 3.f;
 };

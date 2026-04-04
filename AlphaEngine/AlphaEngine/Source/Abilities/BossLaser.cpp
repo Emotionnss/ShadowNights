@@ -136,3 +136,24 @@ bool BossLaser::Triggered(AEVec2 pos)
     }
     return active;
 }
+
+void BossLaser::SaveState(std::ofstream& f) {
+    // write out the laser exact state and timers
+    f << active << " " << charging << " "
+        << transform.GetPosition().x << " " << transform.GetPosition().y << " "
+        << startupDelay << " " << lifespan << "\n";
+}
+
+void BossLaser::LoadState(std::ifstream& f) {
+    float pX, pY;
+
+    // read the exact state back in
+    f >> active >> charging >> pX >> pY >> startupDelay >> lifespan;
+    transform.SetPosition(pX, pY);
+
+    // if the laser was active when we saved, fix its animation
+    if (active) {
+        if (charging) laserSprite->PlayAnimation("spawn", 1, 1.f);
+        else laserSprite->PlayAnimation("attack", -1, 1.f);
+    }
+}

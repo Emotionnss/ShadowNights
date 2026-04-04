@@ -68,13 +68,13 @@ public:
     @brief    Saves the player's current progress to a specified slot.
     @param    slot The save file index to write to (1, 2, or 3).
     *//*______________________________________________________________*/
-    void SaveGame(int slot);
+    virtual void SaveGame(int slot);
 
     /*!
     @brief    Loads the player's saved progress from a specified slot.
     @param    slot The save file index to read from (1, 2, or 3).
     *//*______________________________________________________________*/
-    void LoadGame(int slot);
+    virtual void LoadGame(int slot);
 
     /*!
     @brief    Checks if a valid save file exists for the given slot.
@@ -104,7 +104,7 @@ protected:
 
     bool isPaused = false;
     bool canPause = true; // Allows blocking the pause menu during cutscenes
-    int menuPage = 0; //Used to determine which menu page the player is currently on when the game is paused (0 = main pause menu, 1 = save menu, 2 = load menu, 3 = settings menu, 4 = confirmation prompt)
+	int menuPage = 0; //Used to determine which menu page the player is currently on when the game is paused (0 = main pause menu, 1 = save menu, 2 = load menu, 3 = settings menu, 4 = confirmation prompt)
     float popupTimer = 0.0f;
 
     int levelID = 1;

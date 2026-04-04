@@ -103,13 +103,58 @@ public:
     */
     std::vector<BaseEnemy*>& GetPendingSpawns();
 
+    /*!
+    @brief    Triggers the entrance animation for the Boss's specialized UI health bar.
+
+    This function plays the "spawn" animation for both the health bar background
+    overlay and the foreground progress bar sprites.
+    *//*______________________________________________________________*/
     void SpawnHealthBar();
-private:
+
+    /*!
+    @brief A collection of all active BossLaser ability objects currently in the scene.
+
+    These are updated and rendered every frame by the Boss. During a game load,
+    this list is reconstructed from the save file to resume active laser attacks.
+    */
+    std::vector<BossLaser*> bossLasers;
+
+    /*!
+    @brief A collection of all active BossExplosive ability objects currently in the scene.
+
+    Manages the lifecycle of "Big Projectile" rockets and their subsequent shrapnel
+    explosions. These states are persisted during the BossScene snapshot save.
+    */
+    std::vector<BossExplosive*> bossExplosives;
+
+    /*!
+    @brief The Boss's vulnerable core used during the EXHAUSTED state.
+
+    Contains the transform, texture, and logic flags required to render and
+    calculate collisions for the Boss's weakpoint.
+    */
     Weakpoint weakpoint;
 
-    //FSM Variables
+    // FSM Variables
+
+    /*!
+    @brief Tracks the current phase of the Boss's behavior logic.
+
+    Determines whether the Boss is currently SPAWNING, IDLING, MOVING, or EXHAUSTED.
+    This state is saved and restored to prevent AI resets upon loading.
+    */
     BOSS_STATE currentBossState = BOSS_STATE::SPAWNING;
-    f32 timer{1.0f};
+
+    /*!
+    @brief A general-purpose countdown timer used by the Finite State Machine (FSM).
+
+    This timer tracks the remaining duration of the current AI state (e.g., how much
+    time remains in the EXHAUSTED phase) and controls the weakpoint's bobbing speed.
+    */
+    f32 timer{ 1.0f };
+
+private:
+    
     AEVec2 targetPos{};
     AEVec2 minCoordLimit{}, maxCoordLimit{};
 
@@ -206,9 +251,6 @@ private:
     float castDuration = 0.f;
     PendingAttack pendingAttack = PendingAttack::NONE;
     Transform2D castbarTransform;
-
-    std::vector<BossLaser*> bossLasers;
-    std::vector<BossExplosive*> bossExplosives;
 
     std::vector<BaseEnemy*> pendingSpawns;
 };

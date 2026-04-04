@@ -564,10 +564,22 @@ void BaseScene::LoadGame(int slot) {
 						if (typeID == 1) { newEnemy = new BatEnemy(); newEnemy->Init(eX, eY, 85.f, 60.f, "batenemy"); }
 						else if (typeID == 2) { newEnemy = new ArcherEnemy(); newEnemy->Init(eX, eY, 85.f, 60.f, "sniperenemy"); }
 						else if (typeID == 3) { newEnemy = new ShadowEnemy(); newEnemy->Init(eX, eY, 85.f, 60.f, "shadow1"); }
-						else if (typeID == 4) { newEnemy = new BossEnemy(); newEnemy->Init(eX, eY, 85.f, 60.f, "boss"); }
+						else if (typeID == 4) {
+							BossEnemy* bEnemy = new BossEnemy();
+							bEnemy->Init(eX, eY, 85.f, 60.f, "boss");
+							bEnemy->isBoss = true;
+							newEnemy = bEnemy;
+						}
 
 						if (newEnemy) {
+							// 1. set the saved health first
 							newEnemy->SetHealth(eHP);
+
+							// 2. spawn the health bar so it doesn't stretch and glitch
+							if (typeID == 4) {
+								dynamic_cast<BossEnemy*>(newEnemy)->SpawnHealthBar();
+							}
+
 							enemyList.push_back(newEnemy);
 						}
 					}

@@ -138,9 +138,10 @@ public:
     @param    hp The new health value to apply.
     *//*______________________________________________________________*/
     void SetHealth(int hp) { health = hp; }
+
+    Sprite* sprite = nullptr;
     
 protected:
-    Sprite* sprite = nullptr;
 
     // Physics
     float gravity = -1400.0f;

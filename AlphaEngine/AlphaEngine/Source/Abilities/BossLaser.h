@@ -9,6 +9,7 @@
 #include "../GameObject/Transform2D.h"
 #include "../Sprite/Sprite.h"
 #include "../System/MeshManager.h"
+#include <fstream>
 
 #pragma once
 class BossLaser
@@ -81,5 +82,30 @@ public:
 	@param		AEVec2 pos - where to place center of laser at
 	*/
 	bool Triggered(AEVec2 pos);
+
+	/*!
+	@brief    Serializes the current internal state of the ability to an output file stream.
+
+	This function writes the active status, phase timers, and transformation data
+	of the ability (and any of its internal projectiles) into the save file.
+	It is called by BossScene during its specialized snapshot save process.
+
+	@param    f The output file stream (std::ofstream) associated with the current save slot.
+	@return   void
+	*//*______________________________________________________________*/
+	void SaveState(std::ofstream& f);
+
+	/*!
+	@brief    Deserializes and reconstructs the ability's state from an input file stream.
+
+	This function reads the saved parameters (such as lifespan, charging status,
+	and positions) from the save file. It ensures that animations and physics
+	are immediately resynced so the ability resumes seamlessly without
+	graphical stretching or "jumping."
+
+	@param    f The input file stream (std::ifstream) associated with the current save slot.
+	@return   void
+	*//*______________________________________________________________*/
+	void LoadState(std::ifstream& f);
 };
 

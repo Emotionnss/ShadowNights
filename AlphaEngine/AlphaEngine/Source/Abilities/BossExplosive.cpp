@@ -148,3 +148,69 @@ void BossExplosive::Explode(AEVec2 origin)
 		smallProjectiles.push_back(proj);
 	}
 }
+
+void BossExplosive::SaveState(std::ofstream& f) {
+	f << active << "\n";
+	if (!active) return;
+
+	//Save the Big Projectile
+	if (bigProjectile) {
+		f << 1 << " " << bigProjectile->transform.GetPosition().x << " " << bigProjectile->transform.GetPosition().y << " "
+			<< bigProjectile->GetDirection().x << " " << bigProjectile->GetDirection().y << " " << bigProjectile->GetLifespan() << "\n";
+	}
+	else {
+		f << 0 << "\n"; // 0 means the big projectile already exploded
+	}
+
+	//Save all the Small Projectiles
+	f << smallProjectiles.size() << "\n";
+	for (BaseProjectile* p : smallProjectiles) {
+		f << p->transform.GetPosition().x << " " << p->transform.GetPosition().y << " "
+			<< p->GetDirection().x << " " << p->GetDirection().y << " " << p->GetLifespan() << "\n";
+	}
+}
+
+void BossExplosive::LoadState(std::ifstream& f) {
+	f >> active;
+	if (!active) return;
+
+	// Clean up any default garbage so we don't leak memory when loading
+	if (bigProjectile) { delete bigProjectile; bigProjectile = nullptr; }
+	for (BaseProjectile* p : smallProjectiles) { delete p; }
+	smallProjectiles.clear();
+
+	// Load the Big Projectile
+	int hasBig;
+	f >> hasBig;
+	if (hasBig == 1) {
+		float px, py, dx, dy, life;
+		f >> px >> py >> dx >> dy >> life;
+
+		AEVec2 pos = { px, py };
+		AEVec2 dir = { dx, dy };
+
+		bigProjectile = new BaseProjectile(pos, dir, true);
+		bigProjectile->transform.SetScale(100.f, 100.f);
+		bigProjectile->SetLifespan(life);
+		bigProjectile->projTex = AEGfxTextureLoad("Assets/Weapons/bossProjectile.png");
+		bigProjectile->collidesWithTiles = false;
+	}
+
+	// Load the Small Projectiles
+	int numSmall;
+	if (f >> numSmall) {
+		for (int i = 0; i < numSmall; ++i) {
+			float px, py, dx, dy, life;
+			f >> px >> py >> dx >> dy >> life;
+
+			AEVec2 pos = { px, py };
+			AEVec2 dir = { dx, dy };
+
+			BaseProjectile* proj = new BaseProjectile(pos, dir, true);
+			proj->SetLifespan(life);
+			proj->projTex = AEGfxTextureLoad("Assets/Weapons/bossProjectile.png");
+			proj->collidesWithTiles = false;
+			smallProjectiles.push_back(proj);
+		}
+	}
+}

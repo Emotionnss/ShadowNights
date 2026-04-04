@@ -98,16 +98,9 @@ void BossEnemy::Init(f32 x, f32 y, f32 w, f32 h, std::string spriteName)
 
     attackCooldown = 3.f;
 
+    //fancy healthbar for boss
     barOverlaySprite = new Sprite(CSVManager::ReadInfo("horiBossOverlay"));
-    if (barOverlaySprite)
-    {
-        std::cout << "yes healthbar\n";
-    }
     barSprite = new Sprite(CSVManager::ReadInfo("horiBossBar"));
-    if (barOverlaySprite)
-    {
-        std::cout << "yes healthbar\n";
-    }
     healthbarOverlayTfm.SetScale(1128.f, 100.f);
     healthbarOverlayTfm.SetPosition(AEGfxGetWindowWidth() / 2.f, AEGfxGetWindowHeight() / 2.f);
 }

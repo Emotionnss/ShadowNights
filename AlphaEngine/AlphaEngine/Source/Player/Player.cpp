@@ -490,7 +490,6 @@ void Player::Update(float deltaTime)
 	}
 	else if (coyoteTime > 0.f)
 	{
-		std::cout << coyoteTime << std::endl;
 		coyoteTime -= deltaTime * 10.f;
 		if (coyoteTime < 0.f)
 		{

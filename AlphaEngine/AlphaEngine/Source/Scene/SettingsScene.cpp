@@ -1,3 +1,11 @@
+/*!
+@file       SettingsScene.h
+@author     Yap Yu Xuan, Daevon (yuxuandaevon.yap), Chng Wei Sheng Bennett (chng.w)
+@brief      This file contains the definition of the SettingsScene class, which
+			provides UI for audio, graphics, and gameplay settings and allows
+			the player to adjust options and return to previous menus.
+*//*_______________________________________________________________________*/
+
 #include "SettingsScene.h"
 #include "../System/Scenemanager.h"
 #include "MainMenu.h"

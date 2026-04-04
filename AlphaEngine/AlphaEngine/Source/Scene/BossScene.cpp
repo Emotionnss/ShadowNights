@@ -1,3 +1,10 @@
+/*!
+@file       BossScene.cpp
+@author     Yap Yu Xuan, Daevon (yuxuandaevon.yap), Bay Yeok Hao (yeokhao.bay)
+@brief      This file contains the definition of the BossScene class, which
+            implements the boss encounter level.
+*//*_______________________________________________________________________*/
+
 #include "BossScene.h"
 #include "../System/Scenemanager.h"
 #include "WinScene.h" 

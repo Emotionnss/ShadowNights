@@ -45,7 +45,7 @@ void WinScene::Draw() {
     float w = 0.0f, h = 0.0f;
     AEGfxGetPrintSize(Button::fontId, winMsg, 1.5f, &w, &h);
 
-    AEGfxPrint(Button::fontId, winMsg, -(w / 2.0f), 0.15f, 1.5f, 1.0f, 1.0f, 1.0f, 1.0f);
+    AEGfxPrint(Button::fontId, winMsg, -(w / 2.0f), 0.15f, 1.5f, 0.0f, 0.0f, 0.0f, 1.0f);
 
     btnMenu->Draw();
 }

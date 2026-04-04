@@ -76,6 +76,16 @@ public:
                 AEGfxGetPrintSize(fontId, it->c_str(), 36, &tmpScale.x, &tmpScale.y);
 
                 scale.x = tmpScale.x > scale.x ? tmpScale.x : scale.x;
+
+                if (data[0] == "Timestop")
+                {
+                    scale.x += 0.5f;
+                }
+                else if (data[0] == "WASD")
+                {
+                    scale.x -= 0.25f;
+                }
+
                 if (data.size() <= 5 || data[0] == "Jump")
                 {
                     scale.y += tmpScale.y / 0.95f;

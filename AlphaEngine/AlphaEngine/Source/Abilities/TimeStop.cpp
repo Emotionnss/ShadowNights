@@ -12,11 +12,13 @@
 TimeStop::TimeStop()//constructor
     :meshManager{ MeshManager::GetInstance() }, //mesh manager
     player{ Player::GetInstance() }, //player instance
-    active{ false }, //active boolean
-    spriteName{ "timestop" }//spritename in sprite excelsheet
+    active{ false } //active boolean
 {
-    zoneSprite = new Sprite(CSVManager::ReadInfo(spriteName));//create new sprite for the timestop zone
-    zoneSprite->PlayAnimation("spawn", 0, 1.f);
+    centerDespawn = new Sprite(CSVManager::ReadInfo("timestopCenterDespawn"));
+    zoneCenterSprite = new Sprite(CSVManager::ReadInfo("timestopCenter"));
+    zoneSprite = new Sprite(CSVManager::ReadInfo("timestopZone"));//create new sprite for the timestop zone
+    centerTransform.SetScale(100.f, 100.f);
+    //zoneSprite->PlayAnimation("spawn", 0, 1.f);
 }
 
 TimeStop::~TimeStop()//destructor
@@ -27,6 +29,16 @@ TimeStop::~TimeStop()//destructor
     {
         delete zoneSprite;
         zoneSprite = nullptr;
+    }
+    if (zoneCenterSprite)
+    {
+        delete zoneCenterSprite;
+        zoneCenterSprite = nullptr;
+    }
+    if (centerDespawn)
+    {
+        delete centerDespawn;
+        centerDespawn = nullptr;
     }
 }
 
@@ -99,10 +111,24 @@ void TimeStop::Update(std::vector<BaseEnemy*> enemyList, float dt)//update
         zoneScale = originalScale;//revert the zonescale back to the original
 
     }
+    if (despawning)
+    {
+        despawnTimer -= dt;
+        if (despawnTimer < 0)
+        {
+            despawning = false;
+            despawnTimer = despawnTime;
+        }
+    }
     zoneScale = AEClamp(zoneScale, originalScale, maxScale);//clamp the zone size
     zoneTransform.SetScale(zoneScale, zoneScale);//update the scale of the zone
-    spriteTransform.SetScale(zoneScale * 2.f, zoneScale * 2.f);//update of the scale of the sprite
+
+    zoneSpriteTfm.SetPosition(zoneTransform.GetPosition());
+    zoneSpriteTfm.SetScale(zoneScale * 2.f, zoneScale * 2.f);//*2 bc sprite is smaller than zone
+    //centerTransform.SetScale(zoneScale * 2.f, zoneScale * 2.f);//update of the scale of the sprite
     zoneSprite->Update();//let sprite update as well
+    centerDespawn->Update();
+    zoneCenterSprite->Update();
 }
 
 bool TimeStop::ToggleTime(AEVec2 position)//toggle the ability
@@ -110,15 +136,18 @@ bool TimeStop::ToggleTime(AEVec2 position)//toggle the ability
     if (active == true)//if its active
     {
         active = false;//deactivate it
-        zoneSprite->PlayAnimation("despawn");
+        despawning = true;
+        centerDespawn->PlayAnimation("despawn",0,despawnTime);
         AudioManager::GetInstance()->PlaySFXOneShot("time_stop_start");
     }
     else if (active == false)//if not active
     {
+        despawning = false;
         active = true;//activate
         SetZonePos(position);//set the position of the zone
         AudioManager::GetInstance()->PlaySFXOneShot("time_stop_end");
-        zoneSprite->PlayAnimation("spawn", 0, 1.f);
+        zoneSprite->PlayAnimation("spawn", -1);
+        zoneCenterSprite->PlayAnimation("spawn", -1);
     }
     return active;//return its activity
 }
@@ -141,22 +170,20 @@ f32 TimeStop::GetScale() const//getter
 void TimeStop::SetZonePos(AEVec2 position)//setter for the zones position
 {
     zoneTransform.SetPosition(position);
-    spriteTransform.SetPosition(position);
+    centerTransform.SetPosition(position);
+
 }
 
 void TimeStop::Draw()//Rendering the sprites
 {
     //zone for timestop
-    AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-    AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-    if (active)
+    if (active && !despawning)
     {
-        AEGfxSetTransparency(0.25f);
-        AEGfxSetColorToMultiply(0.0f, 1.0f, 1.0f, 1.0f);
-        AEGfxSetColorToAdd(0.f, 0.f, 255.f, 0.f);
-        AEGfxSetTransform(zoneTransform.GetMatrix().m);
-        AEGfxMeshDraw(meshManager->GetMesh(CIRCLE), AE_GFX_MDM_TRIANGLES);
-
-        zoneSprite->Render(spriteTransform, 0.75f);
+        zoneSprite->Render(zoneSpriteTfm, 0.75f);
+        zoneCenterSprite->Render(centerTransform);
+    }
+    if (despawning && !active)
+    {
+        centerDespawn->Render(centerTransform);
     }
 }

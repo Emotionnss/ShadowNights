@@ -118,7 +118,7 @@ void AbilityHandler::AbilityUpdate(std::vector<BaseEnemy*> enemyList, float dt)
 	//if no abilities active , slowly restore it
 	if (!timeStopped && !timeSlowed && !anchored)
 	{
-		resource += 10 * dt;
+		resource += 100 * dt;
 	}
 
 	//alpha based on if the ability is active / have enough resource for the ability

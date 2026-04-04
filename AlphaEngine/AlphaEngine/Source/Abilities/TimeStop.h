@@ -14,19 +14,23 @@ class TimeStop
 {
 private:
 	bool active{};//if the ability is active
+	bool despawning{};
 	bool tempStop{};//for if the player is reversing back to temporal anchor
 	f32 originalScale = 1.f;//the starting scale for the zone
 	f32 zoneScale = 1.f;//the current scale of the zone
 	f32 maxScale = 500.f;//the maximum size of the zie
 
+	f32 despawnTime{ 0.7f }, despawnTimer{ despawnTime };
 	MeshManager* meshManager = nullptr;//mesh manager
 	Player *player = nullptr;//player
+
+	Transform2D centerTransform{};//transform the center
+
+	Transform2D zoneTransform{};//transform for the zone for the time stopping functionality
+	Transform2D zoneSpriteTfm{};//transform for the zones sprite ONLY as they are of different sizes
 	Sprite* zoneSprite = nullptr;//sprite of the zone
-
-	std::string spriteName;
-	Transform2D spriteTransform{};//transform the sprite
-
-	Transform2D zoneTransform{};//transform for the zone
+	Sprite* zoneCenterSprite = nullptr;
+	Sprite* centerDespawn = nullptr;
 public:
 
 	TimeStop();//time stop constructor

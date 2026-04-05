@@ -74,7 +74,7 @@ public:
             for (std::vector<std::string>::iterator it = data.begin() + 3; it != data.end(); ++it)
             {
                 AEVec2 tmpScale{};
-                AEGfxGetPrintSize(fontId, it->c_str(), 36, &tmpScale.x, &tmpScale.y);
+                AEGfxGetPrintSize(fontId, it->c_str(), 36.f, &tmpScale.x, &tmpScale.y);
 
                 scale.x = tmpScale.x > scale.x ? tmpScale.x : scale.x;
 
@@ -87,7 +87,11 @@ public:
                     scale.x -= 0.25f;
                 }
 
-                if (data.size() <= 5 || data[0] == "Jump")
+                if (data[0] == "WASD")
+                {
+                    scale.y += tmpScale.y + 0.35f;
+                }
+                else if (data.size() <= 5 || data[0] == "Jump")
                 {
                     scale.y += tmpScale.y / 0.95f;
                 }
